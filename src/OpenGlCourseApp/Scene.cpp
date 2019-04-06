@@ -27,7 +27,7 @@ void Scene::load() {
 	short int arrayLocation = 0;
 	
 	while (file >> location >> model >> accessFlag) {
-		// loads scene objects into scene array 
+		// load scene objects into scene array 
 
 		// make automatic with file for models and checks
 
