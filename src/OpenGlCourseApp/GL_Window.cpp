@@ -40,15 +40,12 @@ GL_Window::GL_Window(GLint windowWidth, GLint windowHeight, GLfloat sensitivity)
 }
 
 int GL_Window::Initialize() {
-		if (!glfwInit()) {												// initialize GLFW
+		if (!glfwInit()) {											// initialize GLFW
 			glfwTerminate();
 		}
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);					// set major version to 3
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);		            // set minor version to 3
-
-	// GLFW_OPENGL_COMPAT_PROFILE
-	// GLFW_OPENGL_CORE_PROFILE
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);					// set major version
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);		            // set minor version 
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);	// core profile does not allow backwards compatability
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);			// allow forward compatibility
@@ -63,7 +60,7 @@ int GL_Window::Initialize() {
 	glfwMakeContextCurrent(mainWindow);// set context for GLEW to use : telling glew to draw to our window 
 	// handle key + mouse input
 	createCallbacks();
-	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // change to make mouse appear id needed
+	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // disable cursor
 	glewExperimental = GL_TRUE; // Allow modern extension features
 
 
@@ -74,7 +71,7 @@ int GL_Window::Initialize() {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
-	glEnable(GL_BLEND); // equation ----- Cresult = Csource * Fsource + Cdestination * Fdestination
+	glEnable(GL_BLEND); // Cresult = Csource * Fsource + Cdestination * Fdestination
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glViewport(0, 0, bufferWidth, bufferHeight); // x start : y start : width : height
 
@@ -130,7 +127,7 @@ void GL_Window::handleMouse(GLFWwindow *window, double xPos, double yPos) {
 	if (theWindow->mouseFirstMoved) {
 		theWindow->lastX = xPos;
 		theWindow->lastY = yPos;
-		theWindow->mouseFirstMoved = false; // or 0
+		theWindow->mouseFirstMoved = false;
 	}
 	theWindow->xChange = xPos - theWindow->lastX;
 	theWindow->yChange = theWindow->lastY - yPos; // flip order for inverted mouse movement

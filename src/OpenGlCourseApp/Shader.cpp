@@ -1,8 +1,6 @@
 #include "Shader.h"
 #include <thread>
-//
-// just like ut3, ut4, unity, and others. keep that in mind for past experience
-//
+
 Shader::Shader()
 {
 	shaderID = 0;
@@ -273,7 +271,7 @@ void Shader::SetPointLights(PointLight * pLight, unsigned int lightCount, unsign
 {
 	if (lightCount > MAX_POINT_LIGHTS) lightCount = MAX_POINT_LIGHTS;
 
-	glUniform1i(uniformPointLightCount, lightCount); // make sure this is 1i so we can use an integer to increment
+	glUniform1i(uniformPointLightCount, lightCount); 
 
 	for (size_t i = 0; i < lightCount; i++) {
 		pLight[i].UseLight(uniformPointLight[i].uniformAmbientIntensity,
@@ -294,7 +292,7 @@ void Shader::SetSpotLights(SpotLight * sLight, unsigned int lightCount, unsigned
 {
 	if (lightCount > MAX_SPOT_LIGHTS) lightCount = MAX_SPOT_LIGHTS;
 
-	glUniform1i(uniformSpotLightCount, lightCount); // make sure this is 1i so we can use an integer to increment
+	glUniform1i(uniformSpotLightCount, lightCount); 
 
 	for (size_t i = 0; i < lightCount; i++) {
 		sLight[i].UseLight(uniformSpotLight[i].uniformAmbientIntensity,

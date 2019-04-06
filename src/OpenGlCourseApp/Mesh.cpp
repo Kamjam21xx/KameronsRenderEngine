@@ -17,15 +17,15 @@ void Mesh::CreateMesh(GLfloat *vertices, unsigned int *indices,
 {
 	indexCount = numOfIndices;
 
-	glGenVertexArrays(1, &VAO);																												 // now creating a vertex array on the graphics card in v-ram with the ID 
-	glBindVertexArray(VAO);																												 // binding
+	glGenVertexArrays(1, &VAO);																											
+	glBindVertexArray(VAO);																												 
 
 		glGenBuffers(1, &IBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * numOfIndices, indices, drawType);
 	
-		glGenBuffers(1, &VBO);																				                          // creating a buffer object inside of the VAO
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);																									// now working with with this VBO 
+		glGenBuffers(1, &VBO);																				                          
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);																									
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * numOfVertices, vertices, drawType);	
 
 		// vertex pos
@@ -46,25 +46,24 @@ void Mesh::CreateMesh(GLfloat *vertices, unsigned int *indices,
 
 	// ADD second UV coordinate to vertex for mapped lighting and more. 
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);																								// unbind by binding gl array buffer from VBO while using VAO to 0
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);																									// unbind by binding gl element array buffer to 0 from IBO 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);																								
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);																									
 
 	glBindVertexArray(0);
 }
 void Mesh::CreateMeshNoTangents(GLfloat *vertices, unsigned int *indices, unsigned int numOfVertices, unsigned int numOfIndices, GLenum drawType) {
 	indexCount = numOfIndices;
 
-	glGenVertexArrays(1, &VAO);																												 // now creating a vertex array on the graphics card in v-ram with the ID 
-	glBindVertexArray(VAO);																												 // binding
+	glGenVertexArrays(1, &VAO);																												
+	glBindVertexArray(VAO);																												
 
 	glGenBuffers(1, &IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * numOfIndices, indices, drawType);
 
-	glGenBuffers(1, &VBO);																				                          // creating a buffer object inside of the VAO
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);																									// now working with with this VBO 
+	glGenBuffers(1, &VBO);																				                        
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);																								
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * numOfVertices, vertices, drawType);
-	// can also be --- sizeof(GLfloat x 9)
 
 	// vertex pos
 	glEnableVertexAttribArray(0);
@@ -76,15 +75,10 @@ void Mesh::CreateMeshNoTangents(GLfloat *vertices, unsigned int *indices, unsign
 
 	// normal
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 8, (void*)(sizeof(vertices[0]) * 5));
-	// ADD second UV coordinate to vertex attrib array for mapped lighting and more. 
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 8, (void*)(sizeof(vertices[0]) * 5));  
 
-
-
-	// ADD second UV coordinate to vertex attrib array for mapped lighting and more. 
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);																								// unbind by binding gl array buffer from VBO while using VAO to 0
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);																									// unbind by binding gl element array buffer to 0 from IBO 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);																								
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);																						
 
 	glBindVertexArray(0);
 }
@@ -125,6 +119,5 @@ void Mesh::ClearMesh()
 
 Mesh::~Mesh()
 {
-	// if created in a function and not as a pointer to the object, expect it to be destructed and not displayed on draw
 	ClearMesh();
 }

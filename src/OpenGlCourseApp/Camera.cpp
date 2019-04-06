@@ -34,8 +34,8 @@ glm::vec3 Camera::getCameraDirection() {
 	return glm::normalize(front);
 }
 
-void Camera::keyControl(bool* keys, GLfloat deltaTime) { // matrix addition of vec3 values
-	GLfloat velocity = moveSpeed * deltaTime; // note use of front to move with camera direction 
+void Camera::keyControl(bool* keys, GLfloat deltaTime) { 
+	GLfloat velocity = moveSpeed * deltaTime;
 	if (keys[GLFW_KEY_LEFT_SHIFT]) {
 		velocity *= 4.0f;
 	}
@@ -51,10 +51,10 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime) { // matrix addition of v
 	if (keys[GLFW_KEY_S]) { // backward
 		position -= front * velocity;
 	}
-	if (keys[GLFW_KEY_LEFT_CONTROL]) { // backward
+	if (keys[GLFW_KEY_LEFT_CONTROL]) { // down
 		position -= up * velocity;
 	}
-	if (keys[GLFW_KEY_SPACE]) { // backward
+	if (keys[GLFW_KEY_SPACE]) { // up
 		position += up * velocity;
 	}
 }
@@ -89,7 +89,7 @@ void Camera::update() { // use mouseControl before keyControl in main
 		front.x = cos(glm::radians(yaw) * cos(glm::radians(pitch)));
 		front.y = sin(glm::radians(pitch));
 		front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-		front = glm::normalize(front); // just getting direction, position irrelivant
+		front = glm::normalize(front); 
 
 		right = glm::normalize(glm::cross(front, worldUp));
 		up = glm::normalize(glm::cross(right, front));

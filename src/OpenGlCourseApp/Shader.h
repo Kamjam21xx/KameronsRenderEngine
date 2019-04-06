@@ -48,9 +48,8 @@ public:
 	void SetDirectionalLight(DirectionalLight * dLight);
 	void SetPointLights(PointLight * pLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
 	void SetSpotLights(SpotLight * sLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
-	// possibly replace with predefined texture units 
-	void SetTextureDiffuse(GLuint textureUnit); // keep texture unit for now
-	void SetTextureSpecular(GLuint textureUnit); // keep texture unit for now
+	void SetTextureDiffuse(GLuint textureUnit);
+	void SetTextureSpecular(GLuint textureUnit);
 	void SetTextureMetal(GLuint textureUnit);
 	void SetTextureNormal(GLuint textureUnit);
 	void SetTextureHeight(GLuint textureUnit);

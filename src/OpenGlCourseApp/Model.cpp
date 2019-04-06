@@ -1,20 +1,10 @@
 #include "Model.h"
 #include <iostream>
 
-// set flags for texture class and create singular function for loading texture 
-// unstandardize textures and use rgb where no alpha channel is applicable -- rework shaders for vec3 
-
-// not even using assimp materials, scene, or textures, finish obj loader and remove assimp from project
-
-
 Model::Model()
 {
 
 }
-
-
- // restructure into one function with checks ---- same for others
- // keep for ease of changing for now
 
 void Model::LoadModel(const std::string& fileName, GLenum drawType, std::string colorTexture, bool tangents) {
 	Assimp::Importer importer;

@@ -19,6 +19,6 @@ public:
 	~DirectionalLight();
 	
 private:
-	glm::vec3 direction; // for diffuse lighting
+	glm::vec3 direction;
 };
 

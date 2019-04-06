@@ -11,14 +11,13 @@ public:
 	GL_Window(GLint windowWidth, GLint windowHeight);	
 	GL_Window(GLint windowWidth, GLint windowHeight, GLfloat sensitivity);
 	int Initialize();
-	GLfloat getAspectRatio() { return ( (GLfloat)bufferWidth / (GLfloat)bufferHeight ); } // note: check preformance of encapsulation vs inline
+	GLfloat getAspectRatio() { return ( (GLfloat)bufferWidth / (GLfloat)bufferHeight ); }
 	GLint getWindowWidth() { return width; }
 	GLint getWindowHeight() { return height; }
 	GLint getBufferWidth() { return bufferWidth; }
 	GLint getBufferHeight() { return bufferHeight; }
 	bool getShouldClose() { return glfwWindowShouldClose(mainWindow); }
 
-	// change to use getters and setters in the future
 	bool* getKeys() { return keys; };
 	GLfloat getXChange();
 	GLfloat getYChange();
@@ -35,7 +34,7 @@ private:
 	GLint width, height;
 	GLint bufferWidth, bufferHeight;
 
-	bool keys[1024]; // maybe change to 256 - 348 - 512 
+	bool keys[1024];
 
 	// GLfloat sensitivity;
 	// maybe add up down sensitivity
@@ -45,7 +44,7 @@ private:
 	GLfloat xChange;
 	GLfloat yChange;
 	GLfloat sensitivity;
-	bool mouseFirstMoved; // avoid stupid bugs by checking if the mouse actually moved
+	bool mouseFirstMoved;
 
 	void createCallbacks();
 	static void handleKeys(GLFWwindow *window, int key, int code, int action, int mode);

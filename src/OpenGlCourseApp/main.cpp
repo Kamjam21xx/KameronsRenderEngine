@@ -1,7 +1,5 @@
 #pragma
 #define STB_IMAGE_IMPLEMENTATION
-
-// #include "stb_image.h"
 //										 standard template library
 #include <cmath>
 #include <stdio.h>
@@ -30,48 +28,9 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Material.h"
-
 #include "Model.h"
 #include "SkyBox.h"
 #include "Scene.h"
-
-/* ----------- notes for "re-factoring" 
-
-Check renderPass and restructure for speed as well as the ability to turn lights on and off conditionally
-and or certain functionaity. 
-
-*/
-/*
-	USE singular ray trace, to object, if mouse on true then highlight around edge.
-
-	if clicked use c++ hand written side camera move to object 
-		use time
-		function
-		reduce to range between 0-1
-		translate
-
-	setup time inside shader - maybe
-
-	draw simple diagrams and notes up and code tomorrow
-*/
-/*
-	make a "global" object to encapsulate certain things, called the "Scene" 
-
-	so references are "scene.lights[]" or something like that.
-	make sure it can be emptied without being deleted for future flexibility without refactoring.
-	create functions for resizing all containers that are automatically invoked in some cases
-*/
-/*
-					note to self when modeling. create planes before resorting to boolean exclude include etc
-					start bools from bottom, in counter clockwise, thats best for c4d algos
-*/
-
-// TEMP TEMP TEMP TEMP
-unsigned int framebuffer;
-unsigned int texColorBuffer;	
-unsigned int rbo;
-// // // // // // // // // //
-
 
 const float toRadians = 3.14159265 / 180.0;
 
@@ -79,7 +38,6 @@ GL_Window mainWindow;
 
 std::vector<Mesh*> meshList;
 std::vector<Shader> shaderList;
-// instantiate global vectors for frame buffers and make frame buffer class
 
 Shader directionalShadowShader;
 Shader omniShadowShader;
@@ -101,6 +59,7 @@ SkyBox skybox;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
+GLfloat spin;
 
 GLuint uniformProjection = 0,
 	   uniformModel = 0,
@@ -124,20 +83,7 @@ static const char* outlineFShader = "Shaders/outline.frag";
 static const char* FBVShader = "Shaders/framebuffershader.vert";
 static const char* FBFShader = "Shaders/framebuffershader.frag";
 
-GLfloat spin;
-	/*
-	for (int i = 0; i != 5; ++i) {
-		model = glm::mat4(1.0f);
-		//model = glm::scale(model, glm::vec3(0.4 * (float)i * 1.0f, 0.4 * (float)i * 1.0f, 1.0 * (float)i * 1.0f));
-		model = glm::translate(model, glm::vec3((float) -i, (float) i, (float) -i));
 
-		glm::rot
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		space1Texture.UseTexture();
-
-		meshList[0]->RenderMesh();
-	}
-	*/
 void calcAverageNormals(unsigned int * indices, unsigned int indiceCount, GLfloat * vertices,
 						unsigned int verticeCount, unsigned int vLength, unsigned int normalOffset) {
 	glm::vec3 v1;
@@ -186,11 +132,6 @@ void CreateShaders() {
 	shader1->CreateFromFiles(vShader, fShader);
 	shaderList.push_back(*shader1);
 
-	/*
-	Shader *shader2 = new Shader();
-	shader1->CreateFromFiles(vShader, fShader2);
-	shaderList.push_back(*shader2);
-	*/
 	outlineShader = Shader();
 	outlineShader.CreateFromFiles(outlineVShader, outlineFShader);
 
@@ -210,13 +151,9 @@ void CreateShaders() {
 }
 
 void RenderScene() {
-	// glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	// GL_FALSE means we do not want to transpose the matrix in this function
-
 
 	for (auto element = mainScene.objects.begin() ; element != mainScene.objects.end(); ++element) {
 		glm::mat4 model = glm::mat4(1.0);
-		// model = glm::mat4(1.0f);
 		model = glm::rotate(model, spin * toRadians, glm::vec3(0.0, 1.0, 0.0));
 		// model = glm::translate(model, glm::vec3(2.0, -2.85, 3.0));
 		model = glm::scale(model, glm::vec3(0.025f, 0.025f, 0.025f));
@@ -247,19 +184,15 @@ void DirectionalShadowMapPass(DirectionalLight* light) {
 	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
 	light->GetShadowMap()->Write();
 
-
 	glClear(GL_DEPTH_BUFFER_BIT);
-	//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
 	uniformModel = directionalShadowShader.GetModelLocation();
 	directionalShadowShader.SetDirectionalLightTransform(&light->CalculateLightTransform());
 
-	directionalShadowShader.Validate(); // seems wasteful
-
+	directionalShadowShader.Validate();
 	
-
 	RenderScene();
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void OmniShadowMapPass(PointLight *light) {
@@ -285,7 +218,7 @@ void OmniShadowMapPass(PointLight *light) {
 	
 
 	RenderScene();
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void RenderPass(glm::mat4 projectionMatrix, 
@@ -298,15 +231,9 @@ void RenderPass(glm::mat4 projectionMatrix,
 
 	glViewport(0, 0, 3840, 2160);
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
-	//glViewport(0, 0, 3840, 2160);
-	
-	//glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	//
-	//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	//
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
 	
 	glStencilMask(0x00);
 
@@ -353,7 +280,7 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
-	skybox.bindCubeMapTexture(); // bind skybox cube map to texture unit 6 for sampling of reflections
+	skybox.bindCubeMapTexture(); // TEXTURE UNIT 6
 	RenderScene();	
 	skybox.unbinedCubeMapTexture();
 
@@ -375,26 +302,26 @@ void CreateLights(PointLight &pointLightsR,
 
 	// make plain text loader for lights, add to scene.
 
-	PointLight *pointLights = &pointLightsR; // change later
+	PointLight *pointLights = &pointLightsR; 
 	SpotLight *spotLights = &spotLightsR;
 
 	
-	pointLights[0] = PointLight(2048, 2048,
+	pointLights[0] = PointLight(1024, 1024,
 		0.01f, 100.0f,
 		0.10f, 0.10f, 0.10f,
 		0.1f, 0.1f,
 		1.0f, 3.50f, 1.0f,
 		0.8f, 0.1f, 0.01f);
 	(*pointLightCount)++;
-/*
-	pointLights[1] = PointLight(2048, 2048,
+
+	pointLights[1] = PointLight(1024, 1024,
 		0.01f, 100.0f,
 		7.0f, 7.0f, 7.0f,
 		0.1f, 0.8f,
 		-3.0f, 5.50f, 4.0f,
 		0.8f, 0.01f, 0.00001f);
 	(*pointLightCount)++;
-
+/*
 	pointLights[2] = PointLight(2048, 2048,
 		0.01f, 100.0f,
 		1.0f, 1.0f, 0.0f,
@@ -445,9 +372,6 @@ int main()
 		camera = Camera(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), -90.0f, 0, 3.0f, 0.5f);
 		projection = glm::perspective(glm::radians(52.0f), mainWindow.getAspectRatio(), 0.1f, 100.0f);
 
-		// space1Texture = Texture("Textures/gea.png");
-		// space2Texture = Texture("Textures/space2.png");
-		// gridTexture = Texture("Textures/gridtexture.png");
 	});
 	std::thread threadX([&]() mutable -> void {
 		shineMaterial = Material(4.0f, 32.0f);
@@ -465,9 +389,6 @@ int main()
 		
 		skyboxFaces.push_back("Textures/skybox/front.jpg");
 	});
-
-	 // add file loc pass overload
-
 
 	GLfloat now;
 
@@ -491,141 +412,14 @@ int main()
 
     mainScene.load();
 
-	//space1Texture.LoadTextureA();
-	//space2Texture.LoadTextureA();
-	//gridTexture.LoadTextureA();
-
-//<>=========================================================================================================<>
-
 	std::thread threadB;
 
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glEnable(GL_FRAMEBUFFER_SRGB);
 
+	// MAIN LOOP
 //<>=========================================================================================================<>
-//<>=========================================================================================================<>
-//<>=========================================================================================================<>
-//<>=========================================================================================================<>
-//<>=========================================================================================================<>
-//<>=========================================================================================================<>
-
-	/*                FRAME BUFFERS                     */
-
-	/*
-	// make frame buffer
-	unsigned int fbo, texture;
-	glGenFramebuffers(1, &fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-	if (!(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)) {
-		// check frame buffer and error report
-		printf("ERROR BINDING FRAMEBUFFER");
-		goto skipFBO;
-	}
-	// generate texture for frame buffer
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 
-				 mainWindow.getWindowWidth(), mainWindow.getWindowHeight(),
-				 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// bind texture to frame buffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
-
-
-	// make render buffer         -           write only, fast writes, native gl format
-	unsigned int rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, mainWindow.getWindowWidth(), mainWindow.getWindowHeight());
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-
-	*/
-	//<>=======<>
-/*
-
-	// make frame buffer
-	
-	glGenFramebuffers(1, &framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-	// generate texture for frame buffer
-	
-	glGenTextures(1, &texColorBuffer);
-	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mainWindow.getWindowWidth(), mainWindow.getWindowHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// attach to currently bound framebuffer object
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
-
-	// make render buffer
-
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, mainWindow.getWindowWidth(), mainWindow.getWindowHeight());
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-	if (!(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)) {
-		// check frame buffer and error report
-		printf("ERROR BINDING FRAMEBUFFER");
-		goto skipFBO;
-	}
-
-	// unbind framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// quad 
-	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
-	// positions   // texCoords
-	-1.0f,  1.0f,  0.0f, 1.0f,
-	-1.0f, -1.0f,  0.0f, 0.0f,
-	 1.0f, -1.0f,  1.0f, 0.0f,
-
-	-1.0f,  1.0f,  0.0f, 1.0f,
-	 1.0f, -1.0f,  1.0f, 0.0f,
-	 1.0f,  1.0f,  1.0f, 1.0f
-	};
-
-	// quad object
-	unsigned int quadVAO, quadVBO;
-	glGenVertexArrays(1, &quadVAO);
-	glGenBuffers(1, &quadVBO);
-	glBindVertexArray(quadVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-
-		glActiveTexture(GL_TEXTURE8);
-		glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-
-		framebuffershader.SetTextureDiffuse(8);
-
-
-skipFBO : 
-		*/
-//<>=========================================================================================================<>
-//<>=========================================================================================================<>
-//<>=========================================================================================================<>
-//<>=========================================================================================================<>
-//<>=========================================================================================================<>
-//<>=========================================================================================================<>
-
-
 	while (!mainWindow.getShouldClose()) {
 		
 
@@ -651,10 +445,6 @@ skipFBO :
 		camera.keyControl(mainWindow.getKeys(), deltaTime);
 		threadB.join(); // buffers swapped by this point
 
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-		//glStencilMask(0x00);
-
 		DirectionalShadowMapPass(&mainLight);
 		for (size_t i = 0; i < pointLightCount; i++) {
 			OmniShadowMapPass(&pointLights[i]);
@@ -663,137 +453,11 @@ skipFBO :
 			OmniShadowMapPass(&spotLights[i]);
 		}
 
-		/*
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		glStencilMask(0xFF);
-		*/
-
-		/*
-
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_DEPTH_TEST);
-
-		*/
 		RenderPass(projection, camera.calculateViewMatrix(), &pointLightCount, &spotLightCount, &mainLight, pointLights, spotLights);
-
-
-
-
-
-
-		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		//glViewport(0, 0, 3840, 2160);
-		//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		//glClear(GL_COLOR_BUFFER_BIT);
-
-		//glDisable(GL_DEPTH_TEST);
-
-		//glActiveTexture(GL_TEXTURE5);
-		//glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-
-		//framebuffershader.UseShader();
-
-		//framebuffershader.SetTextureDiffuse(5);
-
-		//glBindVertexArray(quadVAO);
-
-		//glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
-
-
-
-		/*
-		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		glStencilMask(0x00);
-		glDisable(GL_DEPTH_TEST);
-
-		outlineShader.UseShader();
-
-			uniformModel = outlineShader.GetModelLocation();
-			uniformProjection = outlineShader.GetProjectionLocation();
-			uniformView = outlineShader.GetViewLocation();
-			uniformEyePosition = outlineShader.GetEyePositionLocation();
-
-			glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-			glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
-			glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-
-			outlineShader.SetTextureDiffuse(1);
-
-		outlineShader.Validate();
-
-		RenderSceneStencil();
-
-		glStencilMask(0xFF);
-
-		glEnable(GL_DEPTH_TEST);
-		*/
 		
-		glUseProgram(0); // use no shader
+		glUseProgram(0);
 
 	}
-
+//<>=========================================================================================================<>
 	return 0;
 }
-
-
-
-/*
-
-DEFAULT IMPLICIT CONSTRUCTOR DOESNT INITIALIZE VALUES ON glm::mat4 
-either use the explicit constructor -- or -- a compiler for older versions of c++ 
-// glm 4x4 matrice
-
-			-------->			glm::mat4 model = glm::mat4(1.0);        <--------
-
-*/
-
-/*
-void CreateObjects() {
-	
-	unsigned int indices[] = {
-			0, 3, 1,
-			1, 3, 2,
-			2, 3, 0,
-			0, 1, 2
-	};
-	GLfloat vertices[] = { // x - y - z     matrice 
-		//    x      y     z       u    v        nx    ny    nz                  vertices - UV tex coordinates - normals
-			-1.0, -1.0, -0.6,      0.0, 0.0,	0.0f, 0.0f, 0.0f, 
-			0.0 , -1.0, 1.0,      2.0, 0.0,		0.0f, 0.0f, 0.0f,
-			1.0 , -1.0, -0.6,      4.0, 0.0,	0.0f, 0.0f, 0.0f,
-			0.0 , 1.0 , 0.0,      2.0, 4.0,		0.0f, 0.0f, 0.0f
-	};
-
-	GLfloat floorVertices[] = {
-			-10.0f, 0.0f, -10.f,		0.0f, 0.0f,				0.0f, -1.0f, 0.0f,
-			10.0f, 0.0f, -10.0f,		10.0f, 0.0f,			0.0f, -1.0f, 0.0f,
-			-10.0f, 0.0f, 10.0f,		0.0f, 10.0f,			0.0f, -1.0f, 0.0f,
-			10.0f, 0.0f, 10.0f,			10.0f, 10.0f,			0.0f, -1.0f, 0.0f
-	};
-	unsigned int floorIndices[] = {
-			0, 2, 1,
-			1, 2, 3
-	};
-
-
-	calcAverageNormals(indices, 12, vertices, 32, 8, 5);
-
-	Mesh *obj1 = new Mesh();
-	obj1->CreateMeshNoTangents(vertices, indices, 32, 12);
-	meshList.push_back(obj1);
-
-	Mesh *obj2 = new Mesh();
-	obj2->CreateMeshNoTangents(vertices, indices, 32, 12);
-	meshList.push_back(obj2);
-
-	
-	Mesh *obj3 = new Mesh();
-	obj3->CreateMeshNoTangents(floorVertices, floorIndices, 32, 6);
-	meshList.push_back(obj3);
-
-
-}
-*/
