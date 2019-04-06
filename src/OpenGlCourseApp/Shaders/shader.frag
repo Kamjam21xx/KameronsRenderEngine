@@ -3,20 +3,23 @@
 in vec2 TexCoord;
 in vec3 FragPos;
 in vec4 DirectionalLightSpacePos;
-in vec3 T;
-in vec3 N;
-in vec3 viewDirection;
-//in vec3 normal;
-//in vec3 Tangent;
-//in vec3 B;
-//in mat3 TBN;
-// in vec3 camVertPos;
+in mat3 TBN;
 
 out vec4 colour;
 
+
+// variables
 const int MAX_POINT_LIGHTS = 3;
 const int MAX_SPOT_LIGHTS = 3;
 
+vec4 AmbientColourG = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+vec4 SpecularColourG = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+vec4 DiffuseColourG = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+vec3 Normal;
+float heightScale;
+
+// structs
 struct Light
 {
 	vec3 colour;
@@ -59,6 +62,8 @@ struct Material
 	float specularPower;
 };
 
+
+// uniforms
 uniform int pointLightCount;
 uniform int spotLightCount;
 
@@ -68,9 +73,12 @@ uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 uniform OmniShadowMap omniShadowMaps[MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS];
 
+uniform Material material;
 
+uniform vec3 eyePosition;
+uniform vec3 eyeDirection;
 
-// KEEP TEXTURE LAYOUTS EXPLICIT 
+// textures
 layout (binding = 1) uniform sampler2D theTextureDiffuse;
 layout (binding = 4) uniform sampler2D theTextureSpecular;
 layout (binding = 5) uniform sampler2D theTextureNormal;
@@ -79,11 +87,8 @@ layout (binding = 2) uniform sampler2D directionalShadowMap;
 layout (binding = 6) uniform samplerCube skyBoxTexture;
 
 
-uniform Material material;
 
-uniform vec3 eyePosition; // move eyePos & lightPos to vertex shader in future 
-uniform vec3 eyeDirection;
-
+// other
 vec3 gridSamplingDisk[20] = vec3[]
 (
    vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
@@ -93,13 +98,8 @@ vec3 gridSamplingDisk[20] = vec3[]
    vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
 );
 
-vec4 AmbientColourG = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-vec4 SpecularColourG = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-vec4 DiffuseColourG = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
-vec3 Normal;
-float heightScale;
-
+// functions
 vec4 CalcLightByDirection(Light light, vec3 direction, float shadowFactor)
 {
 	vec4 ambientColour = vec4(light.colour, 1.0f) * light.ambientIntensity;
@@ -277,7 +277,6 @@ vec4 CalcSpotLights()
 vec2 ParallaxMapping(vec2 TexCoords, vec3 eyeDir)
 {
 	eyeDir.y *= -1.0f;
-	//eyeDir.xz*= -1.0f;
 
 	const float minLayers = 10.0f;
 	const float maxLayers = 38.0f;
@@ -313,7 +312,6 @@ vec2 ParallaxMapping(vec2 TexCoords, vec3 eyeDir)
 void main()
 {
 	// Tangent Bitangent Normal
-	mat3 TBN = mat3(T, cross(T , N), N);
 	mat3 transposedTBN = transpose(TBN);
 	vec3 TangentViewPos = transposedTBN * eyePosition;
 	vec3 TangentFragPos = transposedTBN * FragPos;
@@ -338,20 +336,17 @@ void main()
 			// shadowFactor = CalcDirectionalLight(DirectionalLightSpacePos);
 			// shadowFactor += CalcSpotLights();
 
-	// Channel mixing
-	colour = diffuse * (AmbientColourG  + shadowFactor * DiffuseColourG) * (AmbientColourG+shadowFactor) * (DiffuseColourG + specular * SpecularColourG / 32.0f);
-	//diffuse *= AmbientColourG;
-	//colour *= diffuse;
-	
+	// Reflection
 	vec3 I = normalize(FragPos - eyePosition);
 	vec3 R = reflect(I, normalize(Normal));
 	vec4 reflectColor = texture(skyBoxTexture, R);
-
 	vec4 reflectionFinal = reflectColor * specular * shadowFactor;
-    colour *= reflectionFinal;
+
+	// Channel mixing
+	colour = diffuse * (AmbientColourG  + shadowFactor * DiffuseColourG) * (AmbientColourG+shadowFactor) * (DiffuseColourG + specular * SpecularColourG / 32.0f) * reflectionFinal;
 	
+	// Gamma
 	float gamma = 3.619;
 	colour.rgb = pow(colour.rgb, vec3(1.0/gamma));	
 
-	// colour.rgb *= texture(theTextureHeight, TexCoord).rgb;
 }
