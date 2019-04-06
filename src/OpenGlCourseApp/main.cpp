@@ -46,12 +46,6 @@ Shader framebuffershader;
 
 Camera camera;
 
-Model church;
-
-Texture space1Texture;
-Texture space2Texture;
-Texture gridTexture;
-
 Material shineMaterial;
 Material dullMaterial;
 
@@ -147,7 +141,6 @@ void CreateShaders() {
 
 	framebuffershader = Shader();
 	framebuffershader.CreateFromFiles(FBVShader, FBFShader);
-
 }
 
 void RenderScene() {
