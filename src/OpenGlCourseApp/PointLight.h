@@ -14,9 +14,9 @@ public:
 			   GLfloat xPos, GLfloat yPos, GLfloat zPos,
 			   GLfloat con, GLfloat lin, GLfloat exp);
 	
-	void UseLight(GLfloat ambientIntensityLocation, GLfloat ambientColourLocation,
-				  GLfloat diffuseIntensityLocation, GLfloat positionLocation, 
-				  GLfloat constantLocation, GLfloat linearLocation, GLfloat exponentLocation);
+	void UseLight(GLuint ambientIntensityLocation, GLuint ambientColourLocation,
+				  GLuint diffuseIntensityLocation, GLuint positionLocation, 
+				  GLuint constantLocation, GLuint linearLocation, GLuint exponentLocation);
 
 	std::vector<glm::mat4> CalculateLightTransform();
 	GLfloat GetFarPlane();
@@ -28,7 +28,6 @@ public:
 
 protected:
 	glm::vec3 position;
-	GLfloat constant, linear, exponent;
+	GLfloat constant, linear, exponent, farPlane;
 
-	GLfloat farPlane;
 };

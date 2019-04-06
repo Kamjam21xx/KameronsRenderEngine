@@ -11,8 +11,8 @@ public:
 					 GLfloat aIntensity, GLfloat dIntensity,               \
 					 GLfloat xDir,		 GLfloat yDir,		 GLfloat zDir);
 
-	void UseLight(GLfloat ambientIntensityLocation, GLfloat ambientColorLocation, \
-				  GLfloat diffuseIntensityLocation, GLfloat directionLocation);
+	void UseLight(GLuint ambientIntensityLocation, GLuint ambientColorLocation, \
+				  GLuint diffuseIntensityLocation, GLuint directionLocation);
 
 	glm::mat4 CalculateLightTransform();
 

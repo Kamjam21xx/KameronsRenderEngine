@@ -19,8 +19,8 @@ DirectionalLight::DirectionalLight(GLfloat shadowWidth, GLfloat shadowHeight,
 }
 
 
-void DirectionalLight::UseLight(GLfloat ambientIntensityLocation, GLfloat ambientColourLocation,
-								GLfloat diffuseIntensityLocation, GLfloat directionLocation) {
+void DirectionalLight::UseLight(GLuint ambientIntensityLocation, GLuint ambientColourLocation,
+								GLuint diffuseIntensityLocation, GLuint directionLocation) {
 	glUniform3f(ambientColourLocation, color.x, color.y, color.z);
 	glUniform1f(ambientIntensityLocation, ambientIntensity);
 

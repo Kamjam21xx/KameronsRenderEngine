@@ -279,8 +279,8 @@ vec2 ParallaxMapping(vec2 TexCoords, vec3 eyeDir)
 	eyeDir.y *= -1.0f;
 	//eyeDir.xz*= -1.0f;
 
-	const float minLayers = 16.0f;
-	const float maxLayers = 48.0f;
+	const float minLayers = 10.0f;
+	const float maxLayers = 38.0f;
 	float layerCount = mix(maxLayers, minLayers, abs(dot(vec3(0.0f, 0.0f, 1.0f), eyeDir)));
 
 	float layerDepth = 1.0f / layerCount;
@@ -319,7 +319,7 @@ void main()
 	vec3 TangentFragPos = transposedTBN * FragPos;
 
 	// Parallax occlusion mapping
-	heightScale = 0.0725f;
+	heightScale = 0.0425f;
 	vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 	vec2 TexCoord = ParallaxMapping(TexCoord, viewDir);
 

@@ -29,9 +29,9 @@ PointLight::PointLight(GLuint shadowWidth, GLuint shadowHeight,
 	shadowMap->Init(shadowWidth, shadowHeight);
 }
 
-void PointLight::UseLight(GLfloat ambientIntensityLocation, GLfloat ambientColourLocation,
-						  GLfloat diffuseIntensityLocation, GLfloat positionLocation,
-						  GLfloat constantLocation,			GLfloat linearLocation,		   GLfloat exponentLocation) {
+void PointLight::UseLight(GLuint ambientIntensityLocation, GLuint ambientColourLocation,
+						  GLuint diffuseIntensityLocation, GLuint positionLocation,
+						  GLuint constantLocation,			GLuint linearLocation,		   GLuint exponentLocation) {
 	glUniform3f(ambientColourLocation, color.x, color.y, color.z);
 	glUniform1f(ambientIntensityLocation, ambientIntensity);
 	glUniform1f(diffuseIntensityLocation, diffuseIntensity);
