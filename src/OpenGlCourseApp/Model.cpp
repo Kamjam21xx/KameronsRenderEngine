@@ -497,7 +497,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 				textureListHeight[i] = new Texture(texPath.c_str());
 
-				if (!textureListHeight[i]->LoadTextureGreyscale(GL_TEXTURE7)) { // structure different for LoadTextureA() aswell
+				if (!textureListHeight[i]->LoadTextureA(GL_TEXTURE7)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListHeight[i];
 					textureListHeight[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -505,9 +505,9 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 			}
 		}
 		if (!textureListHeight[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
-			const char* textureFile = normalTexture.c_str();
+			const char* textureFile = heightTexture.c_str();
 			textureListHeight[i] = new Texture(textureFile);
-			textureListHeight[i]->LoadTextureGreyscale(GL_TEXTURE7);
+			textureListHeight[i]->LoadTextureA(GL_TEXTURE7);
 		}
 	}
 }
