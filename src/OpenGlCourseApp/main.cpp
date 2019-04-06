@@ -381,12 +381,12 @@ void CreateLights(PointLight &pointLightsR,
 	
 	pointLights[0] = PointLight(2048, 2048,
 		0.01f, 100.0f,
-		7.0f, 7.0f, 7.0f,
-		0.1f, 0.8f,
+		0.10f, 0.10f, 0.10f,
+		0.1f, 0.1f,
 		1.0f, 3.50f, 1.0f,
-		0.8f, 0.01f, 0.00001f);
+		0.8f, 0.1f, 0.01f);
 	(*pointLightCount)++;
-
+/*
 	pointLights[1] = PointLight(2048, 2048,
 		0.01f, 100.0f,
 		7.0f, 7.0f, 7.0f,
@@ -394,7 +394,7 @@ void CreateLights(PointLight &pointLightsR,
 		-3.0f, 5.50f, 4.0f,
 		0.8f, 0.01f, 0.00001f);
 	(*pointLightCount)++;
-/*
+
 	pointLights[2] = PointLight(2048, 2048,
 		0.01f, 100.0f,
 		1.0f, 1.0f, 0.0f,
@@ -405,12 +405,12 @@ void CreateLights(PointLight &pointLightsR,
 
 	spotLights[0] = SpotLight(2048, 2048,
 		0.1f, 100.0f,
-		0.005f, 0.005f, 0.005f,
-		0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
-		0.0001f, 0.0f, 0.0f,
-		20.0f); 
+		0.5f, 0.5f, 0.5f,						// FIX SPOTLIGHT EDGE < < < < < << << << <<< <<< <<<< <<<< <<<<< <<<<<<
+		0.01f, 0.9f,
+		5.0f, 4.0f, 1.0f,
+		-0.9f, -1.0f, -0.40f,
+		0.8f, 0.1f, 0.01f,
+		32.0f); 
 	(*spotLightCount)++;
 */
 }

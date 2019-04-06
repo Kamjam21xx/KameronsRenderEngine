@@ -133,8 +133,9 @@ vec4 CalcPointLightByDirection(Light light, vec3 direction, float shadowFactor)
 {
 	vec4 ambientColour = vec4(light.colour, 1.0f) * light.ambientIntensity;
 
-	
-	float diffuseFactor = max(dot(normalize(Normal), normalize(direction)), 0.0f);
+	//float diffuseFactor = max(dot(normalize(Normal), normalize(direction)), 0.0f);
+
+	float diffuseFactor = max(dot(Normal, direction), 0.0f);
 	vec4 diffuseColour = vec4(light.colour * light.diffuseIntensity * diffuseFactor + diffuseFactor * 0.2, 1.0f);
 	
 	vec4 specularColour = vec4(0, 0, 0, 0);
@@ -246,6 +247,7 @@ vec4 CalcSpotLight(SpotLight sLight, int shadowIndex)
 		vec4 colour = CalcPointLight(sLight.base, shadowIndex);
 		
 		return colour * (1.0f - (1.0f - slFactor)*(1.0f/(1.0f - sLight.edge)));
+		//return colour * ((sLight.edge - slFactor) / (sLight.edge - 1.0f));
 		
 	} else {
 		return vec4(0, 0, 0, 0);
