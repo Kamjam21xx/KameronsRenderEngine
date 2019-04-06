@@ -301,20 +301,20 @@ void CreateLights(PointLight &pointLightsR,
 	
 	pointLights[0] = PointLight(1024, 1024,
 		0.01f, 100.0f,
-		0.10f, 0.10f, 0.10f,
-		0.1f, 0.1f,
-		1.0f, 3.50f, 1.0f,
+		1.00f, 1.00f, 1.00f,
+		0.0001f, 0.8f,
+		2.0f, 2.50f, 3.0f,
 		0.8f, 0.1f, 0.01f);
 	(*pointLightCount)++;
-
+/*
 	pointLights[1] = PointLight(1024, 1024,
 		0.01f, 100.0f,
-		7.0f, 7.0f, 7.0f,
-		0.1f, 0.8f,
-		-3.0f, 5.50f, 4.0f,
+		1.0f, 1.0f, 1.0f,
+		0.0001f, 0.8f,
+		-4.0f, 8.50f, -8.0f,
 		0.8f, 0.01f, 0.00001f);
 	(*pointLightCount)++;
-/*
+
 	pointLights[2] = PointLight(2048, 2048,
 		0.01f, 100.0f,
 		1.0f, 1.0f, 0.0f,
@@ -428,7 +428,7 @@ int main()
 		}
 		);
 
-		spin += 0.1f;
+		spin += 0.15f;
 		if (spin >= 360.00f) { spin = 0.0f; }
 
 		glfwPollEvents();		

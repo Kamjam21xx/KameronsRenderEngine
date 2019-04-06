@@ -280,8 +280,8 @@ vec2 ParallaxMapping(vec2 TexCoords, vec3 eyeDir)
 {
 	eyeDir.y *= -1.0f;
 
-	const float minLayers = 10.0f;
-	const float maxLayers = 38.0f;
+	const float minLayers = 4.0f;
+	const float maxLayers = 24.0f;
 	float layerCount = mix(maxLayers, minLayers, abs(dot(vec3(0.0f, 0.0f, 1.0f), eyeDir)));
 
 	float layerDepth = 1.0f / layerCount;
@@ -335,20 +335,19 @@ void main()
 
 	// Light calculation
 	vec4 shadowFactor = CalcPointLights();
-			// shadowFactor = CalcDirectionalLight(DirectionalLightSpacePos);
+		 //shadowFactor = CalcDirectionalLight(DirectionalLightSpacePos);
 			// shadowFactor += CalcSpotLights();
 
 	// Reflection
 	vec3 I = normalize(FragPos - eyePosition);
 	vec3 R = reflect(I, normalize(Normal));
 	vec4 reflectColor = texture(skyBoxTexture, R);
-	vec4 reflectionFinal = reflectColor * specular * shadowFactor;
 
 	// Channel mixing
-	colour = diffuse * (AmbientColourG  + shadowFactor * DiffuseColourG) * (AmbientColourG+shadowFactor) * (DiffuseColourG + specular * SpecularColourG / 32.0f) * reflectionFinal;
-	
+	colour = (AmbientColourG * diffuse) + shadowFactor * (DiffuseColourG * diffuse + SpecularColourG * reflectColor);
+
 	// Gamma
-	float gamma = 3.619;
+	float gamma = 3.119;
 	colour.rgb = pow(colour.rgb, vec3(1.0/gamma));	
 
 }
