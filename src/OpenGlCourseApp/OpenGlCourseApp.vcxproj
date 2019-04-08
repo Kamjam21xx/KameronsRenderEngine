@@ -220,8 +220,11 @@
     <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Models\Backdrop\BASE.fbx" />
     <None Include="Models\default.FLS" />
+    <None Include="Models\Ground\BASE.fbx" />
     <None Include="Models\SimpleModel\BASE.fbx" />
+    <None Include="Models\Walls\BASE.fbx" />
     <None Include="Shaders\directional_shadow_map.frag" />
     <None Include="Shaders\directional_shadow_map.vert" />
     <None Include="Shaders\framebuffershader.frag" />
@@ -237,10 +240,22 @@
     <None Include="Shaders\skybox.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Models\Backdrop\BASE_COLOR.png" />
+    <Image Include="Models\Backdrop\BASE_HEIGHT.png" />
+    <Image Include="Models\Backdrop\BASE_NORMAL.png" />
+    <Image Include="Models\Backdrop\BASE_SPECULAR.png" />
+    <Image Include="Models\Ground\BASE_COLOR.png" />
+    <Image Include="Models\Ground\BASE_HEIGHT.png" />
+    <Image Include="Models\Ground\BASE_NORMAL.png" />
+    <Image Include="Models\Ground\BASE_SPECULAR.png" />
     <Image Include="Models\SimpleModel\BASE_COLOR.png" />
     <Image Include="Models\SimpleModel\BASE_HEIGHT.png" />
     <Image Include="Models\SimpleModel\BASE_NORMAL.png" />
     <Image Include="Models\SimpleModel\BASE_SPECULAR.png" />
+    <Image Include="Models\Walls\BASE_COLOR.png" />
+    <Image Include="Models\Walls\BASE_HEIGHT.png" />
+    <Image Include="Models\Walls\BASE_NORMAL.png" />
+    <Image Include="Models\Walls\BASE_SPECULAR.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

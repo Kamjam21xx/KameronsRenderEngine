@@ -41,6 +41,16 @@ void SpotLight::UseLight(GLuint ambientIntensityLocation, GLuint ambientColourLo
 	glUniform1f(edgeLocation, procEdge);
 }
 
+void SpotLight::SetLightDirection(glm::vec3 dir) {
+	direction = dir;
+}
+
+void SpotLight::SetLightEdge(GLfloat newEdge) {
+	edge = newEdge;
+	procEdge = cosf(glm::radians(newEdge));
+}
+
+
 void SpotLight::SetFlash(glm::vec3 pos, glm::vec3 dir) {
 	position = pos;
 	direction = dir;

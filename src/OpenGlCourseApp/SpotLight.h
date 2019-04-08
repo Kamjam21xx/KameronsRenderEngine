@@ -19,6 +19,8 @@ public:
 		GLuint edgeLocation);
 
 	void SetFlash(glm::vec3 pos, glm::vec3 dir);
+	void SetLightDirection(glm::vec3 dir);
+	void SetLightEdge(GLfloat newEdge);
 
 	~SpotLight();
 

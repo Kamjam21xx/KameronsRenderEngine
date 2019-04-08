@@ -25,6 +25,15 @@
     <Filter Include="Source Files\Models\SimpleModel">
       <UniqueIdentifier>{77f7b168-c560-4365-8cab-37fa005f9f9e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Models\Ground">
+      <UniqueIdentifier>{32a7ad91-86be-4d4c-981c-65cd661ab52e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Models\Backdrop">
+      <UniqueIdentifier>{8dff9eb1-7a77-4cd7-a93f-73be05bcf702}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Models\Walls">
+      <UniqueIdentifier>{400f397c-4db0-4ca4-9ca9-3dde5ebb8ce9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -172,6 +181,15 @@
     <None Include="Models\default.FLS">
       <Filter>Source Files\Models</Filter>
     </None>
+    <None Include="Models\Walls\BASE.fbx">
+      <Filter>Source Files\Models\Walls</Filter>
+    </None>
+    <None Include="Models\Ground\BASE.fbx">
+      <Filter>Source Files\Models\Ground</Filter>
+    </None>
+    <None Include="Models\Backdrop\BASE.fbx">
+      <Filter>Source Files\Models\Backdrop</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Models\SimpleModel\BASE_COLOR.png">
@@ -185,6 +203,42 @@
     </Image>
     <Image Include="Models\SimpleModel\BASE_SPECULAR.png">
       <Filter>Source Files\Models\SimpleModel</Filter>
+    </Image>
+    <Image Include="Models\Walls\BASE_COLOR.png">
+      <Filter>Source Files\Models\Walls</Filter>
+    </Image>
+    <Image Include="Models\Walls\BASE_HEIGHT.png">
+      <Filter>Source Files\Models\Walls</Filter>
+    </Image>
+    <Image Include="Models\Walls\BASE_NORMAL.png">
+      <Filter>Source Files\Models\Walls</Filter>
+    </Image>
+    <Image Include="Models\Walls\BASE_SPECULAR.png">
+      <Filter>Source Files\Models\Walls</Filter>
+    </Image>
+    <Image Include="Models\Ground\BASE_COLOR.png">
+      <Filter>Source Files\Models\Ground</Filter>
+    </Image>
+    <Image Include="Models\Ground\BASE_HEIGHT.png">
+      <Filter>Source Files\Models\Ground</Filter>
+    </Image>
+    <Image Include="Models\Ground\BASE_NORMAL.png">
+      <Filter>Source Files\Models\Ground</Filter>
+    </Image>
+    <Image Include="Models\Ground\BASE_SPECULAR.png">
+      <Filter>Source Files\Models\Ground</Filter>
+    </Image>
+    <Image Include="Models\Backdrop\BASE_COLOR.png">
+      <Filter>Source Files\Models\Backdrop</Filter>
+    </Image>
+    <Image Include="Models\Backdrop\BASE_HEIGHT.png">
+      <Filter>Source Files\Models\Backdrop</Filter>
+    </Image>
+    <Image Include="Models\Backdrop\BASE_NORMAL.png">
+      <Filter>Source Files\Models\Backdrop</Filter>
+    </Image>
+    <Image Include="Models\Backdrop\BASE_SPECULAR.png">
+      <Filter>Source Files\Models\Backdrop</Filter>
     </Image>
   </ItemGroup>
 </Project>

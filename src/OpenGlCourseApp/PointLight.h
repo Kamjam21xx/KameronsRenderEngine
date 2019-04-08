@@ -2,6 +2,7 @@
 #include "Light.h"
 #include "OmniShadowMap.h"
 #include <vector>
+#include <iostream>
 
 class PointLight : public Light
 {
@@ -23,6 +24,12 @@ public:
 	glm::vec3 GetPosition();
 
 	void SetPosition(glm::vec3 pos);
+	void SetLightRange(GLfloat range) {
+		constant = 1.0f;
+		linear = 4.5f / range;
+		exponent = 75.0f / (range * range);
+	}
+
 
 	~PointLight();
 

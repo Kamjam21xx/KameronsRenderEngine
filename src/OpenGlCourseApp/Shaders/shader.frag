@@ -167,8 +167,8 @@ float CalcPointShadowFactor(PointLight light, int shadowIndex)
 	float currentDepth = length(fragToLight);
 	
 	float shadow = 0.0;
-	float bias   = 0.065;
-	int samples  = 20;
+	float bias   = 0.015;
+	int samples  = 40;
 	float viewDistance = length(eyePosition - FragPos);
 	float diskRadius = (1.0 + (viewDistance / omniShadowMaps[shadowIndex].farPlane)) / 85.0;
 	for(int i = 0; i < samples; ++i)
@@ -280,8 +280,8 @@ vec2 ParallaxMapping(vec2 TexCoords, vec3 eyeDir)
 {
 	eyeDir.y *= -1.0f;
 
-	const float minLayers = 4.0f;
-	const float maxLayers = 24.0f;
+	const float minLayers = 32.0f;
+	const float maxLayers = 64.0f;
 	float layerCount = mix(maxLayers, minLayers, abs(dot(vec3(0.0f, 0.0f, 1.0f), eyeDir)));
 
 	float layerDepth = 1.0f / layerCount;
@@ -319,7 +319,7 @@ void main()
 	vec3 TangentFragPos = transposedTBN * FragPos;
 
 	// Parallax occlusion mapping
-	heightScale = 0.0425f;
+	heightScale = 0.0175f;
 	vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 	vec2 TexCoord = ParallaxMapping(TexCoord, viewDir);
 
@@ -344,10 +344,10 @@ void main()
 	vec4 reflectColor = texture(skyBoxTexture, R);
 
 	// Channel mixing
-	colour = (AmbientColourG * diffuse) + shadowFactor * (DiffuseColourG * diffuse + SpecularColourG * reflectColor);
+	colour = (AmbientColourG * diffuse) + shadowFactor * (DiffuseColourG * diffuse + SpecularColourG * reflectColor * specular);
 
 	// Gamma
-	float gamma = 3.119;
+	float gamma = 2.3;
 	colour.rgb = pow(colour.rgb, vec3(1.0/gamma));	
 
 }

@@ -299,13 +299,14 @@ void CreateLights(PointLight &pointLightsR,
 	SpotLight *spotLights = &spotLightsR;
 
 	
-	pointLights[0] = PointLight(1024, 1024,
+	pointLights[0] = PointLight(2 * 1024, 2 * 1024,
 		0.01f, 100.0f,
-		1.00f, 1.00f, 1.00f,
-		0.0001f, 0.8f,
-		2.0f, 2.50f, 3.0f,
-		0.8f, 0.1f, 0.01f);
+		1.00f, 0.80f, .70f,
+		0.000005f, 1.0f,
+		4.0f, 5.650f, 0.0f,
+		1.0f, 0.7f, 1.8f);
 	(*pointLightCount)++;
+	pointLights[0].SetLightRange(80.0f);
 /*
 	pointLights[1] = PointLight(1024, 1024,
 		0.01f, 100.0f,
@@ -332,6 +333,7 @@ void CreateLights(PointLight &pointLightsR,
 		0.8f, 0.1f, 0.01f,
 		32.0f); 
 	(*spotLightCount)++;
+	spotLights[0].SetLightRange(80.0f);
 */
 }
 
@@ -349,7 +351,7 @@ int main()
 	
 
 
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, 8);
 	glEnable(GL_MULTISAMPLE);
 	//mainWindow.swapBuffers();
 
@@ -416,27 +418,30 @@ int main()
 	while (!mainWindow.getShouldClose()) {
 		
 
-		std::thread threadB(&GL_Window::swapBuffers, mainWindow);
+		//std::thread threadB(&GL_Window::swapBuffers, 
+		mainWindow.swapBuffers();
+		//);
 
-		std::thread threadA([&]() mutable -> void {
+		//std::thread threadA([&]() mutable -> void {
 			now = glfwGetTime();
 
 			deltaTime = now - lastTime;
 
 			lastTime = now;
 			
-		}
-		);
+		//}
+		//);
 
-		spin += 0.15f;
+		spin += 0.5f;
 		if (spin >= 360.00f) { spin = 0.0f; }
+
 
 		glfwPollEvents();		
 
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange()); // calls threaded func "update" - use before "keyControl"
-		threadA.join();
+		//threadA.join();
 		camera.keyControl(mainWindow.getKeys(), deltaTime);
-		threadB.join(); // buffers swapped by this point
+		//threadB.join(); // buffers swapped by this point
 
 		DirectionalShadowMapPass(&mainLight);
 		for (size_t i = 0; i < pointLightCount; i++) {

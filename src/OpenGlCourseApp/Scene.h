@@ -1,10 +1,14 @@
 #pragma once
 #include <iostream>
+#include <exception>
 #include <string>
 #include <vector>
 #include <fstream>
+#include <bitset>
+#include <algorithm>
 
 #include "Model.h"
+
 
 
 class Scene
