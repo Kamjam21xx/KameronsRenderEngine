@@ -209,7 +209,7 @@ void Model::LoadMaterials(const aiScene *scene) {
 				
 				textureListDiffuse[i] = new Texture(texPath.c_str());
 
-				if (!textureListDiffuse[i]->LoadTextureA()) { // structure different for LoadTextureA() aswell
+				if (!textureListDiffuse[i]->LoadTexture(GL_TEXTURE1)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListDiffuse[i];
 					textureListDiffuse[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -218,7 +218,7 @@ void Model::LoadMaterials(const aiScene *scene) {
 		}
 		if (!textureListDiffuse[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
 			textureListDiffuse[i] = new Texture("Textures/gridtexture.png"); // default material
-			textureListDiffuse[i]->LoadTextureA();
+			textureListDiffuse[i]->LoadTexture(GL_TEXTURE1);
 		}
 	}
 
@@ -241,7 +241,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture) {
 
 				textureListDiffuse[i] = new Texture(texPath.c_str());
 
-				if (!textureListDiffuse[i]->LoadTextureA()) { // structure different for LoadTextureA() aswell
+				if (!textureListDiffuse[i]->LoadTexture(GL_TEXTURE1)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListDiffuse[i];
 					textureListDiffuse[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -251,7 +251,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture) {
 		if (!textureListDiffuse[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
 			const char* textureFile = colorTexture.c_str();
 			textureListDiffuse[i] = new Texture(textureFile);
-			textureListDiffuse[i]->LoadTextureA();
+			textureListDiffuse[i]->LoadTexture(GL_TEXTURE1);
 		}
 	}
 }
@@ -274,7 +274,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 				textureListDiffuse[i] = new Texture(texPath.c_str());
 
-				if (!textureListDiffuse[i]->LoadTextureA()) { // structure different for LoadTextureA() aswell
+				if (!textureListDiffuse[i]->LoadTexture(GL_TEXTURE)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListDiffuse[i];
 					textureListDiffuse[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -285,7 +285,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 		if (!textureListDiffuse[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
 			const char* textureFile = colorTexture.c_str();
 			textureListDiffuse[i] = new Texture(textureFile);
-			textureListDiffuse[i]->LoadTextureA();
+			textureListDiffuse[i]->LoadTexture(GL_TEXTURE);
 		}
 		textureListSpecular[i] = nullptr;
 		if (material->GetTextureCount(aiTextureType_SPECULAR)) {
@@ -298,7 +298,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 				textureListSpecular[i] = new Texture(texPath.c_str());
 
-				if (!textureListSpecular[i]->LoadTextureA(GL_TEXTURE4)) { // structure different for LoadTextureA() aswell
+				if (!textureListSpecular[i]->LoadTexture(GL_TEXTURE4)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListSpecular[i];
 					textureListSpecular[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -308,7 +308,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 		if (!textureListSpecular[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
 			const char* textureFile = specularTexture.c_str();
 			textureListSpecular[i] = new Texture(textureFile);
-			textureListSpecular[i]->LoadTextureA(GL_TEXTURE4);
+			textureListSpecular[i]->LoadTexture(GL_TEXTURE4);
 		}
 	}
 }
@@ -332,7 +332,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 				textureListDiffuse[i] = new Texture(texPath.c_str());
 
-				if (!textureListDiffuse[i]->LoadTextureA()) { // structure different for LoadTextureA() aswell
+				if (!textureListDiffuse[i]->LoadTexture(GL_TEXTURE)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListDiffuse[i];
 					textureListDiffuse[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -342,7 +342,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 		if (!textureListDiffuse[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
 			const char* textureFile = colorTexture.c_str();
 			textureListDiffuse[i] = new Texture(textureFile);
-			textureListDiffuse[i]->LoadTextureA();
+			textureListDiffuse[i]->LoadTexture(GL_TEXTURE);
 		}
 
 		textureListSpecular[i] = nullptr;
@@ -356,7 +356,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 				textureListSpecular[i] = new Texture(texPath.c_str());
 
-				if (!textureListSpecular[i]->LoadTextureA(GL_TEXTURE4)) { // structure different for LoadTextureA() aswell
+				if (!textureListSpecular[i]->LoadTexture(GL_TEXTURE4)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListSpecular[i];
 					textureListSpecular[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -366,7 +366,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 		if (!textureListSpecular[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
 			const char* textureFile = specularTexture.c_str();
 			textureListSpecular[i] = new Texture(textureFile);
-			textureListSpecular[i]->LoadTextureA(GL_TEXTURE4);
+			textureListSpecular[i]->LoadTexture(GL_TEXTURE4);
 		}
 
 		textureListNormal[i] = nullptr;
@@ -380,7 +380,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 				textureListNormal[i] = new Texture(texPath.c_str());
 
-				if (!textureListNormal[i]->LoadTextureNormalRGBA(GL_TEXTURE5)) { // structure different for LoadTextureA() aswell
+				if (!textureListNormal[i]->LoadTexture(GL_TEXTURE5)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListNormal[i];
 					textureListNormal[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -390,7 +390,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 		if (!textureListNormal[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
 			const char* textureFile = normalTexture.c_str();
 			textureListNormal[i] = new Texture(textureFile);
-			textureListNormal[i]->LoadTextureNormalRGBA(GL_TEXTURE5);
+			textureListNormal[i]->LoadTexture(GL_TEXTURE5);
 		}
 	}
 }
@@ -415,7 +415,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 				textureListDiffuse[i] = new Texture(texPath.c_str());
 
-				if (!textureListDiffuse[i]->LoadTextureA()) { // structure different for LoadTextureA() aswell
+				if (!textureListDiffuse[i]->LoadTexture(GL_TEXTURE)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListDiffuse[i];
 					textureListDiffuse[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -425,7 +425,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 		if (!textureListDiffuse[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
 			const char* textureFile = colorTexture.c_str();
 			textureListDiffuse[i] = new Texture(textureFile);
-			textureListDiffuse[i]->LoadTextureA();
+			textureListDiffuse[i]->LoadTexture(GL_TEXTURE);
 		}
 
 		textureListSpecular[i] = nullptr;
@@ -439,7 +439,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 				textureListSpecular[i] = new Texture(texPath.c_str());
 
-				if (!textureListSpecular[i]->LoadTextureA(GL_TEXTURE4)) { // structure different for LoadTextureA() aswell
+				if (!textureListSpecular[i]->LoadTexture(GL_TEXTURE4)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListSpecular[i];
 					textureListSpecular[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -449,7 +449,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 		if (!textureListSpecular[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
 			const char* textureFile = specularTexture.c_str();
 			textureListSpecular[i] = new Texture(textureFile);
-			textureListSpecular[i]->LoadTextureA(GL_TEXTURE4);
+			textureListSpecular[i]->LoadTexture(GL_TEXTURE4);
 		}
 
 		textureListNormal[i] = nullptr;
@@ -463,7 +463,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 				textureListNormal[i] = new Texture(texPath.c_str());
 
-				if (!textureListNormal[i]->LoadTextureNormalRGBA(GL_TEXTURE5)) { // structure different for LoadTextureA() aswell
+				if (!textureListNormal[i]->LoadTexture(GL_TEXTURE5)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListNormal[i];
 					textureListNormal[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -473,7 +473,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 		if (!textureListNormal[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
 			const char* textureFile = normalTexture.c_str();
 			textureListNormal[i] = new Texture(textureFile);
-			textureListNormal[i]->LoadTextureNormalRGBA(GL_TEXTURE5);
+			textureListNormal[i]->LoadTexture(GL_TEXTURE5);
 		}
 
 		textureListHeight[i] = nullptr;
@@ -487,7 +487,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 				textureListHeight[i] = new Texture(texPath.c_str());
 
-				if (!textureListHeight[i]->LoadTextureA(GL_TEXTURE7)) { // structure different for LoadTextureA() aswell
+				if (!textureListHeight[i]->LoadTexture(GL_TEXTURE7)) { // structure different for LoadTextureA() aswell
 					printf("Failed to load texture at: %s \n", texPath);
 					delete textureListHeight[i];
 					textureListHeight[i] = nullptr; // can make a func for SAFE_DELETE( T& )
@@ -497,7 +497,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 		if (!textureListHeight[i]) { // C:\Users\Kameron\source\repos\OpenGlCourseApp\OpenGlCourseApp\Textures personal direct path
 			const char* textureFile = heightTexture.c_str();
 			textureListHeight[i] = new Texture(textureFile);
-			textureListHeight[i]->LoadTextureA(GL_TEXTURE7);
+			textureListHeight[i]->LoadTexture(GL_TEXTURE7);
 		}
 	}
 }

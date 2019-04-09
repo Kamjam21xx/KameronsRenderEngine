@@ -10,15 +10,9 @@ public:
 	Texture();
 	Texture(const char* fileLoc);
 
-	bool LoadTexture();
-	bool LoadTextureA();
-	bool LoadTextureRGBA();
-
 	bool LoadTexture(GLenum glTextureUnit);
-	bool LoadTextureA(GLenum glTextureUnit);
-	bool LoadTextureRGBA(GLenum glTextureUnit);
-	bool LoadTextureNormalRGBA(GLenum glTextureUnit);
-	bool LoadTextureGreyscale(GLenum glTextureUnit);
+	bool LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type);
+	bool LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering);
 
 	void UseTexture();
 	void ClearTexture();
@@ -31,4 +25,3 @@ private:
 	const char* fileLocation;
 	GLenum textureUnit;
 };
-

@@ -32,6 +32,12 @@
 #include "SkyBox.h"
 #include "Scene.h"
 
+/*
+	making changes thanks to code reviews. if they arent here yet, they will be. 
+
+	will add license info, plz dont sue me or steal my project.0
+*/
+
 const float toRadians = 3.14159265 / 180.0;
 
 GL_Window mainWindow;
