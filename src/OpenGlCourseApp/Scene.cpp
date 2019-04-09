@@ -54,7 +54,6 @@ void Scene::load() {
 		short int arrayLocation = 0;
 
 
-	
 		while (file >> location >> model >> bitFlagStr) {
 
 			std::reverse(bitFlagStr.begin(), bitFlagStr.end());
@@ -143,7 +142,7 @@ void Scene::load() {
 				specular,
 				normal,
 				height,
-				calcTangents
+				bitFlags
 			);
 			arrayLocation++;	
 		}
