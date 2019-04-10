@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <GL/glew.h>
 
 class ShaderHandler									// rename ShaderSource
 {													// possibly make a member of Shader class
@@ -13,15 +14,25 @@ public:
 	ShaderHandler();
 
 	void LoadShaderSource();
-	std::string GetVertexSource();
-	std::string GetFragmentSource();
-	//std::string GetGeometrySource();
-	//std::string GetTesselationSource();
-	void ClearSource();
+
+	void ClearAllSource();
 	void ClearVertexSource();
 	void ClearFragmentSource();
+	void ClearGeometrySource();
+	void ClearTesselationSource();
+
+	const std::string GetVertexSourceStr();
+	const std::string GetFragmentSourceStr();
+	const std::string GetGeometrySourceStr();
+	const std::string GetTesselationSourceStr();
+
+	const char* GetVertexSourcePtr();
+	const char* GetFragmentSourcePtr();
+	const char* GetGeometrySourcePtr();
+	const char* GetTesselationSourcePtr();
 
 	std::string ReadFile();
+
 
 	void SetDLight();
 	void SetDLightDirection();
@@ -51,19 +62,44 @@ public:
 	void SetPOMSamples();								// 2 values - min, max
 	void SetGamma();	
 
-	void SetDiffuseTU();
-	void SetSpecularTU();
-	void SetNormalTU();
-	void SetHeightTU();
-	void SetDShadowTU();
-	void SetSkyBoxTU();
+	void SetDiffuseTU(GLuint textureUnit);
+	void SetSpecularTU(GLuint textureUnit);
+	void SetNormalTU(GLuint textureUnit);
+	void SetHeightTU(GLuint textureUnit);
+	void SetDShadowTU(GLuint textureUnit);
+	void SetSkyTU(GLuint textureUnit);
 
 	void ToggleDiffuseTex();
 	void ToggleSpecularTex();
 	void ToggleNormalTex();
 	void TogglePOM();
-	void ToggleSkyBoxReflection();
+	void ToggleSkyReflection();
 	void ToggleGamma();
+
+	GLuint GetDiffuseTU() 
+	{ 
+		return diffuseTU; 
+	}
+	GLuint GetSpecularTU() 
+	{ 
+		return specularTU; 
+	}
+	GLuint GetNormalTU() 
+	{
+		return normalTU; 
+	}
+	GLuint GetHeightTU() 
+	{ 
+		return heightTU; 
+	}
+	GLuint GetDirectionalShadowTU()
+	{ 
+		return directionalShadowTU; 
+	}
+	GLuint GetSkyBoxTU() 
+	{ 
+		return skyboxTU; 
+	}
 
 /*
 
@@ -74,15 +110,35 @@ public:
 	
 	// set functions to elimate as many uniforms as possible/reasonable
 */
+	// setup material class so the two can work together
 	~ShaderHandler();
 
 private:
+
 	std::string vertexShader;
 	std::string fragmentShader;
 	std::string geometryShader;
 	std::string tesselationShader;
 
+	GLuint diffuseTU,
+		   specularTU,
+		   normalTU,
+		   heightTU,
+		   directionalShadowTU,
+		   skyboxTU;
+
+	bool toggleDiffuseTex,
+		 toggleSpecularTex,
+		 toggleNormalTex,
+		 togglePOM,
+		 toggleSkyBoxReflection,
+		 toggleGamma;
+	
+
+
 	// add checks for logic later
 
 };
+
+
 

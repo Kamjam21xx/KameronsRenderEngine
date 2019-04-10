@@ -180,7 +180,7 @@ float CalcShadowFactor(vec4 DirectionalLightSpacePos)
 	float currentDepth = projCoords.z;
 	
 	vec3 normal = normalize(Normal);
-	vec3 lightDir = normalize(directionalLight.direction); // lightDirection
+	vec3 lightDir = normalize(directionalLight.direction);
 	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 	
 	float shadow = 0.0;
@@ -211,7 +211,7 @@ vec4 CalcDirectionalLight(vec4 DirectionalLightSpacePos)
 
 vec4 CalcPointLight(PointLight pLight, int shadowIndex)
 {
-	vec3 direction = FragPos - pLight.position; // TBN * (eyeDirection + pLight.position)// vec3(); // lightDirection
+	vec3 direction = FragPos - pLight.position;
 	float distance = length(direction);
 	direction = normalize(direction);
 	
@@ -227,7 +227,7 @@ vec4 CalcPointLight(PointLight pLight, int shadowIndex)
 
 vec4 CalcSpotLight(SpotLight sLight, int shadowIndex)
 {
-	vec3 rayDirection = normalize(FragPos - sLight.base.position); // lightDirection
+	vec3 rayDirection = normalize(FragPos - sLight.base.position);
 	float slFactor = dot(rayDirection, sLight.direction);
 	
 	if(slFactor > sLight.edge)
@@ -298,53 +298,62 @@ vec2 ParallaxMapping(vec2 TexCoords, vec3 eyeDir)
 
 	 return currentTexCoords; 
 }
+vec4 reflectSky()
+{
+	vec3 I = normalize(FragPos - eyePosition);
+	vec3 R = reflect(I, normalize(Normal));
+
+	vec4 skyReflection = texture(skyBoxTexture, R);
+
+	return skyReflection;
+}
 
 void main()
 {
-	// Tangent Bitangent Normal
+	// Parallax_occlusion_mapping
 	vec3 TangentViewPos = tTBN * eyePosition;
 	vec3 TangentFragPos = tTBN * FragPos;
-
-	// Parallax occlusion mapping
 	heightScale = 0.0175f;
 	vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 	vec2 TexCoord = ParallaxMapping(TexCoord, viewDir);
+	// END_MAIN_DEFINITION
 
-	// Normal mapping
+
+	// Normal_mapping
 	vec3 NormalTexture = texture(theTextureNormal, TexCoord).rgb * 2.0f - 1.0f;
 	NormalTexture.xy *= -1.0f;
 	Normal = normalize(TBN * NormalTexture);
+	// END_MAIN_DEFINITION
+
     
-	// Texture sampling
+	// Texture_sampling
 	diffuse = texture(theTextureDiffuse, TexCoord);
 	specular = texture(theTextureSpecular, TexCoord);
 	// float alpha = texture(theTextureDiffuse, TexCoord).a;
+	// END_MAIN_DEFINITION
 
-	// Light calculation
+
+	// Light_calculation
 	vec4 shadowFactor = CalcPointLights();
 	//shadowFactor = CalcDirectionalLight(DirectionalLightSpacePos);
 	//shadowFactor += CalcSpotLights();
+	// END_MAIN_DEFINITION
+
 
 	// Reflection
-	vec3 I = normalize(FragPos - eyePosition);
-	vec3 R = reflect(I, normalize(Normal));
-	vec4 reflectColor = texture(skyBoxTexture, R);
+	vec4 reflection = (skyReflection()) * specular;
+	// END_MAIN_DEFINITION
 
-	// Channel mixing
-	colour = shadowFactor * diffuse;
+
+	// Channel_mixing
+	colour = shadowFactor * diffuse * reflection;
 	//shadowFactor = AmbientColourG + shadowFactor * (DiffuseColourG + SpecularColourG);
 	//colour = (AmbientColourG * diffuse) + shadowFactor * (DiffuseColourG * diffuse + SpecularColourG * reflectColor * specular);
+	// END_MAIN_DEFINITION
 
 
 	// Gamma
 	float gamma = 2.3;
 	colour.rgb = pow(colour.rgb, vec3(1.0/gamma));	
-
-	//colour = DiffuseColourG;
-	//colour = shadowFactor;
-	//colour.rgb = vec3(pointLights[0].base.colour);
-	//colour = SpecularColourG;
-	//colour = AmbientColourG;
-	//colour = shadowFactor;
-
+	// END_MAIN_DEFINITION
 }

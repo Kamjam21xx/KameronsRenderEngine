@@ -19,11 +19,10 @@ void Shader::CreateFromFiles(const char* vertexLocation, const char* fragmentLoc
 {
 	std::string vertexString;
 	std::string fragmentString;
-	std::thread readFileThread([&]() mutable -> void {
-		vertexString = ReadFile(vertexLocation);
-		fragmentString = ReadFile(fragmentLocation);
-	});
-	readFileThread.join();
+
+	vertexString = ReadFile(vertexLocation);
+	fragmentString = ReadFile(fragmentLocation);
+
 	const char* vertexCode = vertexString.c_str();
 	const char* fragmentCode = fragmentString.c_str();
 	CompileShader(vertexCode, fragmentCode);
@@ -33,13 +32,12 @@ void Shader::CreateFromFiles(const char* vertexLocation, const char* geometryLoc
 	std::string vertexString;
 	std::string fragmentString;
 	std::string geometryString;
-	std::thread readFileThread([&]() mutable -> void {
-		vertexString = ReadFile(vertexLocation);
-		fragmentString = ReadFile(fragmentLocation);
-		geometryString = ReadFile(geometryLocation);
 
-	});	
-	readFileThread.join();
+	vertexString = ReadFile(vertexLocation);
+	fragmentString = ReadFile(fragmentLocation);
+	geometryString = ReadFile(geometryLocation);
+
+
 	const char* vertexCode = vertexString.c_str();
 	const char* geometryCode = geometryString.c_str();
 	const char* fragmentCode = fragmentString.c_str();
