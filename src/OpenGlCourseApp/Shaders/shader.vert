@@ -10,6 +10,7 @@ out vec2 TexCoord;
 out vec3 FragPos; 
 out vec4 DirectionalLightSpacePos;
 out mat3 TBN;
+out mat3 tTBN;
 
 uniform mat4 model;
 uniform mat4 projection;
@@ -27,4 +28,5 @@ void main()
 	 vec3 N = normalize( vec3(model * vec4(norm, 0.0f)   )   );
 
 	 TBN = mat3(T, cross( T , N ), N);
+	 tTBN = transpose(TBN);
 }

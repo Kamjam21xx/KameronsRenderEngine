@@ -196,6 +196,7 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="GL_Window.cpp" />
+    <ClCompile Include="ShaderHandler.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="SpotLight.cpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="GL_Window.h" />
+    <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="SpotLight.h" />

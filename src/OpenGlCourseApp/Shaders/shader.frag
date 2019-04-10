@@ -4,6 +4,7 @@ in vec2 TexCoord;
 in vec3 FragPos;
 in vec4 DirectionalLightSpacePos;
 in mat3 TBN;
+in mat3 tTBN;
 
 out vec4 colour;
 
@@ -11,13 +12,9 @@ out vec4 colour;
 // variables
 const int MAX_POINT_LIGHTS = 3;
 const int MAX_SPOT_LIGHTS = 3;
-
-vec4 AmbientColourG = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-vec4 SpecularColourG = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-vec4 DiffuseColourG = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+float heightScale;
 
 vec3 Normal;
-float heightScale;
 
 // structs
 struct Light
@@ -86,7 +83,8 @@ layout (binding = 14) uniform sampler2D theTextureHeight;
 layout (binding = 2) uniform sampler2D directionalShadowMap;
 layout (binding = 6) uniform samplerCube skyBoxTexture;
 
-
+vec4 diffuse;
+vec4 specular;
 
 // other
 vec3 gridSamplingDisk[20] = vec3[]
@@ -107,6 +105,7 @@ vec4 CalcLightByDirection(Light light, vec3 direction, float shadowFactor)
 	float diffuseFactor = max(dot(normalize(Normal), normalize(direction)), 0.0f);
 	vec4 diffuseColour = vec4(light.colour * light.diffuseIntensity * diffuseFactor, 1.0f);
 	
+	
 	vec4 specularColour = vec4(0, 0, 0, 0);
 	
 	if(diffuseFactor > 0.0f)
@@ -122,21 +121,15 @@ vec4 CalcLightByDirection(Light light, vec3 direction, float shadowFactor)
 		}
 	}
 
-	SpecularColourG += specularColour;
-	AmbientColourG += ambientColour;
-	DiffuseColourG += diffuseColour;
-
-	return vec4(1.0 - shadowFactor);	// * (diffuseColour + specularColour));
+	return (ambientColour * diffuse) + (1.0 - shadowFactor) * (diffuseColour * diffuse + specularColour * specular);
 }
 
 vec4 CalcPointLightByDirection(Light light, vec3 direction, float shadowFactor)
 {
 	vec4 ambientColour = vec4(light.colour, 1.0f) * light.ambientIntensity;
 
-	//float diffuseFactor = max(dot(normalize(Normal), normalize(direction)), 0.0f);
-
 	float diffuseFactor = max(dot(Normal, direction), 0.0f);
-	vec4 diffuseColour = vec4(light.colour * light.diffuseIntensity * diffuseFactor + diffuseFactor * 0.2, 1.0f);
+	vec4 diffuseColour = vec4(light.colour * (light.diffuseIntensity * diffuseFactor + diffuseFactor * 0.2f), 1.0f);
 	
 	vec4 specularColour = vec4(0, 0, 0, 0);
 	
@@ -153,12 +146,7 @@ vec4 CalcPointLightByDirection(Light light, vec3 direction, float shadowFactor)
 		}
 	}
 
-	SpecularColourG += specularColour;
-	AmbientColourG += ambientColour; 
-	DiffuseColourG += diffuseColour;
-	
-	// 	return ambientColour + (1.0 - shadowFactor) * (diffuseColour + specularColour));
-	return vec4(1.0 - shadowFactor);
+	return (ambientColour * diffuse) + (1.0 - shadowFactor) * (diffuseColour * diffuse + specularColour * specular);
 }
 
 float CalcPointShadowFactor(PointLight light, int shadowIndex)
@@ -246,8 +234,8 @@ vec4 CalcSpotLight(SpotLight sLight, int shadowIndex)
 	{
 		vec4 colour = CalcPointLight(sLight.base, shadowIndex);
 		
-		return colour * (1.0f - (1.0f - slFactor)*(1.0f/(1.0f - sLight.edge)));
-		//return colour * ((sLight.edge - slFactor) / (sLight.edge - 1.0f));
+		// return colour * (1.0f - (1.0f - slFactor)*(1.0f/(1.0f - sLight.edge)));
+		return colour * ((sLight.edge - slFactor) / (sLight.edge - 1.0f));
 		
 	} else {
 		return vec4(0, 0, 0, 0);
@@ -314,9 +302,8 @@ vec2 ParallaxMapping(vec2 TexCoords, vec3 eyeDir)
 void main()
 {
 	// Tangent Bitangent Normal
-	mat3 transposedTBN = transpose(TBN);
-	vec3 TangentViewPos = transposedTBN * eyePosition;
-	vec3 TangentFragPos = transposedTBN * FragPos;
+	vec3 TangentViewPos = tTBN * eyePosition;
+	vec3 TangentFragPos = tTBN * FragPos;
 
 	// Parallax occlusion mapping
 	heightScale = 0.0175f;
@@ -328,15 +315,15 @@ void main()
 	NormalTexture.xy *= -1.0f;
 	Normal = normalize(TBN * NormalTexture);
     
-	// colour & specular sampling
-	vec4 diffuse = texture(theTextureDiffuse, TexCoord);
-	vec4 specular = texture(theTextureSpecular, TexCoord);
+	// Texture sampling
+	diffuse = texture(theTextureDiffuse, TexCoord);
+	specular = texture(theTextureSpecular, TexCoord);
 	// float alpha = texture(theTextureDiffuse, TexCoord).a;
 
 	// Light calculation
 	vec4 shadowFactor = CalcPointLights();
-		 //shadowFactor = CalcDirectionalLight(DirectionalLightSpacePos);
-			// shadowFactor += CalcSpotLights();
+	//shadowFactor = CalcDirectionalLight(DirectionalLightSpacePos);
+	//shadowFactor += CalcSpotLights();
 
 	// Reflection
 	vec3 I = normalize(FragPos - eyePosition);
@@ -344,10 +331,20 @@ void main()
 	vec4 reflectColor = texture(skyBoxTexture, R);
 
 	// Channel mixing
-	colour = (AmbientColourG * diffuse) + shadowFactor * (DiffuseColourG * diffuse + SpecularColourG * reflectColor * specular);
+	colour = shadowFactor * diffuse;
+	//shadowFactor = AmbientColourG + shadowFactor * (DiffuseColourG + SpecularColourG);
+	//colour = (AmbientColourG * diffuse) + shadowFactor * (DiffuseColourG * diffuse + SpecularColourG * reflectColor * specular);
+
 
 	// Gamma
 	float gamma = 2.3;
 	colour.rgb = pow(colour.rgb, vec3(1.0/gamma));	
+
+	//colour = DiffuseColourG;
+	//colour = shadowFactor;
+	//colour.rgb = vec3(pointLights[0].base.colour);
+	//colour = SpecularColourG;
+	//colour = AmbientColourG;
+	//colour = shadowFactor;
 
 }

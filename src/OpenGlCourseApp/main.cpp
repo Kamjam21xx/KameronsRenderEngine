@@ -84,6 +84,8 @@ static const char* FBVShader = "Shaders/framebuffershader.vert";
 static const char* FBFShader = "Shaders/framebuffershader.frag";
 
 
+
+
 void calcAverageNormals(unsigned int * indices, unsigned int indiceCount, GLfloat * vertices,
 						unsigned int verticeCount, unsigned int vLength, unsigned int normalOffset) {
 	glm::vec3 v1;
@@ -153,9 +155,10 @@ void RenderScene() {
 
 	for (auto element = mainScene.objects.begin() ; element != mainScene.objects.end(); ++element) {
 		glm::mat4 model = glm::mat4(1.0);
+
 		model = glm::rotate(model, spin * toRadians, glm::vec3(0.0, 1.0, 0.0));
-		// model = glm::translate(model, glm::vec3(2.0, -2.85, 3.0));
-		model = glm::scale(model, glm::vec3(0.025f, 0.025f, 0.025f));
+		model = glm::translate(model, glm::vec3(2.0, -13.85, 3.0));
+		model = glm::scale(model, glm::vec3(0.065f, 0.065f, 0.065f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -214,8 +217,6 @@ void OmniShadowMapPass(PointLight *light) {
 
 	omniShadowShader.Validate();
 
-	
-
 	RenderScene();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -254,10 +255,6 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 	glUniform3f(uniformEyeDirection, camera.getCameraDirection().x, camera.getCameraDirection().y, camera.getCameraDirection().z);
-
-
-
-
 
 
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
@@ -300,37 +297,42 @@ void CreateLights(PointLight &pointLightsR,
 				  unsigned int *spotLightCount) {
 
 	// make plain text loader for lights, add to scene.
+	// added shadow detail var for ease testing
+	GLint shadowDetail = 3;
 
 	PointLight *pointLights = &pointLightsR; 
 	SpotLight *spotLights = &spotLightsR;
 
 	
-	pointLights[0] = PointLight(2 * 1024, 2 * 1024,
+	pointLights[0] = PointLight(shadowDetail * 256, shadowDetail * 256,
 		0.01f, 100.0f,
-		1.00f, 0.80f, .70f,
-		0.000005f, 1.0f,
-		4.0f, 5.650f, 0.0f,
+		0.7f, 0.7f, 1.0f,
+		0.0f, 1.0f,
+		6.0f, 6.0f, 0.0f,
 		1.0f, 0.7f, 1.8f);
 	(*pointLightCount)++;
-	pointLights[0].SetLightRange(80.0f);
+	pointLights[0].SetLightRange(12.0f);
+
+	pointLights[1] = PointLight(shadowDetail * 256, shadowDetail * 256,
+		0.01f, 100.0f,
+		1.0f, 0.7f, 0.7f,
+		0.0f, 1.0f,
+		6.0f, 6.0f, -2.0f,
+		1.0f, 0.7f, 1.8f);
+	(*pointLightCount)++;
+	pointLights[1].SetLightRange(12.0f);
+
+	pointLights[2] = PointLight(shadowDetail * 256, shadowDetail * 256,
+		0.01f, 100.0f,
+		0.7f, 1.0f, 0.7f,
+		0.0f, 1.0f,
+		6.0f, 6.0f, 2.0f,
+		1.0f, 0.7f, 1.8f);
+	(*pointLightCount)++;
+	pointLights[2].SetLightRange(12.0f);
 /*
-	pointLights[1] = PointLight(1024, 1024,
-		0.01f, 100.0f,
-		1.0f, 1.0f, 1.0f,
-		0.0001f, 0.8f,
-		-4.0f, 8.50f, -8.0f,
-		0.8f, 0.01f, 0.00001f);
-	(*pointLightCount)++;
 
-	pointLights[2] = PointLight(2048, 2048,
-		0.01f, 100.0f,
-		1.0f, 1.0f, 0.0f,
-		0.00f, 0.4f,
-		4.0f, 8.0f, 4.0f,
-		0.35f, 0.1f, 0.05f);
-	(*pointLightCount)++;
-
-	spotLights[0] = SpotLight(2048, 2048,
+		spotLights[0] = SpotLight(shadowDetail * 2048, shadowDetail * 2048,
 		0.1f, 100.0f,
 		0.5f, 0.5f, 0.5f,						// FIX SPOTLIGHT EDGE < < < < < << << << <<< <<< <<<< <<<< <<<<< <<<<<<
 		0.01f, 0.9f,
@@ -438,7 +440,7 @@ int main()
 		//}
 		//);
 
-		spin += 0.5f;
+		spin += 0.1f;
 		if (spin >= 360.00f) { spin = 0.0f; }
 
 
