@@ -13,6 +13,11 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
+//										imgui
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <stdio.h>
 //										 openGL libraries
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -31,6 +36,7 @@
 #include "Model.h"
 #include "SkyBox.h"
 #include "Scene.h"
+
 
 /*
 	making changes thanks to code reviews. if they arent here yet, they will be. 
@@ -157,8 +163,8 @@ void RenderScene() {
 		glm::mat4 model = glm::mat4(1.0);
 
 		model = glm::rotate(model, spin * toRadians, glm::vec3(0.0, 1.0, 0.0));
-		model = glm::translate(model, glm::vec3(2.0, -13.85, 3.0));
-		model = glm::scale(model, glm::vec3(0.065f, 0.065f, 0.065f));
+		//model = glm::translate(model, glm::vec3(2.0, 0.85, 3.0));
+		model = glm::scale(model, glm::vec3(0.025f, 0.025f, 0.025f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -298,7 +304,7 @@ void CreateLights(PointLight &pointLightsR,
 
 	// make plain text loader for lights, add to scene.
 	// added shadow detail var for ease testing
-	GLint shadowDetail = 3;
+	GLint shadowDetail = 4;
 
 	PointLight *pointLights = &pointLightsR; 
 	SpotLight *spotLights = &spotLightsR;
@@ -307,17 +313,17 @@ void CreateLights(PointLight &pointLightsR,
 	pointLights[0] = PointLight(shadowDetail * 256, shadowDetail * 256,
 		0.01f, 100.0f,
 		0.7f, 0.7f, 1.0f,
-		0.0f, 1.0f,
-		6.0f, 6.0f, 0.0f,
+		0.001f, 1.0f,
+		0.25f, 2.75f, 0.0f,
 		1.0f, 0.7f, 1.8f);
 	(*pointLightCount)++;
 	pointLights[0].SetLightRange(12.0f);
-
+/*
 	pointLights[1] = PointLight(shadowDetail * 256, shadowDetail * 256,
 		0.01f, 100.0f,
 		1.0f, 0.7f, 0.7f,
-		0.0f, 1.0f,
-		6.0f, 6.0f, -2.0f,
+		0.0001f, 1.0f,
+		8.0f, 8.0f, -0.5f,
 		1.0f, 0.7f, 1.8f);
 	(*pointLightCount)++;
 	pointLights[1].SetLightRange(12.0f);
@@ -325,12 +331,11 @@ void CreateLights(PointLight &pointLightsR,
 	pointLights[2] = PointLight(shadowDetail * 256, shadowDetail * 256,
 		0.01f, 100.0f,
 		0.7f, 1.0f, 0.7f,
-		0.0f, 1.0f,
-		6.0f, 6.0f, 2.0f,
+		0.0001f, 1.0f,
+		8.0f, 8.0f, 0.5f,
 		1.0f, 0.7f, 1.8f);
 	(*pointLightCount)++;
 	pointLights[2].SetLightRange(12.0f);
-/*
 
 		spotLights[0] = SpotLight(shadowDetail * 2048, shadowDetail * 2048,
 		0.1f, 100.0f,
@@ -359,11 +364,30 @@ int main()
 	
 
 
-	glfwWindowHint(GLFW_SAMPLES, 8);
-	glEnable(GL_MULTISAMPLE);
+	//glfwWindowHint(GLFW_SAMPLES, 16);
+	//glEnable(GL_MULTISAMPLE);
 	//mainWindow.swapBuffers();
+	//glEnable(GL_DEBUG_OUTPUT);
 
-	glEnable(GL_DEBUG_OUTPUT);
+//<>=========================================================================================================<>
+	// (imediate mode graphic user interface)  ---------  IMGUI
+//<>=========================================================================================================<>
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+
+	//ImFont* font = io.Fonts->AddFontDefault();
+	//ImFont* font = io.Fonts->AddFontFromFileTTF("C:\\Users\\Kameron\\Documents\\GitHub\\KameronsRenderEngine\\src\\OpenGlCourseApp\\misc\\fonts\\Karla-Regular.ttf", 15.0f);
+	//IM_ASSERT(font != NULL);
+
+	// io.Fonts->GetTexDataAsRGBA32();
+
+	ImGui_ImplGlfw_InitForOpenGL(mainWindow.mainWindow, true);
+	ImGui_ImplOpenGL3_Init("#version 430");	
+
+	// ImGui::NewFrame();
+	// ImGui::PushFont(NULL);
 
 //<>=========================================================================================================<>
 
@@ -421,49 +445,73 @@ int main()
 	glCullFace(GL_BACK);
 	glEnable(GL_FRAMEBUFFER_SRGB);
 
+
+	static float f = 0.0f;
+	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+//<>=========================================================================================================<>
 	// MAIN LOOP
 //<>=========================================================================================================<>
+
+
 	while (!mainWindow.getShouldClose()) {
 		
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
 
-		//std::thread threadB(&GL_Window::swapBuffers, 
-		mainWindow.swapBuffers();
-		//);
 
-		//std::thread threadA([&]() mutable -> void {
-			now = glfwGetTime();
 
-			deltaTime = now - lastTime;
 
-			lastTime = now;
-			
-		//}
-		//);
+		now = glfwGetTime();
+		deltaTime = now - lastTime;
+		lastTime = now;
 
-		spin += 0.1f;
+		spin += 0.033f;
 		if (spin >= 360.00f) { spin = 0.0f; }
 
-
 		glfwPollEvents();		
-
-		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange()); // calls threaded func "update" - use before "keyControl"
-		//threadA.join();
+		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange()); 
 		camera.keyControl(mainWindow.getKeys(), deltaTime);
-		//threadB.join(); // buffers swapped by this point
 
 		DirectionalShadowMapPass(&mainLight);
-		for (size_t i = 0; i < pointLightCount; i++) {
-			OmniShadowMapPass(&pointLights[i]);
-		}
-		for (size_t i = 0; i < spotLightCount; i++) {
-			OmniShadowMapPass(&spotLights[i]);
-		}
-
+		for (size_t i = 0; i < pointLightCount; i++) { OmniShadowMapPass(&pointLights[i]); }
+		for (size_t i = 0; i < spotLightCount; i++) { OmniShadowMapPass(&spotLights[i]); }
 		RenderPass(projection, camera.calculateViewMatrix(), &pointLightCount, &spotLightCount, &mainLight, pointLights, spotLights);
 		
 		glUseProgram(0);
+		
+		ImGui::Begin("WINDOW!");
+		//
+		ImGui::Text("check out this wicked text dawg");
+		ImGui::End();
+
+		//ImGui::ShowStyleEditor();
+
+		ImGui::Render();
+		glfwMakeContextCurrent(mainWindow.mainWindow);
+
+		// int display_w, display_h;
+		// glfwMakeContextCurrent(mainWindow.mainWindow);
+		// glfwGetFramebufferSize(mainWindow.mainWindow, &display_w, &display_h);
+
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		glfwMakeContextCurrent(mainWindow.mainWindow);
+
+		
+		
+		mainWindow.swapBuffers();
+
 
 	}
 //<>=========================================================================================================<>
+
+	// EXIT
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
+	glfwDestroyWindow(mainWindow.mainWindow);
+	glfwTerminate();
+
 	return 0;
 }

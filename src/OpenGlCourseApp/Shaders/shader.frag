@@ -1,4 +1,4 @@
-#version 450
+#version 430
 
 in vec2 TexCoord;
 in vec3 FragPos;
@@ -158,7 +158,7 @@ float CalcPointShadowFactor(PointLight light, int shadowIndex)
 	float bias   = 0.015;
 	int samples  = 40;
 	float viewDistance = length(eyePosition - FragPos);
-	float diskRadius = (1.0 + (viewDistance / omniShadowMaps[shadowIndex].farPlane)) / 85.0;
+	float diskRadius = (1.0 + (viewDistance / omniShadowMaps[shadowIndex].farPlane)) / 65.0;
 	for(int i = 0; i < samples; ++i)
 	{
 		float closestDepth = texture(omniShadowMaps[shadowIndex].shadowMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
@@ -329,31 +329,28 @@ void main()
 	// Texture_sampling
 	diffuse = texture(theTextureDiffuse, TexCoord);
 	specular = texture(theTextureSpecular, TexCoord);
-	// float alpha = texture(theTextureDiffuse, TexCoord).a;
 	// END_MAIN_DEFINITION
 
 
 	// Light_calculation
 	vec4 shadowFactor = CalcPointLights();
-	//shadowFactor = CalcDirectionalLight(DirectionalLightSpacePos);
-	//shadowFactor += CalcSpotLights();
+	// shadowFactor = CalcDirectionalLight(DirectionalLightSpacePos);
+	// shadowFactor += CalcSpotLights();
 	// END_MAIN_DEFINITION
 
 
 	// Reflection
-	vec4 reflection = (skyReflection()) * specular;
+	vec4 reflection = reflectSky() * (specular + 0.2);
 	// END_MAIN_DEFINITION
 
 
 	// Channel_mixing
 	colour = shadowFactor * diffuse * reflection;
-	//shadowFactor = AmbientColourG + shadowFactor * (DiffuseColourG + SpecularColourG);
-	//colour = (AmbientColourG * diffuse) + shadowFactor * (DiffuseColourG * diffuse + SpecularColourG * reflectColor * specular);
 	// END_MAIN_DEFINITION
 
 
 	// Gamma
-	float gamma = 2.3;
+	float gamma = 3.192;
 	colour.rgb = pow(colour.rgb, vec3(1.0/gamma));	
 	// END_MAIN_DEFINITION
 }

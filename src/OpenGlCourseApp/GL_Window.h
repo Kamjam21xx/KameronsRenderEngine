@@ -7,6 +7,8 @@
 class GL_Window
 {
 public:
+	GLFWwindow *mainWindow;
+
 	GL_Window();
 	GL_Window(GLint windowWidth, GLint windowHeight);	
 	GL_Window(GLint windowWidth, GLint windowHeight, GLfloat sensitivity);
@@ -29,7 +31,6 @@ public:
 	~GL_Window();
 
 private:
-	GLFWwindow *mainWindow;
 
 	GLint width, height;
 	GLint bufferWidth, bufferHeight;

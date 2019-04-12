@@ -97,7 +97,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>
       </LanguageStandard>
       <EnableModules>true</EnableModules>
@@ -119,7 +119,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>
       </LanguageStandard>
       <EnableModules>true</EnableModules>
@@ -143,7 +143,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>
       </LanguageStandard>
       <EnableModules>true</EnableModules>
@@ -169,7 +169,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>
       </LanguageStandard>
       <EnableModules>true</EnableModules>
@@ -184,6 +184,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\libraries\imgui\imgui.cpp" />
+    <ClCompile Include="..\libraries\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\libraries\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\libraries\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\libraries\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\libraries\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Light.cpp" />
@@ -196,13 +202,26 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="GL_Window.cpp" />
-    <ClCompile Include="ShaderHandler.cpp" />
+    <ClCompile Include="ShaderHandler.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\libraries\imgui\imconfig.h" />
+    <ClInclude Include="..\libraries\imgui\imgui.h" />
+    <ClInclude Include="..\libraries\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="..\libraries\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\libraries\imgui\imgui_internal.h" />
+    <ClInclude Include="..\libraries\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\libraries\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\libraries\imgui\imstb_truetype.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="CommonValues.h" />
@@ -215,7 +234,12 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="GL_Window.h" />
-    <ClInclude Include="ShaderHandler.h" />
+    <ClInclude Include="ShaderHandler.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="SpotLight.h" />
@@ -258,6 +282,9 @@
     <Image Include="Models\Walls\BASE_HEIGHT.png" />
     <Image Include="Models\Walls\BASE_NORMAL.png" />
     <Image Include="Models\Walls\BASE_SPECULAR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\libraries\imgui\LICENSE.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

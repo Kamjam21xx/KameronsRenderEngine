@@ -1,3 +1,4 @@
+
 #include "ShaderHandler.h"
 
 
@@ -205,17 +206,24 @@ void ShaderHandler::SetDLightBiasMaxMultiplier()
 
 
 }
-void ShaderHandler::SetPOMHeight()					  
+void ShaderHandler::SetPOMHeight(GLfloat newHeightPOM)					  
+{
+	std::string floatValue = std::to_string(heightPOM);
+	std::string currentHeight = "float gamma = " + floatValue;
+
+	auto begin = fragmentShader.find(currentHeight);
+	begin = fragmentShader.find(floatValue, begin);
+	auto end = begin + floatValue.length();
+
+	std::string newFloatValue = std::to_string(newHeightPOM);
+	fragmentShader.replace(begin, end, newFloatValue);
+}
+void ShaderHandler::SetPOMSamples(GLuint newSampleCount)
 {
 
 
 }
-void ShaderHandler::SetPOMSamples()					  
-{
-
-
-}
-void ShaderHandler::SetGamma()                        
+void ShaderHandler::SetGamma(float newGamma)
 {
 
 }
@@ -325,3 +333,4 @@ ShaderHandler::~ShaderHandler()
 {
 
 }
+

@@ -34,6 +34,9 @@
     <Filter Include="Source Files\Models\Walls">
       <UniqueIdentifier>{400f397c-4db0-4ca4-9ca9-3dde5ebb8ce9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="imGUI">
+      <UniqueIdentifier>{3410bb54-3e7c-4eaa-8f75-880e868df215}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -87,6 +90,24 @@
     <ClCompile Include="ShaderHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\libraries\imgui\imgui.cpp">
+      <Filter>imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\imgui\imgui_demo.cpp">
+      <Filter>imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\imgui\imgui_draw.cpp">
+      <Filter>imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\imgui\imgui_impl_glfw.cpp">
+      <Filter>imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\imgui\imgui_impl_opengl3.cpp">
+      <Filter>imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\imgui\imgui_widgets.cpp">
+      <Filter>imGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">
@@ -139,6 +160,30 @@
     </ClInclude>
     <ClInclude Include="ShaderHandler.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libraries\imgui\imconfig.h">
+      <Filter>imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libraries\imgui\imgui.h">
+      <Filter>imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libraries\imgui\imgui_impl_glfw.h">
+      <Filter>imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libraries\imgui\imgui_impl_opengl3.h">
+      <Filter>imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libraries\imgui\imgui_internal.h">
+      <Filter>imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libraries\imgui\imstb_rectpack.h">
+      <Filter>imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libraries\imgui\imstb_textedit.h">
+      <Filter>imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libraries\imgui\imstb_truetype.h">
+      <Filter>imGUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -246,5 +291,10 @@
     <Image Include="Models\Backdrop\BASE_SPECULAR.png">
       <Filter>Source Files\Models\Backdrop</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\libraries\imgui\LICENSE.txt">
+      <Filter>imGUI</Filter>
+    </Text>
   </ItemGroup>
 </Project>

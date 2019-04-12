@@ -1,3 +1,4 @@
+
 #pragma once
 #include <string>
 #include <iostream>
@@ -9,6 +10,10 @@ class ShaderHandler									// rename ShaderSource
 
 													// UNDER CONSTRUCTION
 														// source code editor for default shader
+
+
+	// could use reverse finds, but im keeping them normal finds for readability. 
+	// keepin it simple
 
 public:
 	ShaderHandler();
@@ -58,9 +63,9 @@ public:
 	void SetDLightBiasMin();
 	void SetDLightBiasMaxMultiplier();
 													// edit default shader to add DLight sample setter();
-	void SetPOMHeight();
-	void SetPOMSamples();								// 2 values - min, max
-	void SetGamma();	
+	void SetPOMHeight(GLfloat heightPOM);
+	void SetPOMSamples(GLuint newSampleCount);								// 2 values - min, max
+	void SetGamma(GLfloat newGamma);	
 
 	void SetDiffuseTU(GLuint textureUnit);
 	void SetSpecularTU(GLuint textureUnit);
@@ -134,11 +139,11 @@ private:
 		 toggleSkyBoxReflection,
 		 toggleGamma;
 	
+	GLfloat gamma, 
+			heightPOM;
 
+	GLuint samplesPOM
 
 	// add checks for logic later
 
 };
-
-
-

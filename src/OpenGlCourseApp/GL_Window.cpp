@@ -45,11 +45,11 @@ int GL_Window::Initialize() {
 		}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);					// set major version
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);		            // set minor version 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);		            // set minor version 
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);	// core profile does not allow backwards compatability
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);			// allow forward compatibility
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+	//glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	mainWindow = glfwCreateWindow(width, height, "OPENGL WINDOW", NULL, NULL);
 	
 		if (!mainWindow) { printf("GLFW Window Creation Failure \n");
@@ -60,7 +60,7 @@ int GL_Window::Initialize() {
 	glfwMakeContextCurrent(mainWindow);// set context for GLEW to use : telling glew to draw to our window 
 	// handle key + mouse input
 	createCallbacks();
-	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // disable cursor
+	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR); // disable cursor
 	glewExperimental = GL_TRUE; // Allow modern extension features
 
 
