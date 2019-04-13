@@ -363,32 +363,43 @@ int main()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	
 
-
-	//glfwWindowHint(GLFW_SAMPLES, 16);
-	//glEnable(GL_MULTISAMPLE);
+	glfwWindowHint(GLFW_SAMPLES, 16);
+	glEnable(GL_MULTISAMPLE);
 	//mainWindow.swapBuffers();
 	//glEnable(GL_DEBUG_OUTPUT);
 
 //<>=========================================================================================================<>
-	// (imediate mode graphic user interface)  ---------  IMGUI
+	// (immediate mode graphic user interface)  ---------  IMGUI
 //<>=========================================================================================================<>
+	/*
+	//
+
+	// reference ImGui.h line 2025 
+	*
+	*	declare pointers and pointer array + bytes per pixel pointer
+	*	call GetTexDataAsAlpha8 to get 8 bit texture to use for font --- give function the pointers to work on
+	*	
+	* call IsBuilt(); for true||false boolean value to control program flow
+	* set texture unit i think ==== SetTexID(ImTexture id);
+	*
+
+	//
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
 
-	//ImFont* font = io.Fonts->AddFontDefault();
-	//ImFont* font = io.Fonts->AddFontFromFileTTF("C:\\Users\\Kameron\\Documents\\GitHub\\KameronsRenderEngine\\src\\OpenGlCourseApp\\misc\\fonts\\Karla-Regular.ttf", 15.0f);
-	//IM_ASSERT(font != NULL);
-
-	// io.Fonts->GetTexDataAsRGBA32();
+	ImFont* font = io.Fonts->AddFontFromFileTTF(u8"C:\\Users\\Kameron\\Documents\\GitHub\\KameronsRenderEngine\\src\\OpenGlCourseApp\\misc\\fonts\\Karla-Regular.ttf", 15.0f);
+	IM_ASSERT(font != NULL);
+	io.Fonts->GetTexDataAsRGBA32();
 
 	ImGui_ImplGlfw_InitForOpenGL(mainWindow.mainWindow, true);
-	ImGui_ImplOpenGL3_Init("#version 430");	
+	ImGui_ImplOpenGL3_Init(u8"#version 430");	
 
-	// ImGui::NewFrame();
-	// ImGui::PushFont(NULL);
-
+	ImGui::NewFrame();
+	//ImGui::PushFont(NULL);
+	*/
 //<>=========================================================================================================<>
 
 	DirectionalLight mainLight;
@@ -453,11 +464,13 @@ int main()
 //<>=========================================================================================================<>
 
 
+
+	//ImGui::EndFrame();
 	while (!mainWindow.getShouldClose()) {
 		
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		//ImGui_ImplOpenGL3_NewFrame();
+		//ImGui_ImplGlfw_NewFrame();
+		//ImGui::NewFrame();
 
 
 
@@ -480,22 +493,22 @@ int main()
 		
 		glUseProgram(0);
 		
-		ImGui::Begin("WINDOW!");
+		//ImGui::Begin("WINDOW!");
 		//
-		ImGui::Text("check out this wicked text dawg");
-		ImGui::End();
+		//ImGui::Text("check out this wicked text dawg");
+		//ImGui::End();
 
 		//ImGui::ShowStyleEditor();
 
-		ImGui::Render();
-		glfwMakeContextCurrent(mainWindow.mainWindow);
+		//ImGui::Render();
+		//glfwMakeContextCurrent(mainWindow.mainWindow);
 
 		// int display_w, display_h;
 		// glfwMakeContextCurrent(mainWindow.mainWindow);
 		// glfwGetFramebufferSize(mainWindow.mainWindow, &display_w, &display_h);
 
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		glfwMakeContextCurrent(mainWindow.mainWindow);
+		//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		//glfwMakeContextCurrent(mainWindow.mainWindow);
 
 		
 		
@@ -506,9 +519,9 @@ int main()
 //<>=========================================================================================================<>
 
 	// EXIT
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
+	//ImGui_ImplOpenGL3_Shutdown();
+	//ImGui_ImplGlfw_Shutdown();
+	//ImGui::DestroyContext();
 
 	glfwDestroyWindow(mainWindow.mainWindow);
 	glfwTerminate();

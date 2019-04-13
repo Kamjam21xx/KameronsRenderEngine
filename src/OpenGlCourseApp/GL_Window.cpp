@@ -60,7 +60,7 @@ int GL_Window::Initialize() {
 	glfwMakeContextCurrent(mainWindow);// set context for GLEW to use : telling glew to draw to our window 
 	// handle key + mouse input
 	createCallbacks();
-	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR); // disable cursor
+	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR); // enable/disable cursor
 	glewExperimental = GL_TRUE; // Allow modern extension features
 
 

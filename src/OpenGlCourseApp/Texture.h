@@ -13,6 +13,7 @@ public:
 	bool LoadTexture(GLenum glTextureUnit);
 	bool LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type);
 	bool LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering);
+	bool LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filteringMIN, GLenum filteringMAX);
 
 	void UseTexture();
 	void ClearTexture();
