@@ -97,7 +97,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui\examples\libs\gl3w;$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>
       </LanguageStandard>
       <EnableModules>true</EnableModules>
@@ -119,7 +119,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui\examples\libs\gl3w;$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>
       </LanguageStandard>
       <EnableModules>true</EnableModules>
@@ -143,7 +143,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui\examples\libs\gl3w;$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>
       </LanguageStandard>
       <EnableModules>true</EnableModules>
@@ -169,7 +169,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\libraries\imgui\examples\libs\gl3w;$(SolutionDir)\libraries\imgui;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLFW\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\GLEW\lib\Release\Win32;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\glm\include;C:\Users\Kameron\Documents\Visual Studio 2017\EXTERNAL LIBS\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>
       </LanguageStandard>
       <EnableModules>true</EnableModules>
@@ -246,6 +246,7 @@
     <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\libraries\imgui\.editorconfig" />
     <None Include="Models\Backdrop\BASE.fbx" />
     <None Include="Models\default.FLS" />
     <None Include="Models\Ground\BASE.fbx" />
@@ -285,6 +286,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\libraries\imgui\LICENSE.txt" />
+    <Text Include="..\libraries\imgui\README.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

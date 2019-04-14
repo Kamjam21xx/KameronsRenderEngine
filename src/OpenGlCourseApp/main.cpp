@@ -1,4 +1,9 @@
 #pragma
+
+//										 openGL libraries
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+//										STB image loader
 #define STB_IMAGE_IMPLEMENTATION
 //										 standard template library
 #include <cmath>
@@ -17,10 +22,6 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include <stdio.h>
-//										 openGL libraries
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 //
 #include "CommonValues.h"
 //										 project 
@@ -36,6 +37,7 @@
 #include "Model.h"
 #include "SkyBox.h"
 #include "Scene.h"
+
 
 
 /*
@@ -365,6 +367,7 @@ int main()
 
 	glfwWindowHint(GLFW_SAMPLES, 16);
 	glEnable(GL_MULTISAMPLE);
+	glfwSwapInterval(1); // vsync
 	//mainWindow.swapBuffers();
 	//glEnable(GL_DEBUG_OUTPUT);
 
@@ -372,8 +375,6 @@ int main()
 	// (immediate mode graphic user interface)  ---------  IMGUI
 //<>=========================================================================================================<>
 	/*
-	//
-
 	// reference ImGui.h line 2025 
 	*
 	*	declare pointers and pointer array + bytes per pixel pointer
@@ -381,27 +382,25 @@ int main()
 	*	
 	* call IsBuilt(); for true||false boolean value to control program flow
 	* set texture unit i think ==== SetTexID(ImTexture id);
-	*
+	
 
-	//
 
 	IMGUI_CHECKVERSION();
+
+	// ImGui::SetAllocatorFunctions(); change mem allocation
+
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
-
+		
+	io.Fonts->Clear();
 	ImFont* font = io.Fonts->AddFontFromFileTTF(u8"C:\\Users\\Kameron\\Documents\\GitHub\\KameronsRenderEngine\\src\\OpenGlCourseApp\\misc\\fonts\\Karla-Regular.ttf", 15.0f);
-	IM_ASSERT(font != NULL);
-	io.Fonts->GetTexDataAsRGBA32();
+	io.Fonts->Build();
 
 	ImGui_ImplGlfw_InitForOpenGL(mainWindow.mainWindow, true);
 	ImGui_ImplOpenGL3_Init(u8"#version 430");	
-
-	ImGui::NewFrame();
-	//ImGui::PushFont(NULL);
-	*/
+*/
 //<>=========================================================================================================<>
-
 	DirectionalLight mainLight;
 	std::vector<std::string> skyboxFaces;
 	glm::mat4 projection;
@@ -443,35 +442,62 @@ int main()
 	CreateShaders();
 
 	threadX.join();
-
-	skybox = SkyBox(skyboxFaces);
-	  
+	skybox = SkyBox(skyboxFaces); 
 	threadY.join();
-
     mainScene.load();
-
 	std::thread threadB;
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glEnable(GL_FRAMEBUFFER_SRGB);
+//<>=========================================================================================================<>
+	// MAIN LOOP
+//<>=========================================================================================================<>
+	
+	//<>=========================================================================================================<>
+	// (immediate mode graphic user interface)  ---------  IMGUI
+//<>=========================================================================================================<>
+	/*
+	// reference ImGui.h line 2025
+	*
+	*	declare pointers and pointer array + bytes per pixel pointer
+	*	call GetTexDataAsAlpha8 to get 8 bit texture to use for font --- give function the pointers to work on
+	*
+	* call IsBuilt(); for true||false boolean value to control program flow
+	* set texture unit i think ==== SetTexID(ImTexture id);
+	*/
+
+
+	IMGUI_CHECKVERSION();
+
+	// ImGui::SetAllocatorFunctions(); change mem allocation
+
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+
+	io.Fonts->Clear();
+
+	ImFont* font = io.Fonts->AddFontFromFileTTF(u8"C:\\Users\\Kameron\\Documents\\GitHub\\KameronsRenderEngine\\src\\OpenGlCourseApp\\misc\\fonts\\Karla-Regular.ttf", 15.0f);
+	
+	io.Fonts->Build();
+
+	ImGui_ImplGlfw_InitForOpenGL(mainWindow.mainWindow, true);
+	ImGui_ImplOpenGL3_Init(u8"#version 430");
+
+	//<>=========================================================================================================<>
 
 
 	static float f = 0.0f;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-//<>=========================================================================================================<>
-	// MAIN LOOP
-//<>=========================================================================================================<>
-
-
-
 	//ImGui::EndFrame();
 	while (!mainWindow.getShouldClose()) {
 		
-		//ImGui_ImplOpenGL3_NewFrame();
-		//ImGui_ImplGlfw_NewFrame();
-		//ImGui::NewFrame();
-
+		//
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		//
 
 
 
@@ -493,23 +519,25 @@ int main()
 		
 		glUseProgram(0);
 		
-		//ImGui::Begin("WINDOW!");
 		//
-		//ImGui::Text("check out this wicked text dawg");
-		//ImGui::End();
+		ImGui::Begin("WINDOW!");
+		ImGui::PushFont(font);
+		ImGui::Text("check out this wicked text dawg");
+		ImGui::PopFont();
+		ImGui::End();
 
 		//ImGui::ShowStyleEditor();
 
-		//ImGui::Render();
-		//glfwMakeContextCurrent(mainWindow.mainWindow);
+		ImGui::Render();
+		glfwMakeContextCurrent(mainWindow.mainWindow);
 
-		// int display_w, display_h;
-		// glfwMakeContextCurrent(mainWindow.mainWindow);
-		// glfwGetFramebufferSize(mainWindow.mainWindow, &display_w, &display_h);
+		 int display_w, display_h;
+		 glfwMakeContextCurrent(mainWindow.mainWindow);
+		 glfwGetFramebufferSize(mainWindow.mainWindow, &display_w, &display_h);
 
-		//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		//glfwMakeContextCurrent(mainWindow.mainWindow);
-
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		glfwMakeContextCurrent(mainWindow.mainWindow);
+		//
 		
 		
 		mainWindow.swapBuffers();
@@ -519,9 +547,9 @@ int main()
 //<>=========================================================================================================<>
 
 	// EXIT
-	//ImGui_ImplOpenGL3_Shutdown();
-	//ImGui_ImplGlfw_Shutdown();
-	//ImGui::DestroyContext();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
 	glfwDestroyWindow(mainWindow.mainWindow);
 	glfwTerminate();

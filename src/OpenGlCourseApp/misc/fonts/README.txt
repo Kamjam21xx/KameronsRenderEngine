@@ -52,7 +52,7 @@ If you have other loading/merging/adding fonts, you can post on the Dear ImGui "
 Using an icon font (such as FontAwesome: http://fontawesome.io or OpenFontIcons. https://github.com/traverseda/OpenFontIcons)
 is an easy and practical way to use icons in your Dear ImGui application.
 A common pattern is to merge the icon font within your main font, so you can embed icons directly from your strings without
-having to change fonts back and forth.
+having to change fonts back and fort0.h.
 
 To refer to the icon UTF-8 codepoints from your C++ code, you may use those headers files created by Juliette Foucaut:
   https://github.com/juliettef/IconFontCppHeaders

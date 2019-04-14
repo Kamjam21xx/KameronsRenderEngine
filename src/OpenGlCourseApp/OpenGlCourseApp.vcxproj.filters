@@ -241,6 +241,9 @@
     <None Include="Models\Backdrop\BASE.fbx">
       <Filter>Source Files\Models\Backdrop</Filter>
     </None>
+    <None Include="..\libraries\imgui\.editorconfig">
+      <Filter>imGUI</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Models\SimpleModel\BASE_COLOR.png">
@@ -294,6 +297,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\libraries\imgui\LICENSE.txt">
+      <Filter>imGUI</Filter>
+    </Text>
+    <Text Include="..\libraries\imgui\README.txt">
       <Filter>imGUI</Filter>
     </Text>
   </ItemGroup>

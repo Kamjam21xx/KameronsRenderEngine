@@ -26,7 +26,7 @@
 //#define IMGUI_IMPL_OPENGL_ES2     // Auto-detected on Emscripten
 //#define IMGUI_IMPL_OPENGL_ES3     // Auto-detected on iOS/Android
 
-// Set default OpenGL3 loader to be gl3w
+
 #define IMGUI_IMPL_OPENGL_LOADER_GLEW
 
 
