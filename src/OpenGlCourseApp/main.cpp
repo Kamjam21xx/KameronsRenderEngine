@@ -91,6 +91,9 @@ static const char* outlineFShader = "Shaders/outline.frag";
 static const char* FBVShader = "Shaders/framebuffershader.vert";
 static const char* FBFShader = "Shaders/framebuffershader.frag";
 
+PointLight pointLights[MAX_POINT_LIGHTS];
+SpotLight spotLights[MAX_SPOT_LIGHTS];
+
 
 
 
@@ -284,19 +287,21 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
 	skybox.bindCubeMapTexture(); // TEXTURE UNIT 6
 	RenderScene();	
 	skybox.unbinedCubeMapTexture();
 
+
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
-
 	skybox.DrawSkyBox(viewMatrix, projectionMatrix);
-
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
+	glDisable(GL_STENCIL_TEST);
+
 }
 
 void CreateLights(PointLight &pointLightsR, 
@@ -352,6 +357,45 @@ void CreateLights(PointLight &pointLightsR,
 */
 }
 
+void useLightEditor() { // shitty setup, change later
+	ImGui::Begin("Light Editor");
+	
+	ImGui::Text("check out thisd wicked text dawg");
+
+	static float lightEditorBrightness = pointLights[0].GetRange();
+	ImVec4 lightColor = ImVec4(pointLights[0].GetLightColorRed(), pointLights[0].GetLightColorGreen(), pointLights[0].GetLightColorBlue(), 1.00f);
+
+
+	ImGui::SliderFloat("float", &lightEditorBrightness, 0.0f, 20.0f);
+	ImGui::ColorEdit3("clear color", (float*)&lightColor);
+
+
+	pointLights[0].SetLightColor(lightColor.x, lightColor.y, lightColor.z);
+	pointLights[0].SetLightRange(lightEditorBrightness);
+	ImGui::End();
+}
+
+void RenderGUI(GLFWwindow* window) {
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		useLightEditor();
+		ImGui::ShowStyleEditor();
+
+		ImGui::EndFrame();
+		ImGui::Render();
+		glfwMakeContextCurrent(window);
+		int display_w, display_h;
+		glfwMakeContextCurrent(window);
+		glfwGetFramebufferSize(window, &display_w, &display_h);
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		glfwMakeContextCurrent(window);
+}
+
+
+
 
 
 int main() 
@@ -368,64 +412,35 @@ int main()
 	glfwWindowHint(GLFW_SAMPLES, 16);
 	glEnable(GL_MULTISAMPLE);
 	glfwSwapInterval(1); // vsync
-	//mainWindow.swapBuffers();
-	//glEnable(GL_DEBUG_OUTPUT);
+	mainWindow.swapBuffers();
+	glEnable(GL_DEBUG_OUTPUT);
 
 //<>=========================================================================================================<>
-	// (immediate mode graphic user interface)  ---------  IMGUI
-//<>=========================================================================================================<>
-	/*
-	// reference ImGui.h line 2025 
-	*
-	*	declare pointers and pointer array + bytes per pixel pointer
-	*	call GetTexDataAsAlpha8 to get 8 bit texture to use for font --- give function the pointers to work on
-	*	
-	* call IsBuilt(); for true||false boolean value to control program flow
-	* set texture unit i think ==== SetTexID(ImTexture id);
-	
 
-
-	IMGUI_CHECKVERSION();
-
-	// ImGui::SetAllocatorFunctions(); change mem allocation
-
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGui::StyleColorsDark();
-		
-	io.Fonts->Clear();
-	ImFont* font = io.Fonts->AddFontFromFileTTF(u8"C:\\Users\\Kameron\\Documents\\GitHub\\KameronsRenderEngine\\src\\OpenGlCourseApp\\misc\\fonts\\Karla-Regular.ttf", 15.0f);
-	io.Fonts->Build();
-
-	ImGui_ImplGlfw_InitForOpenGL(mainWindow.mainWindow, true);
-	ImGui_ImplOpenGL3_Init(u8"#version 430");	
-*/
-//<>=========================================================================================================<>
 	DirectionalLight mainLight;
 	std::vector<std::string> skyboxFaces;
 	glm::mat4 projection;
 
-	std::thread threadY([&]()mutable->void{
-		camera = Camera(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), -90.0f, 0, 3.0f, 0.5f);
-		projection = glm::perspective(glm::radians(52.0f), mainWindow.getAspectRatio(), 0.1f, 100.0f);
 
-	});
-	std::thread threadX([&]() mutable -> void {
-		shineMaterial = Material(4.0f, 32.0f);
-		dullMaterial = Material(0.5f, 50.0f);
+	camera = Camera(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), -90.0f, 0, 3.0f, 0.5f);
+	projection = glm::perspective(glm::radians(52.0f), mainWindow.getAspectRatio(), 0.1f, 100.0f);
 
-		skyboxFaces.push_back("Textures/skybox/right.jpg"); // take note of the file type
+
+	shineMaterial = Material(4.0f, 32.0f);
+	dullMaterial = Material(0.5f, 50.0f);
+
+	skyboxFaces.push_back("Textures/skybox/right.jpg"); // take note of the file type
 		
-		skyboxFaces.push_back("Textures/skybox/left.jpg");
+	skyboxFaces.push_back("Textures/skybox/left.jpg");
 		
-		skyboxFaces.push_back("Textures/skybox/top.jpg");
+	skyboxFaces.push_back("Textures/skybox/top.jpg");
 		
-		skyboxFaces.push_back("Textures/skybox/bot.jpg");
+	skyboxFaces.push_back("Textures/skybox/bot.jpg");
 		
-		skyboxFaces.push_back("Textures/skybox/back.jpg");
+	skyboxFaces.push_back("Textures/skybox/back.jpg");
 		
-		skyboxFaces.push_back("Textures/skybox/front.jpg");
-	});
+	skyboxFaces.push_back("Textures/skybox/front.jpg");
+
 
 	GLfloat now;
 
@@ -434,43 +449,26 @@ int main()
 								 0.25f, 0.8f,
 								 -5.0f, -10.0f, -10.0f);
 
-	PointLight pointLights[MAX_POINT_LIGHTS];
-	SpotLight spotLights[MAX_SPOT_LIGHTS];
+	//PointLight pointLights[MAX_POINT_LIGHTS];
+	//SpotLight spotLights[MAX_SPOT_LIGHTS];
 	unsigned int spotLightCount = 0;	
 	unsigned int pointLightCount = 0;
 	CreateLights(*pointLights, *spotLights, &pointLightCount, &spotLightCount);
 	CreateShaders();
 
-	threadX.join();
+
 	skybox = SkyBox(skyboxFaces); 
-	threadY.join();
     mainScene.load();
 	std::thread threadB;
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glEnable(GL_FRAMEBUFFER_SRGB);
-//<>=========================================================================================================<>
-	// MAIN LOOP
-//<>=========================================================================================================<>
-	
-	//<>=========================================================================================================<>
-	// (immediate mode graphic user interface)  ---------  IMGUI
-//<>=========================================================================================================<>
-	/*
-	// reference ImGui.h line 2025
-	*
-	*	declare pointers and pointer array + bytes per pixel pointer
-	*	call GetTexDataAsAlpha8 to get 8 bit texture to use for font --- give function the pointers to work on
-	*
-	* call IsBuilt(); for true||false boolean value to control program flow
-	* set texture unit i think ==== SetTexID(ImTexture id);
-	*/
 
-
+//<>=========================================================================================================<>
+// (immediate mode graphic user interface)  ---------  IMGUI
+//<>=========================================================================================================<>
 	IMGUI_CHECKVERSION();
-
-	// ImGui::SetAllocatorFunctions(); change mem allocation
 
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -478,26 +476,21 @@ int main()
 
 	io.Fonts->Clear();
 
-	ImFont* font = io.Fonts->AddFontFromFileTTF(u8"C:\\Users\\Kameron\\Documents\\GitHub\\KameronsRenderEngine\\src\\OpenGlCourseApp\\misc\\fonts\\Karla-Regular.ttf", 15.0f);
+	ImFont* font = io.Fonts->AddFontFromFileTTF(u8"C:\\Users\\Kameron\\Documents\\GitHub\\KameronsRenderEngine\\src\\OpenGlCourseApp\\misc\\fonts\\Karla-Regular.ttf", 22.0f);
 	
 	io.Fonts->Build();
 
 	ImGui_ImplGlfw_InitForOpenGL(mainWindow.mainWindow, true);
 	ImGui_ImplOpenGL3_Init(u8"#version 430");
-
-	//<>=========================================================================================================<>
-
-
-	static float f = 0.0f;
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	//ImGui::EndFrame();
+//<>=========================================================================================================<>
+	// MAIN LOOP
+//<>=========================================================================================================<>
 	while (!mainWindow.getShouldClose()) {
 		
-		//
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		//
+		glViewport(0, 0, 3840, 2160);
+
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 
 
@@ -509,37 +502,22 @@ int main()
 		if (spin >= 360.00f) { spin = 0.0f; }
 
 		glfwPollEvents();		
-		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange()); 
+		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange()); // fix later to stop xchange while not clicked
 		camera.keyControl(mainWindow.getKeys(), deltaTime);
 
 		DirectionalShadowMapPass(&mainLight);
 		for (size_t i = 0; i < pointLightCount; i++) { OmniShadowMapPass(&pointLights[i]); }
 		for (size_t i = 0; i < spotLightCount; i++) { OmniShadowMapPass(&spotLights[i]); }
+
 		RenderPass(projection, camera.calculateViewMatrix(), &pointLightCount, &spotLightCount, &mainLight, pointLights, spotLights);
-		
+			
 		glUseProgram(0);
-		
-		//
-		ImGui::Begin("WINDOW!");
-		ImGui::PushFont(font);
-		ImGui::Text("check out this wicked text dawg");
-		ImGui::PopFont();
-		ImGui::End();
 
-		//ImGui::ShowStyleEditor();
+		/////////////////////////////
 
-		ImGui::Render();
-		glfwMakeContextCurrent(mainWindow.mainWindow);
+		RenderGUI(mainWindow.mainWindow);
 
-		 int display_w, display_h;
-		 glfwMakeContextCurrent(mainWindow.mainWindow);
-		 glfwGetFramebufferSize(mainWindow.mainWindow, &display_w, &display_h);
 
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		glfwMakeContextCurrent(mainWindow.mainWindow);
-		//
-		
-		
 		mainWindow.swapBuffers();
 
 

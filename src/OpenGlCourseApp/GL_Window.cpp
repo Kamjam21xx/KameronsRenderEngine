@@ -121,7 +121,7 @@ void GL_Window::handleKeys(GLFWwindow *window, int key, int code, int action, in
 }
 void GL_Window::handleMouse(GLFWwindow *window, double xPos, double yPos) {
 	GL_Window* theWindow = static_cast<GL_Window*>(glfwGetWindowUserPointer(window));
-	if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
+	if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) || !glfwGetKey(window, GLFW_KEY_LEFT_ALT)) { 
 		return;
 	}
 	if (theWindow->mouseFirstMoved) {

@@ -20,6 +20,8 @@ PointLight::PointLight(GLuint shadowWidth, GLuint shadowHeight,
 	exponent = exp;
 	constant = con;
 
+	range = 4.5f * linear;
+
 	farPlane = far;
 
 	float aspect = (float)shadowWidth / (float)shadowHeight;

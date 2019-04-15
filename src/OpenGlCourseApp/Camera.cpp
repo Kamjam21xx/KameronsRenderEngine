@@ -59,6 +59,7 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime) {
 	}
 }
 void Camera::mouseControl(GLfloat xChange, GLfloat yChange) { // think in radians
+
 	xChange = (xChange * turnSpeed);
 	yChange = (yChange * turnSpeed);
 

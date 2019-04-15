@@ -24,17 +24,21 @@ public:
 	glm::vec3 GetPosition();
 
 	void SetPosition(glm::vec3 pos);
-	void SetLightRange(GLfloat range) {
+	void SetLightRange(GLfloat newRange) {
 		constant = 1.0f;
-		linear = 4.5f / range;
-		exponent = 75.0f / (range * range);
-	}
+		linear = 4.5f / newRange;
+		exponent = 75.0f / (newRange * newRange);
 
+		range = newRange; // SET BRIGHTNESS IN CONSTRUCTOR BASES ON THESE VALUES ? range = constant * (exp + linear;
+	}
+	float GetRange() {
+		return (float)range;
+	}
 
 	~PointLight();
 
 protected:
 	glm::vec3 position;
-	GLfloat constant, linear, exponent, farPlane;
+	GLfloat constant, linear, exponent, farPlane, range;
 
 };
