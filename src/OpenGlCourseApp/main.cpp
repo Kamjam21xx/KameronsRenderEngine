@@ -30,13 +30,13 @@
 #include "GL_Window.h"
 #include "Camera.h"
 #include "Texture.h"
-#include "DirectionalLight.h"
-#include "PointLight.h"
-#include "SpotLight.h"
+
 #include "Material.h"
 #include "Model.h"
 #include "SkyBox.h"
 #include "Scene.h"
+#include "GraphicUI.h"
+
 
 
 
@@ -358,64 +358,7 @@ void CreateLights(PointLight &pointLightsR,
 	spotLights[0].SetLightRange(80.0f);
 */
 }
-void pLightEdit() {
-	for (unsigned int i = 0; i < pointLightCount; ++i) {
-		ImGui::PushID(i);
 
-		// Set variables
-		float pLightDiffuse = pointLights[i].GetDiffuseIntensity();
-		float pLightAmbient = pointLights[i].GetAmbientIntensity();
-		float pLightRange = pointLights[i].GetRange();
-		ImVec4 pLightColor = ImVec4(pointLights[i].GetLightColorRed(), pointLights[i].GetLightColorGreen(), pointLights[i].GetLightColorBlue(), 1.00f);
-
-		// make GUI
-		ImGui::Text(" ");
-		ImGui::SliderAngle("Diffuse", &pLightDiffuse, 0.0f, 200.0f);
-		ImGui::SliderFloat("Ambient", &pLightAmbient, 0.0f, 0.1f);
-		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 100.0f);
-		ImGui::ColorEdit3("Color", (float*)&pLightColor);
-
-		// Set member values to variable values
-		pointLights[i].SetDiffuseIntensity(pLightDiffuse);
-		pointLights[i].SetAmbientIntensity(pLightAmbient);
-		pointLights[i].SetLightRange(pLightRange);
-		pointLights[i].SetLightColor(pLightColor.x, pLightColor.y, pLightColor.z);
-
-		ImGui::PopID();
-	}
-}
-
-void useLightsEditor() { // shitty setup, change later
-	ImGui::Begin("Light Editor");
-
-	ImGui::Text("Point Lights");
-	pLightEdit();
-
-	ImGui::End();
-}
-
-void RenderGUI(GLFWwindow* window) {
-
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-
-		useLightsEditor();
-		ImGui::ShowStyleEditor();
-
-		ImGui::Begin("Window Information");
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::End();
-
-		ImGui::EndFrame();
-		ImGui::Render();
-		glfwMakeContextCurrent(window);
-		int display_w, display_h;
-		glfwMakeContextCurrent(window);
-		glfwGetFramebufferSize(window, &display_w, &display_h);
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		glfwMakeContextCurrent(window);
-}
 
 
 
@@ -505,6 +448,8 @@ int main()
 
 	ImGui_ImplGlfw_InitForOpenGL(mainWindow.mainWindow, true);
 	ImGui_ImplOpenGL3_Init(u8"#version 430");
+
+	GraphicUI graphicUserInterface = GraphicUI(mainWindow.mainWindow);
 //<>=========================================================================================================<>
 	// MAIN LOOP
 //<>=========================================================================================================<>
@@ -538,7 +483,7 @@ int main()
 
 		/////////////////////////////
 
-		RenderGUI(mainWindow.mainWindow);
+
 
 
 		mainWindow.swapBuffers();
