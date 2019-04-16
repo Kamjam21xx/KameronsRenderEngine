@@ -8,19 +8,18 @@ GraphicUI::GraphicUI(GLFWwindow *windowPtr)
 }
 
 
-void GraphicUI::Render() {
+void GraphicUI::Start() {
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		EditLights();
-		ImGui::ShowStyleEditor();
-		DisplayInfo();
+
+}
+void GraphicUI::End() {
 
 		ImGui::EndFrame();
 		ImGui::Render();
-
 		glfwMakeContextCurrent(window);
 		int display_w, display_h;
 		glfwMakeContextCurrent(window);
@@ -36,18 +35,23 @@ void GraphicUI::DisplayInfo() {
 		ImGui::End();
 }
 
-void GraphicUI::EditLights(std::vector<PointLight> *pLights, std::vector<SpotLight> *sLights, DirectionalLight *dLight, unsigned short int pLightCount, unsigned short int sLightCount) { // shitty setup, change later
+void GraphicUI::EditLights(PointLight *pLights,SpotLight *sLights, DirectionalLight *dLight, unsigned short int pLightCount, unsigned short int sLightCount, bool dLightEdit, bool pLightEdit, bool sLightEdit) { // shitty setup, change later
+	
+	// rework checks to || "or" to increase execution speed.
+
 	ImGui::Begin("Light Editor");
-
-	ImGui::Text("Directional Light");
-	EditDLight(dLight);
-
-	ImGui::Text("Point Lights");
-	EditPLights(pLights, pLightCount);
-
-	ImGui::Text("Spot Lights");
-	EditSLights(sLights, sLightCount);
-
+	if (dLightEdit && (dLight != NULL)) {
+		ImGui::Text("Directional Light");
+		EditDLight(dLight);
+	}
+	if (pLightEdit && (pLights != NULL) && (pLightCount != NULL) && (pLightCount >= 1)) {
+		ImGui::Text("Point Lights");
+		EditPLights(pLights, pLightCount);
+	}
+	if (sLightEdit && (sLights != NULL) && (sLightCount != NULL) && (sLightCount >= 1)) {
+		ImGui::Text("Spot Lights");
+		EditSLights(sLights, sLightCount);
+	}
 	ImGui::End();
 }
 void GraphicUI::EditDLight(DirectionalLight *dLight) {
@@ -67,62 +71,93 @@ void GraphicUI::EditDLight(DirectionalLight *dLight) {
 	dLight->SetAmbientIntensity(dLightAmbient);
 	dLight->SetLightColor(dLightColor.x, dLightColor.y, dLightColor.z);
 }
-void GraphicUI::EditPLights(std::vector<PointLight> *pLights, unsigned short int lightCount) {
+void GraphicUI::EditPLights(PointLight *pLights, unsigned short int lightCount) {
 
 	for (unsigned int i = 0; i < lightCount; ++i) {
 		ImGui::PushID(i);
 
 		// Set variables
-		float pLightDiffuse = (*pLights)[i].GetDiffuseIntensity();
-		float pLightAmbient = (*pLights)[i].GetAmbientIntensity();
-		float pLightRange = (*pLights)[i].GetRange();
-		ImVec4 pLightColor = ImVec4((*pLights)[i].GetLightColorRed(), (*pLights)[i].GetLightColorGreen(), (*pLights)[i].GetLightColorBlue(), 1.00f);
+		float pLightDiffuse = pLights[i].GetDiffuseIntensity();
+		float pLightAmbient = pLights[i].GetAmbientIntensity();
+		float pLightRange = pLights[i].GetRange();
+		ImVec4 pLightColor = ImVec4(pLights[i].GetLightColorRed(), pLights[i].GetLightColorGreen(), pLights[i].GetLightColorBlue(), 1.00f);
 
 		// make GUI
 		ImGui::Text(" ");
-		ImGui::SliderFloat("Diffuse", &pLightDiffuse, 0.0f, 2.0f);
+		ImGui::SliderFloat("Diffuse", &pLightDiffuse, 0.0f, 20.0f);
 		ImGui::SliderFloat("Ambient", &pLightAmbient, 0.0f, 0.2f);
 		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 100.0f);
 		ImGui::ColorEdit3("Color", (float*)&pLightColor);
 
 		// Set member values to variable values
-		(*pLights)[i].SetDiffuseIntensity(pLightDiffuse);
-		(*pLights)[i].SetAmbientIntensity(pLightAmbient);
-		(*pLights)[i].SetLightRange(pLightRange);
-		(*pLights)[i].SetLightColor(pLightColor.x, pLightColor.y, pLightColor.z);
+		pLights[i].SetDiffuseIntensity(pLightDiffuse);
+		pLights[i].SetAmbientIntensity(pLightAmbient);
+		pLights[i].SetLightRange(pLightRange);
+		pLights[i].SetLightColor(pLightColor.x, pLightColor.y, pLightColor.z);
 
 		ImGui::PopID();
 	}
 }
-void GraphicUI::EditSLights(std::vector<SpotLight> *sLights, unsigned short int lightCount) {
+void GraphicUI::EditSLights(SpotLight *sLights, unsigned short int lightCount) {
+	
 	for (unsigned int i = 0; i < lightCount; ++i) {
 		ImGui::PushID(i);
 
 		// Set variables
-		float pLightDiffuse = (*sLights)[i].GetDiffuseIntensity();
-		float pLightAmbient = (*sLights)[i].GetAmbientIntensity();
-		float pLightRange = (*sLights)[i].GetRange();
-		ImVec4 pLightColor = ImVec4((*sLights)[i].GetLightColorRed(), (*sLights)[i].GetLightColorGreen(), (*sLights)[i].GetLightColorBlue(), 1.00f);
+		float pLightDiffuse = sLights[i].GetDiffuseIntensity();
+		float pLightAmbient = sLights[i].GetAmbientIntensity();
+		float pLightRange = sLights[i].GetRange();
+		ImVec4 pLightColor = ImVec4(sLights[i].GetLightColorRed(), sLights[i].GetLightColorGreen(), sLights[i].GetLightColorBlue(), 1.00f);
 
 		// make GUI
 		ImGui::Text(" ");
-		ImGui::SliderFloat("Diffuse", &pLightDiffuse, 0.0f, 200.0f);
-		ImGui::SliderFloat("Ambient", &pLightAmbient, 0.0f, 0.1f);
+		ImGui::SliderFloat("Diffuse", &pLightDiffuse, 0.0f, 20.0f);
+		ImGui::SliderFloat("Ambient", &pLightAmbient, 0.0f, 0.2f);
 		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 100.0f);
 		ImGui::ColorEdit3("Color", (float*)&pLightColor);
 
 		// Set member values to variable values
-		(*sLights)[i].SetDiffuseIntensity(pLightDiffuse);
-		(*sLights)[i].SetAmbientIntensity(pLightAmbient);
-		(*sLights)[i].SetLightRange(pLightRange);
-		(*sLights)[i].SetLightColor(pLightColor.x, pLightColor.y, pLightColor.z);
+		sLights[i].SetDiffuseIntensity(pLightDiffuse);
+		sLights[i].SetAmbientIntensity(pLightAmbient);
+		sLights[i].SetLightRange(pLightRange);
+		sLights[i].SetLightColor(pLightColor.x, pLightColor.y, pLightColor.z);
 
 		ImGui::PopID();
 	}
 }
 
+void GraphicUI::EditScene(GLfloat *spin) {
+	
+	ImGui::Begin("Scene Editor");
 
+	EditSceneSpin(spin);
 
+	ImGui::End();
+}
+void GraphicUI::EditSceneSpin(GLfloat *spin) {
+	
+	if (ImGui::Button("Enable Spin")) {
+		
+		enableSpin = !enableSpin;
+
+		if (enableSpin) {
+
+			(*spin) = stateSaveSpin;
+		}
+		else {
+			stateSaveSpin = (*spin);
+			(*spin) = 0.0f;
+		}
+	}
+
+	if (enableSpin) {
+		ImGui::SliderFloat("Spin", spin, -1.0f, 1.0f);
+	}
+	else {
+
+	}
+
+}
 
 GraphicUI::~GraphicUI()
 {

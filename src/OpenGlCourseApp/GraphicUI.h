@@ -23,14 +23,17 @@ public:
 	
 	GraphicUI(GLFWwindow *windowPtr);
 
-	void Render();
+	void Start();
+	void End();
 	void DisplayInfo();
 	
-	void EditLights(std::vector<PointLight> *pLights, std::vector<SpotLight> *sLights, DirectionalLight *dLight, unsigned short int pLightCount, unsigned short int sLightCount);
+	void EditLights(PointLight *pLights, SpotLight *sLights, DirectionalLight *dLight, unsigned short int pLightCount, unsigned short int sLightCount, bool dLightEdit, bool pLightEdit, bool sLightEdit);
 	void EditDLight(DirectionalLight *dLight);
-	void EditPLights(std::vector<PointLight> *pLights, unsigned short int lightCount);
-	void EditSLights(std::vector<SpotLight> *sLights, unsigned short int lightCount);
+	void EditPLights(PointLight *pLights, unsigned short int lightCount);
+	void EditSLights(SpotLight *sLights, unsigned short int lightCount);
 
+	void EditScene(GLfloat *spin);
+	void EditSceneSpin(GLfloat *spin);
 
 
 	~GraphicUI();
@@ -38,6 +41,10 @@ public:
 private:
 	
 	GLFWwindow *window;
+
+	bool enableSpin;
+
+	GLfloat stateSaveSpin;
 
 	// possible take addresses per function call
 	// OR store addresses for v-table lookups

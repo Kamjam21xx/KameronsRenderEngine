@@ -93,8 +93,8 @@ static const char* FBFShader = "Shaders/framebuffershader.frag";
 
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
-unsigned int spotLightCount = 0;
-unsigned int pointLightCount = 0;
+unsigned short int spotLightCount = 0;
+unsigned short int pointLightCount = 0;
 
 
 
@@ -236,8 +236,8 @@ void OmniShadowMapPass(PointLight *light) {
 
 void RenderPass(glm::mat4 projectionMatrix, 
 				glm::mat4 viewMatrix, 
-				unsigned int* pointLightCount, 
-				unsigned int* spotLightCount, 
+				unsigned short int* pointLightCount, 
+				unsigned short int* spotLightCount, 
 				DirectionalLight* mainLight, 
 				PointLight *pointLights, 
 				SpotLight *spotLights) {
@@ -308,8 +308,8 @@ void RenderPass(glm::mat4 projectionMatrix,
 
 void CreateLights(PointLight &pointLightsR, 
 				  SpotLight &spotLightsR, 
-				  unsigned int *pointLightCount, 
-				  unsigned int *spotLightCount) {
+				  unsigned short int *pointLightCount, 
+				  unsigned short int *spotLightCount) {
 
 	// make plain text loader for lights, add to scene.
 	// added shadow detail var for ease testing
@@ -450,6 +450,11 @@ int main()
 	ImGui_ImplOpenGL3_Init(u8"#version 430");
 
 	GraphicUI graphicUserInterface = GraphicUI(mainWindow.mainWindow);
+	
+	// // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // 
+
+	GLfloat spinModifier = 0.0f;
+
 //<>=========================================================================================================<>
 	// MAIN LOOP
 //<>=========================================================================================================<>
@@ -466,7 +471,7 @@ int main()
 		deltaTime = now - lastTime;
 		lastTime = now;
 
-		spin += 0.033f;
+		spin += spinModifier;
 		if (spin >= 360.00f) { spin = 0.0f; }
 
 		glfwPollEvents();		
@@ -480,12 +485,18 @@ int main()
 		RenderPass(projection, camera.calculateViewMatrix(), &pointLightCount, &spotLightCount, &mainLight, pointLights, spotLights);
 			
 		glUseProgram(0);
+		
+		///////////////////////////// GUI
+		graphicUserInterface.Start();
+		ImGui::ShowStyleEditor();
 
-		/////////////////////////////
-
-
-
-
+		graphicUserInterface.EditLights(pointLights, NULL, NULL, pointLightCount, NULL, false, true, false);
+		graphicUserInterface.EditScene(&spinModifier);
+		graphicUserInterface.DisplayInfo();
+		
+		graphicUserInterface.End();
+		///////////////////////////// GUI
+		
 		mainWindow.swapBuffers();
 
 
