@@ -31,6 +31,7 @@ public:
 	void SetLightColor(GLfloat red, GLfloat green, GLfloat blue) {
 		color = glm::vec3(red, green, blue);
 	}
+	
 	glm::vec3 GetLightColor() {
 		return color;
 	}
@@ -42,6 +43,12 @@ public:
 	}
 	float GetLightColorBlue() {
 		return (float)color.b;
+	}
+	float GetAmbientIntensity() {
+		return ambientIntensity;
+	}
+	float GetDiffuseIntensity() {
+		return diffuseIntensity;
 	}
 
 	~Light();

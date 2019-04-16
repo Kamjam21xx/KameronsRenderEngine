@@ -93,6 +93,8 @@ static const char* FBFShader = "Shaders/framebuffershader.frag";
 
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
+unsigned int spotLightCount = 0;
+unsigned int pointLightCount = 0;
 
 
 
@@ -325,13 +327,13 @@ void CreateLights(PointLight &pointLightsR,
 		1.0f, 0.7f, 1.8f);
 	(*pointLightCount)++;
 	pointLights[0].SetLightRange(12.0f);
-/*
+
 	pointLights[1] = PointLight(shadowDetail * 256, shadowDetail * 256,
 		0.01f, 100.0f,
 		1.0f, 0.7f, 0.7f,
 		0.0001f, 1.0f,
 		8.0f, 8.0f, -0.5f,
-		1.0f, 0.7f, 1.8f);
+		1.0f, 0.7f, -1.8f);
 	(*pointLightCount)++;
 	pointLights[1].SetLightRange(12.0f);
 
@@ -340,10 +342,10 @@ void CreateLights(PointLight &pointLightsR,
 		0.7f, 1.0f, 0.7f,
 		0.0001f, 1.0f,
 		8.0f, 8.0f, 0.5f,
-		1.0f, 0.7f, 1.8f);
+		-1.0f, 0.7f, 1.8f);
 	(*pointLightCount)++;
 	pointLights[2].SetLightRange(12.0f);
-
+/*
 		spotLights[0] = SpotLight(shadowDetail * 2048, shadowDetail * 2048,
 		0.1f, 100.0f,
 		0.5f, 0.5f, 0.5f,						// FIX SPOTLIGHT EDGE < < < < < << << << <<< <<< <<<< <<<< <<<<< <<<<<<
@@ -356,22 +358,39 @@ void CreateLights(PointLight &pointLightsR,
 	spotLights[0].SetLightRange(80.0f);
 */
 }
+void pLightEdit() {
+	for (unsigned int i = 0; i < pointLightCount; ++i) {
+		ImGui::PushID(i);
 
-void useLightEditor() { // shitty setup, change later
+		// Set variables
+		float pLightDiffuse = pointLights[i].GetDiffuseIntensity();
+		float pLightAmbient = pointLights[i].GetAmbientIntensity();
+		float pLightRange = pointLights[i].GetRange();
+		ImVec4 pLightColor = ImVec4(pointLights[i].GetLightColorRed(), pointLights[i].GetLightColorGreen(), pointLights[i].GetLightColorBlue(), 1.00f);
+
+		// make GUI
+		ImGui::Text(" ");
+		ImGui::SliderAngle("Diffuse", &pLightDiffuse, 0.0f, 200.0f);
+		ImGui::SliderFloat("Ambient", &pLightAmbient, 0.0f, 0.1f);
+		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 100.0f);
+		ImGui::ColorEdit3("Color", (float*)&pLightColor);
+
+		// Set member values to variable values
+		pointLights[i].SetDiffuseIntensity(pLightDiffuse);
+		pointLights[i].SetAmbientIntensity(pLightAmbient);
+		pointLights[i].SetLightRange(pLightRange);
+		pointLights[i].SetLightColor(pLightColor.x, pLightColor.y, pLightColor.z);
+
+		ImGui::PopID();
+	}
+}
+
+void useLightsEditor() { // shitty setup, change later
 	ImGui::Begin("Light Editor");
-	
-	ImGui::Text("check out thisd wicked text dawg");
 
-	static float lightEditorBrightness = pointLights[0].GetRange();
-	ImVec4 lightColor = ImVec4(pointLights[0].GetLightColorRed(), pointLights[0].GetLightColorGreen(), pointLights[0].GetLightColorBlue(), 1.00f);
+	ImGui::Text("Point Lights");
+	pLightEdit();
 
-
-	ImGui::SliderFloat("float", &lightEditorBrightness, 0.0f, 20.0f);
-	ImGui::ColorEdit3("clear color", (float*)&lightColor);
-
-
-	pointLights[0].SetLightColor(lightColor.x, lightColor.y, lightColor.z);
-	pointLights[0].SetLightRange(lightEditorBrightness);
 	ImGui::End();
 }
 
@@ -381,8 +400,12 @@ void RenderGUI(GLFWwindow* window) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		useLightEditor();
+		useLightsEditor();
 		ImGui::ShowStyleEditor();
+
+		ImGui::Begin("Window Information");
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
 
 		ImGui::EndFrame();
 		ImGui::Render();
@@ -451,8 +474,8 @@ int main()
 
 	//PointLight pointLights[MAX_POINT_LIGHTS];
 	//SpotLight spotLights[MAX_SPOT_LIGHTS];
-	unsigned int spotLightCount = 0;	
-	unsigned int pointLightCount = 0;
+	//unsigned int spotLightCount = 0;
+	//unsigned int pointLightCount = 0;
 	CreateLights(*pointLights, *spotLights, &pointLightCount, &spotLightCount);
 	CreateShaders();
 
