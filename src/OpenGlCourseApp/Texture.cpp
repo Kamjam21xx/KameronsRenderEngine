@@ -20,8 +20,8 @@ Texture::Texture(const char* fileLoc)
 	textureUnit = GL_TEXTURE1;
 }
 
-bool Texture::LoadTexture(GLenum glTextureUnit) {
-
+bool Texture::LoadTexture(GLenum glTextureUnit) 
+{
 	unsigned char *texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
 	textureUnit = glTextureUnit;
 	if (!texData) {
@@ -47,8 +47,8 @@ bool Texture::LoadTexture(GLenum glTextureUnit) {
 	return true;
 }
 
-bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type) {
-
+bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type) 
+{
 	unsigned char *texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
 	textureUnit = glTextureUnit;
 	if (!texData) {
@@ -73,8 +73,8 @@ bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum fo
 	return true;
 }
 
-bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering) {
-
+bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering) 
+{
 	unsigned char *texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
 	textureUnit = glTextureUnit;
 	if (!texData) {
@@ -99,8 +99,8 @@ bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum fo
 	return true;
 }
 
-bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filteringMIN, GLenum filteringMAX) {
-
+bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filteringMIN, GLenum filteringMAX) 
+{
 	unsigned char *texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
 	textureUnit = glTextureUnit;
 	if (!texData) {
@@ -125,7 +125,58 @@ bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum fo
 	return true;
 }
 
-void Texture::ClearTexture() {
+
+bool Texture::GenerateTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLint texWidth, GLint texHeight)
+{
+	// used for FrameBuffer class texture
+	textureUnit = glTextureUnit;
+	height = texHeight;
+	width = texWidth;
+
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texHeight, texHeight, 0, format, type, NULL);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return true;
+}
+
+bool Texture::GenerateTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint texWidth, GLint texHeight)
+{
+	// used for FrameBuffer class texture
+	textureUnit = glTextureUnit;
+	height = texHeight;
+	width = texWidth;
+
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texWidth, texHeight, 0, format, type, NULL);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return true;
+}
+
+
+void Texture::ClearTexture() 
+{
 	glDeleteTextures(1, &textureID);
 	textureID = 0;
 	width = 0;
@@ -133,9 +184,40 @@ void Texture::ClearTexture() {
 	bitDepth = 0;
 	fileLocation = NULL;
 }
-void Texture::UseTexture() {
+void Texture::UseTexture() 
+{
 	glActiveTexture(textureUnit);
 	glBindTexture(GL_TEXTURE_2D, textureID); 
+}
+
+
+void Texture::SetTextureUnit(GLuint glTextureUnit) 
+{
+	textureUnit = glTextureUnit;
+}
+int Texture::GetWidth() const
+{
+	return width;
+}
+int Texture::GetHeight() const
+{
+	return height;
+}
+int Texture::GetBitDepth() const
+{
+	return bitDepth;
+}
+GLuint Texture::GetTextureID() const
+{
+	return textureID;
+}
+GLuint Texture::GetTextureUnit() const
+{
+	return textureUnit;
+}
+const char* Texture::GetFileLocationPtr() const 
+{
+	return fileLocation
 }
 
 

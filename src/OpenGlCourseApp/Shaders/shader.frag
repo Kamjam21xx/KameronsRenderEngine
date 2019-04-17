@@ -316,7 +316,7 @@ void main()
 	// Parallax_occlusion_mapping
 	vec3 TangentViewPos = tTBN * eyePosition;
 	vec3 TangentFragPos = tTBN * FragPos;
-	heightScale = 0.002175f;
+	heightScale = 0.0175f;
 	vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 	vec2 TexCoord = ParallaxMapping(TexCoord, viewDir);
 	// END_MAIN_DEFINITION
@@ -395,6 +395,7 @@ void main()
 			else
 			{
 				colour = shadowFactor * reflection;
+				colour.rgb = pow(colour.rgb, vec3(1.0/gamma));	
 			}
 		}
 	//}

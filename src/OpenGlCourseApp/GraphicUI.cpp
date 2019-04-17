@@ -82,7 +82,7 @@ void GraphicUI::EditPLights(PointLight *pLights, unsigned short int lightCount)
 		float pLightDiffuse = pLights[i].GetDiffuseIntensity();
 		float pLightAmbient = pLights[i].GetAmbientIntensity();
 		float pLightRange = pLights[i].GetRange();
-		ImVec4 pLightColor = ImVec4(pLights[i].GetLightColorRed(), pLights[i].GetLightColorGreen(), pLights[i].GetLightColorBlue(), 1.00f);
+		ImVec4 pLightColor = ImVec4(pLights[i].GetLightColorRed() / 4.0f, pLights[i].GetLightColorGreen() / 4.0f, pLights[i].GetLightColorBlue() / 4.0f, 1.00f);
 
 		// make GUI
 		ImGui::Text(" ");
@@ -91,11 +91,11 @@ void GraphicUI::EditPLights(PointLight *pLights, unsigned short int lightCount)
 		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 1000.0f);
 		ImGui::ColorEdit3("Color", (float*)&pLightColor);
 
-		// Set member values to variable values
+		// Set member variable values to variable values
 		pLights[i].SetDiffuseIntensity(pLightDiffuse);
 		pLights[i].SetAmbientIntensity(pLightAmbient);
 		pLights[i].SetLightRange(pLightRange);
-		pLights[i].SetLightColor(pLightColor.x, pLightColor.y, pLightColor.z);
+		pLights[i].SetLightColor(pLightColor.x * 4.0f, pLightColor.y * 4.0f, pLightColor.z * 4.0f);
 
 		ImGui::PopID();
 	}
@@ -110,7 +110,7 @@ void GraphicUI::EditSLights(SpotLight *sLights, unsigned short int lightCount)
 		float pLightDiffuse = sLights[i].GetDiffuseIntensity();
 		float pLightAmbient = sLights[i].GetAmbientIntensity();
 		float pLightRange = sLights[i].GetRange();
-		ImVec4 pLightColor = ImVec4(sLights[i].GetLightColorRed(), sLights[i].GetLightColorGreen(), sLights[i].GetLightColorBlue(), 1.00f);
+		ImVec4 pLightColor = ImVec4(sLights[i].GetLightColorRed() / 4.0f, sLights[i].GetLightColorGreen() / 4.0f, sLights[i].GetLightColorBlue() / 4.0f, 1.00f);
 
 		// make GUI
 		ImGui::Text(" ");
@@ -119,11 +119,11 @@ void GraphicUI::EditSLights(SpotLight *sLights, unsigned short int lightCount)
 		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 1000.0f);
 		ImGui::ColorEdit3("Color", (float*)&pLightColor);
 
-		// Set member values to variable values
+		// Set member variable values to variable values
 		sLights[i].SetDiffuseIntensity(pLightDiffuse);
 		sLights[i].SetAmbientIntensity(pLightAmbient);
 		sLights[i].SetLightRange(pLightRange);
-		sLights[i].SetLightColor(pLightColor.x, pLightColor.y, pLightColor.z);
+		sLights[i].SetLightColor(pLightColor.x * 4.0f, pLightColor.y * 4.0f, pLightColor.z * 4.0f);
 
 		ImGui::PopID();
 	}
@@ -186,39 +186,26 @@ void GraphicUI::EditSplitScreen(GLboolean *splitScreenIsOn, GLuint *splitScreenT
 	{
 		(*splitScreenIsOn) = !(*splitScreenIsOn);
 	}
+
 	if ((*splitScreenIsOn)) 
 	{
-		if ((*splitScreenType) == 0)
-		{
-			ImGui::Text("Color Map");
-		}
-		else if ((*splitScreenType) == 1)
-		{
-			ImGui::Text("Specular Map");
-		}
-		else if ((*splitScreenType) == 2)
-		{
-			ImGui::Text("Reflection");
-		}
-		else if ((*splitScreenType) == 3)
-		{
-			ImGui::Text("Light Result");
-		}
-		else if ((*splitScreenType) == 4)
-		{
-			ImGui::Text("Tangent Normal");
-		}
-		else if ((*splitScreenType) == 5)
-		{
-			ImGui::Text("Normal Map");
-		}
-		else if ((*splitScreenType) == 6)
-		{
-			ImGui::Text("Height Map");
-		}
-		else
-		{
-			ImGui::Text("No Diffuse Multiply");
+		switch ((*splitScreenType)) {
+		case 0 : ImGui::Text("Color Map");
+				 break;
+		case 1 : ImGui::Text("Specular Map");
+				 break;
+		case 2 : ImGui::Text("Reflection");
+				 break;
+		case 3 : ImGui::Text("Light Result");
+				 break;
+		case 4 : ImGui::Text("Tangent Normal");
+				 break;
+		case 5 : ImGui::Text("Normal Map");
+				 break;
+		case 6 : ImGui::Text("Height Map");
+				 break;
+		case 7 : ImGui::Text("No Diffuse Multiply");
+				 break;
 		}
 
 		ImGui::SliderInt("View", (int*)splitScreenType, 0, 7);

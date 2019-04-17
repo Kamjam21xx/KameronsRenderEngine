@@ -111,6 +111,9 @@
     <ClCompile Include="GraphicUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h">
@@ -189,6 +192,9 @@
       <Filter>imGUI</Filter>
     </ClInclude>
     <ClInclude Include="GraphicUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

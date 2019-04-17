@@ -37,7 +37,13 @@
 #include "Scene.h"
 #include "GraphicUI.h"
 
-
+//
+//
+//
+//			ADD CONST CORRECTNESS through the entire application
+//
+//
+//
 
 
 /*
