@@ -2,6 +2,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <stdio.h>
+
 #include "Texture.h"
 
 class FrameBuffer
@@ -22,6 +24,7 @@ private:
 	FrameBuffer();
 
 	Texture texture;
+	GLint bufferWidth, bufferHeight;
 	GLuint FBO;
 
 

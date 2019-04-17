@@ -126,7 +126,7 @@ bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum fo
 }
 
 
-bool Texture::GenerateTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLint texWidth, GLint texHeight)
+bool Texture::GenerateTextureFBO(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLint texWidth, GLint texHeight)
 {
 	// used for FrameBuffer class texture
 	textureUnit = glTextureUnit;
@@ -143,14 +143,10 @@ bool Texture::GenerateTexture(GLenum glTextureUnit, GLenum internalFormat, GLenu
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texHeight, texHeight, 0, format, type, NULL);
 
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
 	return true;
 }
 
-bool Texture::GenerateTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint texWidth, GLint texHeight)
+bool Texture::GenerateTextureFBO(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint texWidth, GLint texHeight)
 {
 	// used for FrameBuffer class texture
 	textureUnit = glTextureUnit;
@@ -167,11 +163,12 @@ bool Texture::GenerateTexture(GLenum glTextureUnit, GLenum internalFormat, GLenu
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texWidth, texHeight, 0, format, type, NULL);
 
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
 	return true;
+}
+
+void Texture::BindZero()
+{
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 
