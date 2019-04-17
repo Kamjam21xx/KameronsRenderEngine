@@ -35,6 +35,10 @@ public:
 	void EditScene(GLfloat *spin);
 	void EditSceneSpin(GLfloat *spin);
 
+	void EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType);
+	void EditFiltering();
+	void EditSplitScreen(GLboolean *splitScreenIsOn, GLuint *splitScreenType);
+
 
 	~GraphicUI();
 

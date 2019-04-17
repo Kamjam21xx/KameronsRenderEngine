@@ -46,20 +46,19 @@ void Shader::CreateFromFiles(const char* vertexLocation, const char* geometryLoc
 std::string Shader::ReadFile(const char* fileLocation) 
 {
 	std::string content;
-	std::thread readFileThread([&]() mutable -> void {
-		std::ifstream fileStream(fileLocation, std::ios::in);
-		if (!fileStream.is_open()) {
-			printf("Failed to read %s! File doesn't exist.");
-			content = "";
-		}
-		std::string line = "";
-		while (!fileStream.eof()) {
-			std::getline(fileStream, line);
-			content.append(line + "\n");
-		}
-		fileStream.close();
-	});
-	readFileThread.join();
+
+	std::ifstream fileStream(fileLocation, std::ios::in);
+	if (!fileStream.is_open()) {
+		printf("Failed to read %s! File doesn't exist.");
+		content = "";
+	}
+	std::string line = "";
+	while (!fileStream.eof()) {
+		std::getline(fileStream, line);
+		content.append(line + "\n");
+	}
+	fileStream.close();
+
 	return content;
 }
 void Shader::CompileShader(const char* vertexCode, const char* fragmentCode) 
@@ -126,6 +125,8 @@ void Shader::CompileProgram()
 	uniformSpecularPower = glGetUniformLocation(shaderID, "material.specularPower");
 	uniformEyePosition = glGetUniformLocation(shaderID, "eyePosition");
 	uniformEyeDirection = glGetUniformLocation(shaderID, "eyeDirection");
+	uniformSplitScreenIsOn = glGetUniformLocation(shaderID, "splitScreenIsOn");
+	uniformSplitScreenType = glGetUniformLocation(shaderID, "splitScreenType");
 
 	uniformPointLightCount = glGetUniformLocation(shaderID, "pointLightCount");
 
@@ -257,6 +258,14 @@ GLuint Shader::GetFarPlanelocation()
 {
 	return uniformFarPlane;
 }
+GLuint Shader::GetSplitScreenIsOnLocation() 
+{
+	return uniformSplitScreenIsOn;
+}
+GLuint Shader::GetSplitScreenTypeLocation() 
+{
+	return uniformSplitScreenType;
+}
 
 void Shader::SetDirectionalLight(DirectionalLight * dLight) 
 {
@@ -345,6 +354,14 @@ void Shader::SetLightMatrices(std::vector<glm::mat4> lightMatrices)
 void Shader::SetTextureSkyBox(GLuint textureUnit) 
 {
 	glUniform1i(uniformTextureSkyBox, textureUnit);
+}
+void Shader::SetSplitScreenIsOn(GLboolean splitScreenIsOn) 
+{
+	glUniform1i(uniformSplitScreenIsOn, splitScreenIsOn);
+}
+void Shader::SetSplitScreenType(GLuint splitScreenType) 
+{
+	glUniform1i(uniformSplitScreenType, splitScreenType);
 }
 
 void Shader::UseShader() 

@@ -41,6 +41,8 @@ public:
 	GLuint GetEyeDirectionLocation();
 	GLuint GetOmniLightLocation();
 	GLuint GetFarPlanelocation();
+	GLuint GetSplitScreenIsOnLocation();
+	GLuint GetSplitScreenTypeLocation();
 
 	void UseShader();
 	void ClearShader();
@@ -57,6 +59,8 @@ public:
 	void SetDirectionalLightTransform(glm::mat4 *lTransform);
 	void SetLightMatrices(std::vector<glm::mat4> lightMatrices);
 	void SetTextureSkyBox(GLuint textureUnit);
+	void SetSplitScreenIsOn(GLboolean splitScreenIsOn);
+	void SetSplitScreenType(GLuint splitScreenType);
 	
 	~Shader();
 
@@ -71,7 +75,7 @@ private:
 		uniformTextureDiffuse, uniformTextureSpecular, uniformTextureMetal, uniformTextureNormal, uniformTextureHeight,
 		uniformTextureSkyBox,
 		uniformDirectionalLightTransform, uniformDirectionalShadowMap,
-		uniformOmniLightPos, uniformFarPlane;
+		uniformOmniLightPos, uniformFarPlane, uniformSplitScreenIsOn, uniformSplitScreenType;
 
 	GLuint uniformLightMatrices[6];
 

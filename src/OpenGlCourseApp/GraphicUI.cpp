@@ -8,16 +8,14 @@ GraphicUI::GraphicUI(GLFWwindow *windowPtr)
 }
 
 
-void GraphicUI::Start() {
-
+void GraphicUI::Start() 
+{
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-
-
 }
-void GraphicUI::End() {
-
+void GraphicUI::End() 
+{
 		ImGui::EndFrame();
 		ImGui::Render();
 		glfwMakeContextCurrent(window);
@@ -27,7 +25,8 @@ void GraphicUI::End() {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwMakeContextCurrent(window);
 }
-void GraphicUI::DisplayInfo() {
+void GraphicUI::DisplayInfo() 
+{
 		ImGui::Begin("Window Information");
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -35,27 +34,29 @@ void GraphicUI::DisplayInfo() {
 		ImGui::End();
 }
 
-void GraphicUI::EditLights(PointLight *pLights,SpotLight *sLights, DirectionalLight *dLight, unsigned short int pLightCount, unsigned short int sLightCount, bool dLightEdit, bool pLightEdit, bool sLightEdit) { // shitty setup, change later
-	
+void GraphicUI::EditLights(PointLight *pLights,SpotLight *sLights, DirectionalLight *dLight, unsigned short int pLightCount, unsigned short int sLightCount, bool dLightEdit, bool pLightEdit, bool sLightEdit) 
+{
 	// rework checks to || "or" to increase execution speed.
-
 	ImGui::Begin("Light Editor");
-	if (dLightEdit && (dLight != NULL)) {
+	if (dLightEdit && (dLight != NULL)) 
+	{
 		ImGui::Text("Directional Light");
 		EditDLight(dLight);
 	}
-	if (pLightEdit && (pLights != NULL) && (pLightCount != NULL) && (pLightCount >= 1)) {
+	if (pLightEdit && (pLights != NULL) && (pLightCount != NULL) && (pLightCount >= 1)) 
+	{
 		ImGui::Text("Point Lights");
 		EditPLights(pLights, pLightCount);
 	}
-	if (sLightEdit && (sLights != NULL) && (sLightCount != NULL) && (sLightCount >= 1)) {
+	if (sLightEdit && (sLights != NULL) && (sLightCount != NULL) && (sLightCount >= 1)) 
+	{
 		ImGui::Text("Spot Lights");
 		EditSLights(sLights, sLightCount);
 	}
 	ImGui::End();
 }
-void GraphicUI::EditDLight(DirectionalLight *dLight) {
-
+void GraphicUI::EditDLight(DirectionalLight *dLight) 
+{
 	// Set variables
 	float dLightDiffuse = dLight->GetDiffuseIntensity();
 	float dLightAmbient = dLight->GetAmbientIntensity();
@@ -71,9 +72,10 @@ void GraphicUI::EditDLight(DirectionalLight *dLight) {
 	dLight->SetAmbientIntensity(dLightAmbient);
 	dLight->SetLightColor(dLightColor.x, dLightColor.y, dLightColor.z);
 }
-void GraphicUI::EditPLights(PointLight *pLights, unsigned short int lightCount) {
-
-	for (unsigned int i = 0; i < lightCount; ++i) {
+void GraphicUI::EditPLights(PointLight *pLights, unsigned short int lightCount) 
+{
+	for (unsigned int i = 0; i < lightCount; ++i) 
+	{
 		ImGui::PushID(i);
 
 		// Set variables
@@ -86,7 +88,7 @@ void GraphicUI::EditPLights(PointLight *pLights, unsigned short int lightCount) 
 		ImGui::Text(" ");
 		ImGui::SliderFloat("Diffuse", &pLightDiffuse, 0.0f, 20.0f);
 		ImGui::SliderFloat("Ambient", &pLightAmbient, 0.0f, 0.2f);
-		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 100.0f);
+		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 1000.0f);
 		ImGui::ColorEdit3("Color", (float*)&pLightColor);
 
 		// Set member values to variable values
@@ -98,9 +100,10 @@ void GraphicUI::EditPLights(PointLight *pLights, unsigned short int lightCount) 
 		ImGui::PopID();
 	}
 }
-void GraphicUI::EditSLights(SpotLight *sLights, unsigned short int lightCount) {
-	
-	for (unsigned int i = 0; i < lightCount; ++i) {
+void GraphicUI::EditSLights(SpotLight *sLights, unsigned short int lightCount) 
+{
+	for (unsigned int i = 0; i < lightCount; ++i)
+	{
 		ImGui::PushID(i);
 
 		// Set variables
@@ -113,7 +116,7 @@ void GraphicUI::EditSLights(SpotLight *sLights, unsigned short int lightCount) {
 		ImGui::Text(" ");
 		ImGui::SliderFloat("Diffuse", &pLightDiffuse, 0.0f, 20.0f);
 		ImGui::SliderFloat("Ambient", &pLightAmbient, 0.0f, 0.2f);
-		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 100.0f);
+		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 1000.0f);
 		ImGui::ColorEdit3("Color", (float*)&pLightColor);
 
 		// Set member values to variable values
@@ -126,37 +129,100 @@ void GraphicUI::EditSLights(SpotLight *sLights, unsigned short int lightCount) {
 	}
 }
 
-void GraphicUI::EditScene(GLfloat *spin) {
-	
+void GraphicUI::EditScene(GLfloat *spin) 
+{
 	ImGui::Begin("Scene Editor");
 
 	EditSceneSpin(spin);
 
 	ImGui::End();
 }
-void GraphicUI::EditSceneSpin(GLfloat *spin) {
+void GraphicUI::EditSceneSpin(GLfloat *spin) 
+{
 	
-	if (ImGui::Button("Enable Spin")) {
+	if (ImGui::Button("Enable Spin")) 
+	{
 		
 		enableSpin = !enableSpin;
 
-		if (enableSpin) {
+		if (enableSpin) 
+	{
 
 			(*spin) = stateSaveSpin;
 		}
-		else {
+		else 
+	{
 			stateSaveSpin = (*spin);
 			(*spin) = 0.0f;
 		}
 	}
 
-	if (enableSpin) {
+	if (enableSpin) 
+	{
 		ImGui::SliderFloat("Spin", spin, -1.0f, 1.0f);
 	}
-	else {
+	else 
+	{
 
 	}
 
+}
+
+void GraphicUI::EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType) 
+{
+	ImGui::Begin("Render Settings");
+
+	EditSplitScreen(splitScreenIsOn, splitScreenType);
+
+	ImGui::End();
+}
+void GraphicUI::EditFiltering() 
+{
+
+}
+void GraphicUI::EditSplitScreen(GLboolean *splitScreenIsOn, GLuint *splitScreenType) 
+{
+	if (ImGui::Button("Enable Channel View")) 
+	{
+		(*splitScreenIsOn) = !(*splitScreenIsOn);
+	}
+	if ((*splitScreenIsOn)) 
+	{
+		if ((*splitScreenType) == 0)
+		{
+			ImGui::Text("Color Map");
+		}
+		else if ((*splitScreenType) == 1)
+		{
+			ImGui::Text("Specular Map");
+		}
+		else if ((*splitScreenType) == 2)
+		{
+			ImGui::Text("Reflection");
+		}
+		else if ((*splitScreenType) == 3)
+		{
+			ImGui::Text("Light Result");
+		}
+		else if ((*splitScreenType) == 4)
+		{
+			ImGui::Text("Tangent Normal");
+		}
+		else if ((*splitScreenType) == 5)
+		{
+			ImGui::Text("Normal Map");
+		}
+		else if ((*splitScreenType) == 6)
+		{
+			ImGui::Text("Height Map");
+		}
+		else
+		{
+			ImGui::Text("No Diffuse Multiply");
+		}
+
+		ImGui::SliderInt("View", (int*)splitScreenType, 0, 7);
+	}
 }
 
 GraphicUI::~GraphicUI()
@@ -176,4 +242,18 @@ GraphicUI::~GraphicUI()
 		counter++;
 	ImGui::SameLine();
 	ImGui::Text("counter = %d", counter);
+
+	
+	
+	
+	
+	
+Models/Ground/ BASE 01101111
+Models/SimpleModel/ BASE 01101111
+Models/Backdrop/ BASE 01101111
+	
+	
+
+	
+	
 */

@@ -81,6 +81,10 @@ GLuint uniformProjection = 0,
 
 Scene mainScene;
 
+GLboolean splitScreenIsOn = false;
+GLuint splitScreenType = 0;
+
+
 // main shader programs
 static const char* vShader = "Shaders/shader.vert";
 static const char* fShader = "Shaders/shader.frag";
@@ -268,7 +272,8 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 	glUniform3f(uniformEyeDirection, camera.getCameraDirection().x, camera.getCameraDirection().y, camera.getCameraDirection().z);
-
+	shaderList[0].SetSplitScreenIsOn(splitScreenIsOn);
+	shaderList[0].SetSplitScreenType(splitScreenType);
 
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
 	shaderList[0].SetTextureDiffuse(1);
@@ -322,12 +327,12 @@ void CreateLights(PointLight &pointLightsR,
 	pointLights[0] = PointLight(shadowDetail * 256, shadowDetail * 256,
 		0.01f, 100.0f,
 		0.7f, 0.7f, 1.0f,
-		0.001f, 1.0f,
-		0.25f, 2.75f, 0.0f,
-		1.0f, 0.7f, 1.8f);
+		0.001f, 40.0f,
+		3.0f, 2.75f, 3.0f,
+		100.0f, 10.0f, -200.8f);
 	(*pointLightCount)++;
 	pointLights[0].SetLightRange(12.0f);
-
+/*
 	pointLights[1] = PointLight(shadowDetail * 256, shadowDetail * 256,
 		0.01f, 100.0f,
 		1.0f, 0.7f, 0.7f,
@@ -345,7 +350,7 @@ void CreateLights(PointLight &pointLightsR,
 		-1.0f, 0.7f, 1.8f);
 	(*pointLightCount)++;
 	pointLights[2].SetLightRange(12.0f);
-/*
+
 		spotLights[0] = SpotLight(shadowDetail * 2048, shadowDetail * 2048,
 		0.1f, 100.0f,
 		0.5f, 0.5f, 0.5f,						// FIX SPOTLIGHT EDGE < < < < < << << << <<< <<< <<<< <<<< <<<<< <<<<<<
@@ -425,7 +430,7 @@ int main()
 
 	skybox = SkyBox(skyboxFaces); 
     mainScene.load();
-	std::thread threadB;
+
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -460,19 +465,18 @@ int main()
 //<>=========================================================================================================<>
 	while (!mainWindow.getShouldClose()) {
 		
-		glViewport(0, 0, 3840, 2160);
-
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-
-
+		// Other scene variables
 		now = glfwGetTime();
 		deltaTime = now - lastTime;
 		lastTime = now;
 
 		spin += spinModifier;
 		if (spin >= 360.00f) { spin = 0.0f; }
+
+		// Main GL Calls
+		glViewport(0, 0, 3840, 2160);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		glfwPollEvents();		
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange()); // fix later to stop xchange while not clicked
@@ -483,20 +487,21 @@ int main()
 		for (size_t i = 0; i < spotLightCount; i++) { OmniShadowMapPass(&spotLights[i]); }
 
 		RenderPass(projection, camera.calculateViewMatrix(), &pointLightCount, &spotLightCount, &mainLight, pointLights, spotLights);
-			
+
 		glUseProgram(0);
-		
-		///////////////////////////// GUI
+
+		// GUI
 		graphicUserInterface.Start();
 		ImGui::ShowStyleEditor();
 
 		graphicUserInterface.EditLights(pointLights, NULL, NULL, pointLightCount, NULL, false, true, false);
 		graphicUserInterface.EditScene(&spinModifier);
+		graphicUserInterface.EditRenderSettings(&splitScreenIsOn, &splitScreenType);
 		graphicUserInterface.DisplayInfo();
 		
 		graphicUserInterface.End();
-		///////////////////////////// GUI
-		
+
+		// DisplayFinalFrame
 		mainWindow.swapBuffers();
 
 

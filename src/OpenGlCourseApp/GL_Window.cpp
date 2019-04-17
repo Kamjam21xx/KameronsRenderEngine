@@ -104,20 +104,20 @@ void GL_Window::setSensitivity(float newSensitivity)
 
 void GL_Window::handleKeys(GLFWwindow *window, int key, int code, int action, int mode) {
 	GL_Window* theWindow = static_cast<GL_Window*>(glfwGetWindowUserPointer(window));
-	std::thread threadZ([&]()mutable->void {
-		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-			glfwSetWindowShouldClose(window, GL_TRUE);
+
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+	if (key >= 0 && key < 1024) {
+		if (action == GLFW_PRESS) {
+			theWindow->keys[key] = true;
 		}
-		if (key >= 0 && key < 1024) {
-			if (action == GLFW_PRESS) {
-				theWindow->keys[key] = true;
-			}
-			else if (action == GLFW_RELEASE) {
-				theWindow->keys[key] = false;
-			}
+		else if (action == GLFW_RELEASE) {
+			theWindow->keys[key] = false;
 		}
-	});
-	threadZ.join();
+	}
+
+
 }
 void GL_Window::handleMouse(GLFWwindow *window, double xPos, double yPos) {
 	GL_Window* theWindow = static_cast<GL_Window*>(glfwGetWindowUserPointer(window));

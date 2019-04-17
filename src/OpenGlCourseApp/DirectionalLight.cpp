@@ -29,10 +29,8 @@ void DirectionalLight::UseLight(GLuint ambientIntensityLocation, GLuint ambientC
 }
 glm::mat4 DirectionalLight::CalculateLightTransform() {
 	glm::mat4 matrix4;
-	std::thread calcLight([&]() mutable -> void {
-		matrix4 = lightProj * glm::lookAt(-direction, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	});
-	calcLight.join();
+	matrix4 = lightProj * glm::lookAt(-direction, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
 	return matrix4;
 }
 

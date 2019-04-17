@@ -75,6 +75,9 @@ uniform Material material;
 uniform vec3 eyePosition;
 uniform vec3 eyeDirection;
 
+uniform bool splitScreenIsOn;
+uniform int splitScreenType;
+
 // textures
 layout (binding = 1) uniform sampler2D theTextureDiffuse;
 layout (binding = 4) uniform sampler2D theTextureSpecular;
@@ -313,7 +316,7 @@ void main()
 	// Parallax_occlusion_mapping
 	vec3 TangentViewPos = tTBN * eyePosition;
 	vec3 TangentFragPos = tTBN * FragPos;
-	heightScale = 0.0175f;
+	heightScale = 0.002175f;
 	vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 	vec2 TexCoord = ParallaxMapping(TexCoord, viewDir);
 	// END_MAIN_DEFINITION
@@ -350,7 +353,49 @@ void main()
 
 
 	// Gamma
-	float gamma = 3.192;
+	float gamma = 2.192;
 	colour.rgb = pow(colour.rgb, vec3(1.0/gamma));	
 	// END_MAIN_DEFINITION
+
+	// dont make splitScreen Function
+	// uniform bool splitScreenIsOn;
+	// uniform int splitScreenType;			
+	//if(gl_FragCoord.x > 1920)
+	//{
+		if(splitScreenIsOn) 
+		{
+			if(splitScreenType == 0)
+			{
+				colour.rgb = diffuse.rgb;
+			}
+			else if(splitScreenType == 1)
+			{
+				colour.rgb = specular.rgb;
+			}
+			else if(splitScreenType == 2)
+			{
+				colour.rgb = reflection.rgb;
+			}
+			else if(splitScreenType == 3)
+			{
+				colour.rgb = shadowFactor.rgb;
+			}
+			else if(splitScreenType == 4)
+			{
+				colour.rgb = Normal.rgb;
+			}
+			else if(splitScreenType == 5)
+			{
+				colour.rgb = NormalTexture.rgb;
+			}
+			else if(splitScreenType == 6)
+			{
+				colour.rgb = vec3(texture(theTextureHeight, TexCoord).r);
+			}
+			else
+			{
+				colour = shadowFactor * reflection;
+			}
+		}
+	//}
 }
