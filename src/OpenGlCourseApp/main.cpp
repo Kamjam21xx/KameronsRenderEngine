@@ -37,14 +37,39 @@
 #include "Scene.h"
 #include "GraphicUI.h"
 
-//
-//
-//
-//			ADD CONST CORRECTNESS through the entire application
-//
-//
-//
+/*
+	to do list
 
+	- pack skybox loading into a neat member function of SkyBox.h
+	- make the scene class encapsulate more to clean up the code and make it more understandable
+	- finish shader baker class "ShaderHandler" and work it in
+	- setup FrameBuffer class
+	- setup more GUI functionality 
+	- make GUI more efficient and pretty with tabs
+	- clean shaders
+	- pack texture data into fewer texture units with no unused channels
+	- add metal to scene, model, texture, shaders and shader class
+	- fix directional light and fix to camera
+	- fix spotlight edge calculations
+	- setup hdri and post processing buffer
+	- setup deffered rendering
+	- add pbr mode, pipeline, shaders, and GUI manip
+	- implement fast fourier transform
+	- implement reflection
+	- reinstate alpha and blending and add sort algorithm and seperate shader 
+	- implement auto alpha detection for if the alpha channel is used, and use correct texture loader. flip bit flag for hasAlpha
+	- add mouse smoothing WHILE CONTROLING CAMERA
+	- add hotkey/keyBinding editor
+	- add smooth acceleration to camera movement
+	- add sort algorithm for baked shader functionality
+	- add audio engine
+	- add event handling
+	- add physics engine
+	
+	CLEAN UP MAIN
+	+ much more
+
+*/
 
 /*
 	making changes thanks to code reviews. if they arent here yet, they will be. 
@@ -72,7 +97,8 @@ Material dullMaterial;
 SkyBox skybox;
 
 GLfloat deltaTime = 0.0f;
-GLfloat lastTime = 0.0f;
+GLfloat lastTime = 0.0f;	
+GLfloat now = 0.0f;
 GLfloat spin;
 
 GLuint uniformProjection = 0,
@@ -357,7 +383,7 @@ void CreateLights(PointLight &pointLightsR,
 	(*pointLightCount)++;
 	pointLights[2].SetLightRange(12.0f);
 
-		spotLights[0] = SpotLight(shadowDetail * 2048, shadowDetail * 2048,
+	spotLights[0] = SpotLight(shadowDetail * 2048, shadowDetail * 2048,
 		0.1f, 100.0f,
 		0.5f, 0.5f, 0.5f,						// FIX SPOTLIGHT EDGE < < < < < << << << <<< <<< <<<< <<<< <<<<< <<<<<<
 		0.01f, 0.9f,
@@ -368,9 +394,14 @@ void CreateLights(PointLight &pointLightsR,
 	(*spotLightCount)++;
 	spotLights[0].SetLightRange(80.0f);
 */	
+}
+GLfloat DeltaTime() 
+{
+	now = glfwGetTime();
+	deltaTime = now - lastTime;
+	lastTime = now;
 
-
-
+	return deltaTime;
 }
 
 
@@ -384,10 +415,8 @@ int main()
 	mainWindow.Initialize();
 
 	glViewport(0, 0, 3840, 2160);
-
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	
 
 	glfwWindowHint(GLFW_SAMPLES, 16);
 	glEnable(GL_MULTISAMPLE);
@@ -401,42 +430,26 @@ int main()
 	std::vector<std::string> skyboxFaces;
 	glm::mat4 projection;
 
-
 	camera = Camera(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), -90.0f, 0, 3.0f, 0.5f);
 	projection = glm::perspective(glm::radians(52.0f), mainWindow.getAspectRatio(), 0.1f, 100.0f);
-
 
 	shineMaterial = Material(4.0f, 32.0f);
 	dullMaterial = Material(0.5f, 50.0f);
 
-	skyboxFaces.push_back("Textures/skybox/right.jpg"); // take note of the file type
-		
-	skyboxFaces.push_back("Textures/skybox/left.jpg");
-		
+	skyboxFaces.push_back("Textures/skybox/right.jpg"); // take note of the file type	
+	skyboxFaces.push_back("Textures/skybox/left.jpg");	// make skybox loader & pack into a neat member function
 	skyboxFaces.push_back("Textures/skybox/top.jpg");
-		
 	skyboxFaces.push_back("Textures/skybox/bot.jpg");
-		
 	skyboxFaces.push_back("Textures/skybox/back.jpg");
-		
 	skyboxFaces.push_back("Textures/skybox/front.jpg");
-
-
-	GLfloat now;
 
 	mainLight = DirectionalLight(256, 256,
 								 0.01f, 0.01f, 0.01f,
 								 0.25f, 0.8f,
 								 -5.0f, -10.0f, -10.0f);
 
-	//PointLight pointLights[MAX_POINT_LIGHTS];
-	//SpotLight spotLights[MAX_SPOT_LIGHTS];
-	//unsigned int spotLightCount = 0;
-	//unsigned int pointLightCount = 0;
 	CreateLights(*pointLights, *spotLights, &pointLightCount, &spotLightCount);
 	CreateShaders();
-
-
 	skybox = SkyBox(skyboxFaces); 
     mainScene.load();
 
@@ -447,7 +460,7 @@ int main()
 
 //<>=========================================================================================================<>
 // (immediate mode graphic user interface)  ---------  IMGUI
-//<>=========================================================================================================<>
+
 	IMGUI_CHECKVERSION();
 
 	ImGui::CreateContext();
@@ -464,20 +477,17 @@ int main()
 	ImGui_ImplOpenGL3_Init(u8"#version 430");
 
 	GraphicUI graphicUserInterface = GraphicUI(mainWindow.mainWindow);
-	
-	// // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // 
+
+//<>=========================================================================================================<>
+// MAIN LOOP
 
 	GLfloat spinModifier = 0.0f;
 
-//<>=========================================================================================================<>
-	// MAIN LOOP
-//<>=========================================================================================================<>
 	while (!mainWindow.getShouldClose()) {
 		
 		// Other scene variables
-		now = glfwGetTime();
-		deltaTime = now - lastTime;
-		lastTime = now;
+
+		deltaTime = DeltaTime();
 
 		// junk JUNK
 		glm::vec3 ALP = camera.getCameraPosition();
@@ -521,9 +531,8 @@ int main()
 
 
 	}
-//<>=========================================================================================================<>
+//<>=========================================================================================================<>// EXIT
 
-	// EXIT
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
