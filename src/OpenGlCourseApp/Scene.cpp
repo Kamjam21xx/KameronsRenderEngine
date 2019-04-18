@@ -36,7 +36,7 @@ Scene::Scene(std::string sceneFileLocation) {
 }
 
 
-void Scene::load() {
+void Scene::load() { // pretty much has to be a full function. dont break it up
 	
 	try {
 		std::ifstream file("Models/default.FLS");
@@ -53,7 +53,6 @@ void Scene::load() {
 		std::bitset<8> bitFlags; 
 		short int arrayLocation = 0;
 
-
 		while (file >> location >> model >> bitFlagStr) {
 
 			std::reverse(bitFlagStr.begin(), bitFlagStr.end());
@@ -63,74 +62,47 @@ void Scene::load() {
 			path = location + model;
 
 			switch (bitFlags[2]) { // DRAW TYPE
-				case(1): {
-					drawType = GL_STATIC_DRAW;
-					break;
-				}
-				
-				case(0): {
-					if (bitFlags[3] == 1) {
-						drawType = GL_DYNAMIC_DRAW;
-						break;
-					}
-					else {
-						drawType = GL_STREAM_DRAW;
-						break;
-					}
-				}
+				case (1) : drawType = GL_STATIC_DRAW;
+						   break;
+				case (0) : if (bitFlags[3] == 1) {
+						       drawType = GL_DYNAMIC_DRAW;
+							   break;
+						   }
+						   else {
+						       drawType = GL_STREAM_DRAW;
+							   break;
+						   }
 			}
-
 			switch (bitFlags[1]) { // ENABLE TANGENTS
-				case(1): 
-					calcTangents = true;
-					break;
-				case(0): 
-					calcTangents = false;
-					break;
+				case (1) : calcTangents = true;
+					       break;
+				case (0) : calcTangents = false;
+					       break;
 			}
-
 			switch (bitFlags[4]) { // COLOR TEXTURE
-				case(1): {
-					color = path + "_COLOR.png";
-					break;
-				}
-				case(0): {
-					color = "";
-					break;
-				}
-			}
+				case (1) : color = path + "_COLOR.png";
+					       break;
+				case (0) : color = "";
+					       break;
 
+			}
 			switch (bitFlags[5]) { // SPECULAR TEXTURE
-				case(1): {
-					specular = path + "_SPECULAR.png";
-					break;
-				}
-				case(0): {
-					specular = "";
-					break;
-				}
+				case (1) : specular = path + "_SPECULAR.png";
+					       break;
+				case (0) : specular = "";
+					       break;
 			}
-
 			switch (bitFlags[6]) { // NORMAL TEXTURE
-				case(1): {
-					normal = path + "_NORMAL.png";
-					break;
-				}
-				case(0): {
-					normal = "";
-					break;
-				}
+				case (1) : normal = path + "_NORMAL.png";
+					       break;
+				case (0) : normal = "";
+					       break;
 			}
-
 			switch (bitFlags[7]) { // HEIGHT TEXTURE
-				case(1): {
-					height = path + "_HEIGHT.png";
-					break;
-				}
-				case(0): {
-					height = "";
-					break;
-				}
+				case (1) : height = path + "_HEIGHT.png";
+					       break;
+				case (0) : height = "";
+					       break;
 			}
 
 			// PUSH and LOAD OBJECT

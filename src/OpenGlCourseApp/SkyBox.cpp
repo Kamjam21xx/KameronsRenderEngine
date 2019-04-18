@@ -6,23 +6,59 @@ SkyBox::SkyBox()
 {
 }
 
+SkyBox::SkyBox(std::string fileLocation, const char *vertexShader, const char *fragmentShader) // directory to folder 
+{
+	std::vector<std::string> faceLocations;
+	faceLocations.push_back(fileLocation + "/right.jpg");
+	faceLocations.push_back(fileLocation + "/left.jpg");
+	faceLocations.push_back(fileLocation + "/top.jpg");
+	faceLocations.push_back(fileLocation + "/bot.jpg");
+	faceLocations.push_back(fileLocation + "/back.jpg");
+	faceLocations.push_back(fileLocation + "/front.jpg");
+
+	LoadShader(vertexShader, fragmentShader);
+	LoadTexturedCube(faceLocations);
+}
 SkyBox::SkyBox(std::vector<std::string> faceLocations)
 {
-	// shader
+	const char* vert = "Shaders/skybox.vert";
+	const char* frag = "Shaders/skybox.frag";
+
+	LoadShader(vert, frag);
+	LoadTexturedCube(faceLocations);
+}
+
+void SkyBox::LoadFromDirectory(std::string fileLocation, const char *vertexShader, const char *fragmentShader) // directory to folder 
+{
+	std::vector<std::string> faceLocations;
+	faceLocations.push_back(fileLocation + "/right.jpg");
+	faceLocations.push_back(fileLocation + "/left.jpg");	
+	faceLocations.push_back(fileLocation + "/top.jpg");
+	faceLocations.push_back(fileLocation + "/bot.jpg");
+	faceLocations.push_back(fileLocation + "/back.jpg");
+	faceLocations.push_back(fileLocation + "/front.jpg");
+
+	LoadShader(vertexShader, fragmentShader);
+	LoadTexturedCube(faceLocations);
+}
+
+void SkyBox::LoadShader(const char *vertexShader, const char *fragmentShader)
+{
 	skyShader = new Shader();
-	skyShader->CreateFromFiles("Shaders/skybox.vert", "Shaders/skybox.frag");
+	skyShader->CreateFromFiles(vertexShader, fragmentShader);
 
 	uniformProjection = skyShader->GetProjectionLocation();
 	uniformView = skyShader->GetViewLocation();
+}
 
-	// texture
+void SkyBox::LoadTexturedCube(std::vector<std::string> faceLocations) 
+{
+	// Texture
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
 	int width, height, bitDepth;
-
-	for (size_t i = 0; i < 6; ++i) {
-
+	for (size_t i = 0; i < 6; ++i) 
+	{
 		unsigned char *texData = stbi_load(faceLocations[i].c_str(), &width, &height, &bitDepth, 0);
 		if (!texData) {
 			printf("Failed to find: %s \n", faceLocations[i].c_str());
@@ -38,48 +74,50 @@ SkyBox::SkyBox(std::vector<std::string> faceLocations)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+	// Cube Mesh
+	unsigned int skyBoxIndices[]{
+	0, 1, 2,
+	2, 1, 3,
+
+	2, 3, 5,
+	5, 3, 7,
+
+	5, 7, 4,
+	4, 7, 6,
+
+	4, 6, 0,
+	0, 6, 1,
+
+	4, 0, 5,
+	5, 0, 2,
+
+	1, 6, 3,
+	3, 6, 7,
+	};
+	float skyBoxVertices[]{
+		-1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		 1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+
+		-1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		 1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		-1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+	};
+
 	// Mesh Setup
-	unsigned int skyboxIndices[] {
-		0, 1, 2,
-		2, 1, 3,
-
-		2, 3, 5,
-		5, 3, 7,
-
-		5, 7, 4,
-		4, 7, 6,
-
-		4, 6, 0,
-		0, 6, 1,
-
-		4, 0, 5,
-		5, 0, 2,
-
-		1, 6, 3,
-		3, 6, 7,
-	};
-
-	float skyboxVertices[] {
-			-1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-			-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-	
-			-1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-			-1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
-	};
-
 	skyMesh = new Mesh();
-	skyMesh->CreateMeshNoTangents(skyboxVertices, skyboxIndices, 64, 36, GL_STATIC_DRAW);
+	skyMesh->CreateMeshNoTangents(skyBoxVertices, skyBoxIndices, 64, 36, GL_STATIC_DRAW);
 }
 
-void SkyBox::bindCubeMapTexture() const {
+void SkyBox::bindCubeMapTexture() const 
+{
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 }
-void SkyBox::unbinedCubeMapTexture() const {
+void SkyBox::unbinedCubeMapTexture() const 
+{
 	// add it if i need it i guess
 }
 

@@ -427,7 +427,6 @@ int main()
 //<>=========================================================================================================<>
 
 	DirectionalLight mainLight;
-	std::vector<std::string> skyboxFaces;
 	glm::mat4 projection;
 
 	camera = Camera(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), -90.0f, 0, 3.0f, 0.5f);
@@ -436,13 +435,6 @@ int main()
 	shineMaterial = Material(4.0f, 32.0f);
 	dullMaterial = Material(0.5f, 50.0f);
 
-	skyboxFaces.push_back("Textures/skybox/right.jpg"); // take note of the file type	
-	skyboxFaces.push_back("Textures/skybox/left.jpg");	// make skybox loader & pack into a neat member function
-	skyboxFaces.push_back("Textures/skybox/top.jpg");
-	skyboxFaces.push_back("Textures/skybox/bot.jpg");
-	skyboxFaces.push_back("Textures/skybox/back.jpg");
-	skyboxFaces.push_back("Textures/skybox/front.jpg");
-
 	mainLight = DirectionalLight(256, 256,
 								 0.01f, 0.01f, 0.01f,
 								 0.25f, 0.8f,
@@ -450,7 +442,7 @@ int main()
 
 	CreateLights(*pointLights, *spotLights, &pointLightCount, &spotLightCount);
 	CreateShaders();
-	skybox = SkyBox(skyboxFaces); 
+	skybox = SkyBox("Textures/skybox", "Shaders/skybox.vert", "Shaders/skybox.frag");
     mainScene.load();
 
 
