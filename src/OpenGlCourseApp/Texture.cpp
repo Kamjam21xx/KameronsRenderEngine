@@ -166,7 +166,7 @@ bool Texture::GenerateTextureFBO(GLenum glTextureUnit, GLenum internalFormat, GL
 	return true;
 }
 
-void Texture::BindZero()
+void Texture::BindZero() const
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -181,7 +181,7 @@ void Texture::ClearTexture()
 	bitDepth = 0;
 	fileLocation = NULL;
 }
-void Texture::UseTexture() 
+void Texture::UseTexture() const
 {
 	glActiveTexture(textureUnit);
 	glBindTexture(GL_TEXTURE_2D, textureID); 
@@ -214,7 +214,7 @@ GLuint Texture::GetTextureUnit() const
 }
 const char* Texture::GetFileLocationPtr() const 
 {
-	return fileLocation
+	return fileLocation;
 }
 
 

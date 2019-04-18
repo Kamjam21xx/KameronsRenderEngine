@@ -88,7 +88,7 @@ void Shader::CompileShader(const char* vertexCode, const char* geometryCode, con
 
 	glDeleteShader(shaderID);
 }
-void Shader::Validate()
+void Shader::Validate() const
 {
 	GLint result = 0;
 	GLchar eLog[1024] = { 0 };
@@ -206,63 +206,63 @@ void Shader::CompileProgram()
 	
 }
 
-GLuint Shader::GetDiffuseIntensityLocation() 
+GLuint Shader::GetDiffuseIntensityLocation() const
 {
 	return uniformDirectionalLight.uniformDiffuseIntensity;		
 }
-GLuint Shader::GetDirectionLocation() 
+GLuint Shader::GetDirectionLocation() const
 {	
 	return uniformDirectionalLight.uniformDirection;			
 }
-GLuint Shader::GetProjectionLocation() 
+GLuint Shader::GetProjectionLocation() const
 {	
 	return uniformProjection;									
 }
-GLuint Shader::GetModelLocation() 
+GLuint Shader::GetModelLocation() const
 {	
 	return uniformModel;										
 }
-GLuint Shader::GetViewLocation() 
+GLuint Shader::GetViewLocation() const
 {	
 	return uniformView;											
 }		
-GLuint Shader::GetAmbientColorLocation() 
+GLuint Shader::GetAmbientColorLocation() const
 {	
 	return uniformDirectionalLight.uniformColor;				
 }
-GLuint Shader::GetAmbientIntensityLocation() 
+GLuint Shader::GetAmbientIntensityLocation() const
 {	
 	return uniformDirectionalLight.uniformAmbientIntensity;		
 }
-GLuint Shader::GetSpecularIntensityLocation() 
+GLuint Shader::GetSpecularIntensityLocation() const
 {	
 	return uniformSpecularIntensity;							
 }
-GLuint Shader::GetSpecularPowerLocation() 
+GLuint Shader::GetSpecularPowerLocation() const
 {	
 	return uniformSpecularPower;								
 }
-GLuint Shader::GetEyePositionLocation()	
+GLuint Shader::GetEyePositionLocation()	const
 {	
 	return uniformEyePosition;									
 }
-GLuint Shader::GetEyeDirectionLocation()
+GLuint Shader::GetEyeDirectionLocation()const
 {					 
 	return uniformEyeDirection;
 }
-GLuint Shader::GetOmniLightLocation() 
+GLuint Shader::GetOmniLightLocation() const
 {
 	return uniformOmniLightPos;
 }
-GLuint Shader::GetFarPlanelocation() 
+GLuint Shader::GetFarPlanelocation() const
 {
 	return uniformFarPlane;
 }
-GLuint Shader::GetSplitScreenIsOnLocation() 
+GLuint Shader::GetSplitScreenIsOnLocation() const
 {
 	return uniformSplitScreenIsOn;
 }
-GLuint Shader::GetSplitScreenTypeLocation() 
+GLuint Shader::GetSplitScreenTypeLocation() const
 {
 	return uniformSplitScreenType;
 }

@@ -32,7 +32,7 @@ void Model::LoadModel(const std::string& fileName, GLenum drawType, std::string 
 
 }
 
-void Model::RenderModel() {
+void Model::RenderModel() const {
 	for (size_t i = 0; i < meshList.size(); ++i) {
 		unsigned int materialIndex = meshToTex[i];
 		

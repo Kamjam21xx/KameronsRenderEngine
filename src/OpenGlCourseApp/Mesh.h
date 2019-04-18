@@ -10,7 +10,7 @@ public:
 	void CreateMesh(GLfloat *vertices, unsigned int *indices, unsigned int numOfVertices, unsigned int numOfIndices, GLenum drawType);
 	void CreateMeshNoTangents(GLfloat *vertices, unsigned int *indices, unsigned int numOfVertices, unsigned int numOfIndices, GLenum drawType); 
 
-	void RenderMesh();
+	void RenderMesh() const ;
 	void ClearMesh();
 
 	~Mesh();

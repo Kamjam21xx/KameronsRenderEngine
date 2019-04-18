@@ -158,7 +158,7 @@ float CalcPointShadowFactor(PointLight light, int shadowIndex)
 	float currentDepth = length(fragToLight);
 	
 	float shadow = 0.0;
-	float bias   = 0.015;
+	float bias   = 0.15;
 	int samples  = 40;
 	float viewDistance = length(eyePosition - FragPos);
 	float diskRadius = (1.0 + (viewDistance / omniShadowMaps[shadowIndex].farPlane)) / 65.0;

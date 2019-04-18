@@ -13,17 +13,17 @@ public:
 	GL_Window(GLint windowWidth, GLint windowHeight);	
 	GL_Window(GLint windowWidth, GLint windowHeight, GLfloat sensitivity);
 	int Initialize();
-	GLfloat getAspectRatio() { return ( (GLfloat)bufferWidth / (GLfloat)bufferHeight ); }
-	GLint getWindowWidth() { return width; }
-	GLint getWindowHeight() { return height; }
-	GLint getBufferWidth() { return bufferWidth; }
-	GLint getBufferHeight() { return bufferHeight; }
-	bool getShouldClose() { return glfwWindowShouldClose(mainWindow); }
+	GLfloat getAspectRatio() const { return ( (GLfloat)bufferWidth / (GLfloat)bufferHeight ); }
+	GLint getWindowWidth() const { return width; }
+	GLint getWindowHeight() const { return height; }
+	GLint getBufferWidth() const { return bufferWidth; }
+	GLint getBufferHeight() const { return bufferHeight; }
+	bool getShouldClose() const { return glfwWindowShouldClose(mainWindow); }
 
 	bool* getKeys() { return keys; };
-	GLfloat getXChange();
-	GLfloat getYChange();
-	GLfloat getSensitivity();
+	GLfloat getXChange() ;
+	GLfloat getYChange()  ;
+	GLfloat getSensitivity() ;
 
 	void setSensitivity(float newSensitivity);
 

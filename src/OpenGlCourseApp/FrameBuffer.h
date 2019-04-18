@@ -13,7 +13,8 @@ public:
 	FrameBuffer(GLenum textureUnit, GLint width, GLint height);
 	FrameBuffer(GLenum textureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height);
 
-	GLuint GetFBO();
+	GLuint GetFBO() const;
+	GLuint GetRBO() const;
 
 	void SetTextureUnit(GLuint textureUnit);
 	
@@ -25,7 +26,7 @@ private:
 
 	Texture texture;
 	GLint bufferWidth, bufferHeight;
-	GLuint FBO;
+	GLuint FBO, RBO;
 
 
 };

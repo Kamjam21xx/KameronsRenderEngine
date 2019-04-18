@@ -25,7 +25,7 @@ SpotLight::SpotLight(GLuint shadowWidth, GLuint shadowHeight,
 void SpotLight::UseLight(GLuint ambientIntensityLocation, GLuint ambientColourLocation,
 				GLuint diffuseIntensityLocation, GLuint positionLocation, GLuint directionLocation,
 				GLuint constantLocation, GLuint linearLocation, GLuint exponentLocation,
-				GLuint edgeLocation) {
+				GLuint edgeLocation) const {
 	glUniform3f(ambientColourLocation, color.x, color.y, color.z);
 
 

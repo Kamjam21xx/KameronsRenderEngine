@@ -32,22 +32,22 @@ public:
 		color = glm::vec3(red, green, blue);
 	}
 	
-	glm::vec3 GetLightColor() {
+	glm::vec3 GetLightColor() const {
 		return color;
 	}
-	float GetLightColorRed() {
+	float GetLightColorRed() const {
 		return (float)color.r;
 	}
-	float GetLightColorGreen() {
+	float GetLightColorGreen() const {
 		return (float)color.g;
 	}
-	float GetLightColorBlue() {
+	float GetLightColorBlue() const {
 		return (float)color.b;
 	}
-	float GetAmbientIntensity() {
+	float GetAmbientIntensity() const {
 		return ambientIntensity;
 	}
-	float GetDiffuseIntensity() {
+	float GetDiffuseIntensity() const {
 		return diffuseIntensity;
 	}
 

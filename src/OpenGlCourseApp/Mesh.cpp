@@ -84,7 +84,7 @@ void Mesh::CreateMeshNoTangents(GLfloat *vertices, unsigned int *indices, unsign
 }
 
 
-void Mesh::RenderMesh()
+void Mesh::RenderMesh() const
 {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);

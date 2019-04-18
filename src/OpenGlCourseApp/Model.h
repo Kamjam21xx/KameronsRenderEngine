@@ -20,7 +20,7 @@ public:
 
 	void LoadModel(const std::string& fileName, GLenum drawType, std::string colorTexture, std::string specularTexture, std::string normalTexture, std::string heightTexture, std::bitset<8> bitSet);
 	
-	void RenderModel();
+	void RenderModel() const ;
 	void ClearModel();
 
 	~Model();

@@ -271,8 +271,8 @@ void RenderPass(glm::mat4 projectionMatrix,
 	uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
 	uniformSpecularPower = shaderList[0].GetSpecularPowerLocation();
 
-	//spotLights[0].SetFlash(camera.getCameraPosition(), camera.getCameraDirection());
-	//pointLights[0].SetPosition(camera.getCameraPosition());
+	//pointLights[0].SetFlash(camera.getCameraPosition(), camera.getCameraDirection());
+
 	
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -338,7 +338,7 @@ void CreateLights(PointLight &pointLightsR,
 		100.0f, 10.0f, -200.8f);
 	(*pointLightCount)++;
 	pointLights[0].SetLightRange(12.0f);
-/*
+
 	pointLights[1] = PointLight(shadowDetail * 256, shadowDetail * 256,
 		0.01f, 100.0f,
 		1.0f, 0.7f, 0.7f,
@@ -347,7 +347,7 @@ void CreateLights(PointLight &pointLightsR,
 		1.0f, 0.7f, -1.8f);
 	(*pointLightCount)++;
 	pointLights[1].SetLightRange(12.0f);
-
+/*
 	pointLights[2] = PointLight(shadowDetail * 256, shadowDetail * 256,
 		0.01f, 100.0f,
 		0.7f, 1.0f, 0.7f,
@@ -367,7 +367,10 @@ void CreateLights(PointLight &pointLightsR,
 		32.0f); 
 	(*spotLightCount)++;
 	spotLights[0].SetLightRange(80.0f);
-*/
+*/	
+
+
+
 }
 
 
@@ -388,7 +391,7 @@ int main()
 
 	glfwWindowHint(GLFW_SAMPLES, 16);
 	glEnable(GL_MULTISAMPLE);
-	glfwSwapInterval(1); // vsync
+	//glfwSwapInterval(1); // vsync
 	mainWindow.swapBuffers();
 	glEnable(GL_DEBUG_OUTPUT);
 
@@ -475,6 +478,12 @@ int main()
 		now = glfwGetTime();
 		deltaTime = now - lastTime;
 		lastTime = now;
+
+		// junk JUNK
+		glm::vec3 ALP = camera.getCameraPosition();
+		ALP = glm::vec3(ALP.x, ALP.y - 0.275f, ALP.z + 0.275f);
+		pointLights[1].SetPosition(ALP);
+		// junk JUNK
 
 		spin += spinModifier;
 		if (spin >= 360.00f) { spin = 0.0f; }

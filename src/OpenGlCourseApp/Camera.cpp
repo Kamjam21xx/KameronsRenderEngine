@@ -27,10 +27,10 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	update();
 }
 
-glm::vec3 Camera::getCameraPosition() {
+glm::vec3 Camera::getCameraPosition() const {
 	return position;
 }
-glm::vec3 Camera::getCameraDirection() {
+glm::vec3 Camera::getCameraDirection() const {
 	return glm::normalize(front);
 }
 

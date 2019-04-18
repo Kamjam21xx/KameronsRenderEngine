@@ -75,15 +75,15 @@ SkyBox::SkyBox(std::vector<std::string> faceLocations)
 	skyMesh->CreateMeshNoTangents(skyboxVertices, skyboxIndices, 64, 36, GL_STATIC_DRAW);
 }
 
-void SkyBox::bindCubeMapTexture() {
+void SkyBox::bindCubeMapTexture() const {
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 }
-void SkyBox::unbinedCubeMapTexture() {
-
+void SkyBox::unbinedCubeMapTexture() const {
+	// add it if i need it i guess
 }
 
-void SkyBox::DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
+void SkyBox::DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) const
 {
 	viewMatrix = glm::mat4(glm::mat3(viewMatrix));
 

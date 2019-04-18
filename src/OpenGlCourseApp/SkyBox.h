@@ -20,9 +20,9 @@ public:
 	SkyBox();
 	SkyBox(std::vector<std::string> faceLocations);
 
-	void bindCubeMapTexture();
-	void unbinedCubeMapTexture();
-	void DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix);
+	void bindCubeMapTexture() const ;
+	void unbinedCubeMapTexture() const ;
+	void DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) const ;
 
 	~SkyBox();
 

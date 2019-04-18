@@ -83,17 +83,19 @@ void GL_Window::createCallbacks() {
 	glfwSetKeyCallback(mainWindow, handleKeys);
 	glfwSetCursorPosCallback(mainWindow, handleMouse);
 }
-GLfloat GL_Window::getXChange() {
+GLfloat GL_Window::getXChange() 
+{
 	GLfloat theChange = xChange * sensitivity;
 	xChange = 0.0f;
 	return theChange;
 }
-GLfloat GL_Window::getYChange() {
+GLfloat GL_Window::getYChange() 
+{
 	GLfloat theChange = yChange * sensitivity;
 	yChange = 0.0f;
 	return theChange;
 }
-GLfloat GL_Window::getSensitivity()
+GLfloat GL_Window::getSensitivity() 
 {
 	return sensitivity;
 }

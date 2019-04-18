@@ -17,11 +17,11 @@ public:
 	
 	void UseLight(GLuint ambientIntensityLocation, GLuint ambientColourLocation,
 				  GLuint diffuseIntensityLocation, GLuint positionLocation, 
-				  GLuint constantLocation, GLuint linearLocation, GLuint exponentLocation);
+				  GLuint constantLocation, GLuint linearLocation, GLuint exponentLocation) const ;
 
 	std::vector<glm::mat4> CalculateLightTransform();
-	GLfloat GetFarPlane();
-	glm::vec3 GetPosition();
+	GLfloat GetFarPlane() const ;
+	glm::vec3 GetPosition() const ;
 
 	void SetPosition(glm::vec3 pos);
 	void SetLightRange(GLfloat newRange) {
@@ -31,7 +31,7 @@ public:
 
 		range = newRange; // SET BRIGHTNESS IN CONSTRUCTOR BASES ON THESE VALUES ? range = constant * (exp + linear;
 	}
-	float GetRange() {
+	float GetRange() const {
 		return (float)range;
 	}
 

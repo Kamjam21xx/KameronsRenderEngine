@@ -37,13 +37,17 @@ FrameBuffer::FrameBuffer(GLuint textureUnit, GLenum internalFormat, GLenum forma
 		glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 		bufferWidth = width;
 		bufferHeight = height;
-		texture.GenerateTextureFBO(textureUnit, internalFormat, format, type, filtering, width, height);
 
+		// set color component
+		texture.GenerateTextureFBO(textureUnit, internalFormat, format, type, filtering, width, height);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture.GetTextureID(), 0);	
-		
-		glTexImage2D(GL_TEXTURE_2D)
-		
-		
+
+		// add depth component
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture.GetTextureID() , 0);
+
+		// make render buffer object
+
 		
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glDeleteFramebuffers(1, &FBO);
@@ -57,9 +61,13 @@ FrameBuffer::FrameBuffer(GLuint textureUnit, GLenum internalFormat, GLenum forma
 
 
 
-GLuint FrameBuffer::GetFBO() 
+GLuint FrameBuffer::GetFBO() const
 {
 	return FBO;
+}
+GLuint FrameBuffer::GetRBO() const
+{
+	return RBO;
 }
 
 void FrameBuffer::SetTextureUnit(GLuint textureUnit) 

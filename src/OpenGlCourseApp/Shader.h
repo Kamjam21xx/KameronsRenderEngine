@@ -24,25 +24,25 @@ public:
 	void CreateFromString(const char* vertexCode, const char* fragmentCode);
 	void CreateFromFiles(const char* vertexLocation, const char* fragmentLocation);
 	void CreateFromFiles(const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation);
-	void Validate();
+	void Validate() const ;
 
 	std::string ReadFile(const char* fileLocation);
 
-	GLuint GetProjectionLocation();
-	GLuint GetModelLocation();
-	GLuint GetViewLocation();
-	GLuint GetAmbientIntensityLocation();
-	GLuint GetAmbientColorLocation();
-	GLuint GetDiffuseIntensityLocation();
-	GLuint GetDirectionLocation();
-	GLuint GetSpecularIntensityLocation();
-	GLuint GetSpecularPowerLocation();
-	GLuint GetEyePositionLocation();
-	GLuint GetEyeDirectionLocation();
-	GLuint GetOmniLightLocation();
-	GLuint GetFarPlanelocation();
-	GLuint GetSplitScreenIsOnLocation();
-	GLuint GetSplitScreenTypeLocation();
+	GLuint GetProjectionLocation() const ;
+	GLuint GetModelLocation() const ;
+	GLuint GetViewLocation() const ;
+	GLuint GetAmbientIntensityLocation() const ;
+	GLuint GetAmbientColorLocation() const ;
+	GLuint GetDiffuseIntensityLocation() const ;
+	GLuint GetDirectionLocation() const ;
+	GLuint GetSpecularIntensityLocation() const ;
+	GLuint GetSpecularPowerLocation() const ;
+	GLuint GetEyePositionLocation() const ;
+	GLuint GetEyeDirectionLocation() const ;
+	GLuint GetOmniLightLocation() const ;
+	GLuint GetFarPlanelocation() const ;
+	GLuint GetSplitScreenIsOnLocation() const ;
+	GLuint GetSplitScreenTypeLocation() const ;
 
 	void UseShader();
 	void ClearShader();
