@@ -4,7 +4,7 @@ in vec2 TexCoords;
 
 out vec4 FragColor;
 
-uniform sampler2D theTextureDiffuse;
+layout (binding = 15) uniform sampler2D theTextureDiffuse;
 
 const float offset = 1.0 / 300.0;
 

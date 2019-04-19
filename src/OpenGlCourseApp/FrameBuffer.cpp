@@ -37,34 +37,26 @@ FrameBuffer::FrameBuffer(GLuint textureUnit, GLenum internalFormat, GLenum forma
 	glGenFramebuffers(1, &FBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+	bufferWidth = width;
+	bufferHeight = height;
+
+	// set color component
+	colorTexture.GenerateTextureFBO(textureUnit, internalFormat, format, type, filtering, width, height);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture.GetTextureID(), 0);	
+
+	// add depth & stencil component
+	glGenRenderbuffers(1, &RBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height); // single rbo for both depth and stencil
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+
+	// check if FrameBuffer is complete
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		bufferWidth = width;
-		bufferHeight = height;
-
-		// set color component
-		colorTexture.GenerateTextureFBO(textureUnit, internalFormat, format, type, filtering, width, height);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture.GetTextureID(), 0);	
-
-		// add depth & stencil component
-		glGenRenderbuffers(1, &RBO);
-		glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height); // single rbo for both depth and stencil
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-		// check if FrameBuffer is complete
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		{
-			printf("FrameBuffer object : framebuffer incomplete!");
-		}
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		printf("FrameBuffer object : framebuffer incomplete!");
 	}
-	else 
-	{
-		printf("FrameBuffer object instantiation failed");
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glDeleteFramebuffers(1, &FBO);
-	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 GLuint FrameBuffer::GetFBO() const

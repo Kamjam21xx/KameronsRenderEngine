@@ -133,6 +133,7 @@ SpotLight spotLights[MAX_SPOT_LIGHTS];
 unsigned short int spotLightCount = 0;
 unsigned short int pointLightCount = 0;
 
+unsigned int screenQuadVAO, screenQuadVBO;
 
 
 void calcAverageNormals(unsigned int * indices, unsigned int indiceCount, GLfloat * vertices, unsigned int verticeCount, unsigned int vLength, unsigned int normalOffset) {
@@ -275,14 +276,12 @@ void RenderPass(glm::mat4 projectionMatrix,
 				PointLight *pointLights, 
 				SpotLight *spotLights) {
 
+	glBindFramebuffer(GL_FRAMEBUFFER, framebufferHDR.GetFBO());
+
 	glViewport(0, 0, 3840, 2160);
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
-	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	
 	glStencilMask(0x00);
-
 
 	shaderList[0].UseShader();
 
@@ -294,16 +293,13 @@ void RenderPass(glm::mat4 projectionMatrix,
 	uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
 	uniformSpecularPower = shaderList[0].GetSpecularPowerLocation();
 
-	//pointLights[0].SetFlash(camera.getCameraPosition(), camera.getCameraDirection());
-
-	
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 	glUniform3f(uniformEyeDirection, camera.getCameraDirection().x, camera.getCameraDirection().y, camera.getCameraDirection().z);
+
 	shaderList[0].SetSplitScreenIsOn(splitScreenIsOn);
 	shaderList[0].SetSplitScreenType(splitScreenType);
-
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
 	shaderList[0].SetTextureDiffuse(1);
 	shaderList[0].SetTextureSpecular (4);
@@ -312,12 +308,10 @@ void RenderPass(glm::mat4 projectionMatrix,
 	shaderList[0].SetTextureHeight(7);
 	shaderList[0].SetDirectionalShadowMap(2); // 2
 	shaderList[0].SetTextureSkyBox(6);	
-	
 	shaderList[0].SetDirectionalLight(mainLight);
 	shaderList[0].SetPointLights(pointLights, (*pointLightCount), 8, 0);
 	shaderList[0].SetSpotLights(spotLights, (*spotLightCount), 8 + (*pointLightCount), (*pointLightCount));
 	shaderList[0].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
-
 	shaderList[0].Validate();
 
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -335,6 +329,18 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	framebuffershader.UseShader();
+
+	glBindVertexArray(screenQuadVAO);
+	framebufferHDR.colorTexture.UseTexture();
+	glDisable(GL_DEPTH_TEST);
+	glBindTexture(GL_TEXTURE_2D, framebufferHDR.colorTexture.GetTextureID());
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 }
 
@@ -428,7 +434,28 @@ int main()
 //<>=========================================================================================================<>
 // frame buffer setup
 
-	framebufferHDR = FrameBuffer(GL_TEXTURE16, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_LINEAR, mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
+	float quadVertices[] = {
+	-1.0f,  1.0f,  0.0f, 1.0f,
+	-1.0f, -1.0f,  0.0f, 0.0f,
+	 1.0f, -1.0f,  1.0f, 0.0f,
+
+	-1.0f,  1.0f,  0.0f, 1.0f,
+	 1.0f, -1.0f,  1.0f, 0.0f,
+	 1.0f,  1.0f,  1.0f, 1.0f
+	};
+
+	glGenVertexArrays(1, &screenQuadVAO);
+	glGenBuffers(1, &screenQuadVBO);
+	glBindVertexArray(screenQuadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, screenQuadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	// framebufferHDR = FrameBuffer(GL_TEXTURE15, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_LINEAR, mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
+	framebufferHDR = FrameBuffer(GL_TEXTURE15, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR, mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
 
 //<>=========================================================================================================<>
 // prep
