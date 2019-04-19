@@ -10,7 +10,8 @@ class FrameBuffer
 {
 public:
 	
-	FrameBuffer(GLenum textureUnit, GLint width, GLint height);
+	FrameBuffer();
+	//FrameBuffer(GLenum textureUnit, GLint width, GLint height);
 	FrameBuffer(GLenum textureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height);
 
 	GLuint GetFBO() const;
@@ -22,12 +23,12 @@ public:
 	~FrameBuffer();
 
 private:
-	FrameBuffer();
 
-	Texture texture;
+	Texture colorTexture;
+
+
 	GLint bufferWidth, bufferHeight;
 	GLuint FBO, RBO;
-
 
 };
 

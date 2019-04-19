@@ -1,11 +1,17 @@
 #pragma once
 #include <GL\glew.h>
 
+#include <vector>
+
+#include "Texture.h" 
+
+// throw in vector of texture*
 // refactor material class properly to contain the correct objects and functions
 
 class Material
 {
 public:
+
 	Material();
 	Material(GLfloat sIntensity, GLfloat specularP);
 
@@ -23,6 +29,8 @@ public:
 private:
 	GLfloat specularIntensity;
 	GLfloat specularPower;
+
+
 
 };
 

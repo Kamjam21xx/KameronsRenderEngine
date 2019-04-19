@@ -3,43 +3,33 @@
 
 Scene::Scene()
 {
-	// rework load() with producer consumer in 2 threads
 
-	// possibly add logging boolean
-
-	// will add bitflag storage for model class
-	// bitflags will be used for rendering order and shader use
-
-		/*       bitset layout is as follows
-				
-
-			0	ignore 
-
-			1	calc tangents
-
-			2	draw type(2 bits)
-			3
-
-			4	color
-
-			5	specular
-
-			6	normal
-
-			7	height
-		*/
-	// change bitset to sized int
 }
 
-Scene::Scene(std::string sceneFileLocation) {
-	sceneFile = sceneFileLocation;
+Scene::Scene(std::string newFilePath) {
+	sceneFileLocation = newFilePath;
+}
+void Scene::load() 
+{
+	if (sceneFileLocation == "" || NULL)
+	{
+		printf("Scene.sceneFileLocation not set : cannot load");
+	}
+	else
+	{
+		loadSceneFile();
+	}
+}
+void Scene::loadNewFileLocation(std::string newFilePath) 
+{
+	sceneFileLocation = newFilePath;
+	loadSceneFile();
 }
 
-
-void Scene::load() { // pretty much has to be a full function. dont break it up
+void Scene::loadSceneFile() { // pretty much has to be a full function. dont break it up
 	
 	try {
-		std::ifstream file("Models/default.FLS");
+		std::ifstream file(sceneFileLocation);
 		if (file.is_open()) {
 			std::cout << "default.FLS loading \n";
 		}
@@ -133,6 +123,34 @@ void Scene::render() {
 	
 }
 
+
+
+	// rework load() with producer consumer in 2 threads
+
+	// possibly add logging boolean
+
+	// will add bitflag storage for model class
+	// bitflags will be used for rendering order and shader use
+
+		/*       bitset layout is as follows
+				
+
+			0	ignore 
+
+			1	calc tangents
+
+			2	draw type(2 bits)
+			3
+
+			4	color
+
+			5	specular
+
+			6	normal
+
+			7	height
+		*/
+	// change bitset to sized int
 
 Scene::~Scene()
 {

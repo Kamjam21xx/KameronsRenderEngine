@@ -11,10 +11,10 @@ Material::Material(GLfloat sIntensity, GLfloat specularP)
 {
 	specularIntensity = sIntensity;
 	specularPower = specularP;
-
 }
 
-void Material::UseMaterial(GLuint specularIntensityLocation, GLuint specularPowerLocation) const {
+void Material::UseMaterial(GLuint specularIntensityLocation, GLuint specularPowerLocation) const 
+{
 	glUniform1f(specularIntensityLocation, specularIntensity);
 	glUniform1f(specularPowerLocation, specularPower);
 }

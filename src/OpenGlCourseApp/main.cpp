@@ -30,25 +30,32 @@
 #include "GL_Window.h"
 #include "Camera.h"
 #include "Texture.h"
-
 #include "Material.h"
 #include "Model.h"
 #include "SkyBox.h"
 #include "Scene.h"
 #include "GraphicUI.h"
+#include "FrameBuffer.h"
 
 /*
 	to do list
 
-	- pack skybox loading into a neat member function of SkyBox.h
-	- make the scene class encapsulate more to clean up the code and make it more understandable
+	- CODE REVIEW! when most of this is done
+
+	x encapsulate loading for skybox and simplify functions/construction
+	x encapsulate skybox inside scene class
+	-> stop xChange and yChange for mouse input while not clicked, if first clicked, change is 0.0f
+	-> make materials encapsulate references to textures
+	-> make texture packing functionality for faster gpu stuff
+	-> eliminate matrix multiplication in vertex shader for faster execution speed
+	-> make the scene class encapsulate more to clean up the code and make it more understandable
 	- finish shader baker class "ShaderHandler" and work it in
 	- setup FrameBuffer class
 	- setup more GUI functionality 
 	- make GUI more efficient and pretty with tabs
 	- clean shaders
-	- pack texture data into fewer texture units with no unused channels
-	- add metal to scene, model, texture, shaders and shader class
+	-> pack texture data into fewer texture units with no unused channels
+	->add metal to scene, model, texture, shaders and shader class
 	- fix directional light and fix to camera
 	- fix spotlight edge calculations
 	- setup hdri and post processing buffer
@@ -56,19 +63,18 @@
 	- add pbr mode, pipeline, shaders, and GUI manip
 	- implement fast fourier transform
 	- implement reflection
-	- reinstate alpha and blending and add sort algorithm and seperate shader 
-	- implement auto alpha detection for if the alpha channel is used, and use correct texture loader. flip bit flag for hasAlpha
+	-> reinstate alpha and blending and add sort algorithm and seperate shader 
+	-> implement auto alpha detection for if the alpha channel is used, and use correct texture loader. flip bit flag for hasAlpha
 	- add mouse smoothing WHILE CONTROLING CAMERA
-	- add hotkey/keyBinding editor
+	-> add hotkey/keyBinding editor
 	- add smooth acceleration to camera movement
 	- add sort algorithm for baked shader functionality
-	- add audio engine
-	- add event handling
-	- add physics engine
+	-> add audio engine
+	-> add event handling
+	-> add physics engine
 	
 	CLEAN UP MAIN
 	+ much more
-
 */
 
 /*
@@ -80,26 +86,16 @@
 const float toRadians = 3.14159265 / 180.0;
 
 GL_Window mainWindow;
+FrameBuffer framebufferHDR;
+Camera camera;
 
-std::vector<Mesh*> meshList;
+Scene mainScene;
+
 std::vector<Shader> shaderList;
-
 Shader directionalShadowShader;
 Shader omniShadowShader;
 Shader outlineShader;
 Shader framebuffershader;
-
-Camera camera;
-
-Material shineMaterial;
-Material dullMaterial;
-
-SkyBox skybox;
-
-GLfloat deltaTime = 0.0f;
-GLfloat lastTime = 0.0f;	
-GLfloat now = 0.0f;
-GLfloat spin;
 
 GLuint uniformProjection = 0,
 	   uniformModel = 0,
@@ -111,13 +107,7 @@ GLuint uniformProjection = 0,
 	   uniformOmniLightPos = 0,
 	   uniformFarPlane = 0;
 
-Scene mainScene;
-
-GLboolean splitScreenIsOn = false;
-GLuint splitScreenType = 0;
-
-
-// main shader programs
+// main shader program hard locations
 static const char* vShader = "Shaders/shader.vert";
 static const char* fShader = "Shaders/shader.frag";
 static const char* olvShader = "Shaders/olfshader.vert";
@@ -127,6 +117,17 @@ static const char* outlineFShader = "Shaders/outline.frag";
 static const char* FBVShader = "Shaders/framebuffershader.vert";
 static const char* FBFShader = "Shaders/framebuffershader.frag";
 
+Material shineMaterial;
+Material dullMaterial;
+
+GLfloat deltaTime = 0.0f;
+GLfloat lastTime = 0.0f;	
+GLfloat now = 0.0f;
+GLfloat spin;
+
+GLboolean splitScreenIsOn = false;
+GLuint splitScreenType = 0;
+
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
 unsigned short int spotLightCount = 0;
@@ -134,9 +135,7 @@ unsigned short int pointLightCount = 0;
 
 
 
-
-void calcAverageNormals(unsigned int * indices, unsigned int indiceCount, GLfloat * vertices,
-						unsigned int verticeCount, unsigned int vLength, unsigned int normalOffset) {
+void calcAverageNormals(unsigned int * indices, unsigned int indiceCount, GLfloat * vertices, unsigned int verticeCount, unsigned int vLength, unsigned int normalOffset) {
 	glm::vec3 v1;
 	glm::vec3 v2;
 	glm::vec3 normal;
@@ -176,7 +175,6 @@ void calcAverageNormals(unsigned int * indices, unsigned int indiceCount, GLfloa
 		vertices[nOffset + 2] = vec.z;
 	}
 } // phong average
-
 
 void CreateShaders() {
 	Shader *shader1 = new Shader();
@@ -228,7 +226,6 @@ void RenderSceneStencil() {
 		(*element).RenderModel();
 	}
 }
-
 
 void DirectionalShadowMapPass(DirectionalLight* light) {
 	directionalShadowShader.UseShader();
@@ -327,15 +324,13 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
-	skybox.bindCubeMapTexture(); // TEXTURE UNIT 6
+	mainScene.skybox.bindCubeMapTexture(); // TEXTURE UNIT 6
 	RenderScene();	
-	skybox.unbinedCubeMapTexture();
-
 
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
-	skybox.DrawSkyBox(viewMatrix, projectionMatrix);
+	mainScene.skybox.DrawSkyBox(viewMatrix, projectionMatrix);
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
@@ -395,6 +390,7 @@ void CreateLights(PointLight &pointLightsR,
 	spotLights[0].SetLightRange(80.0f);
 */	
 }
+
 GLfloat DeltaTime() 
 {
 	now = glfwGetTime();
@@ -407,10 +403,11 @@ GLfloat DeltaTime()
 
 
 
-
-
 int main() 
 {	
+//<>=========================================================================================================<>
+// Window Setup
+
 	mainWindow = GL_Window(3840, 2160);
 	mainWindow.Initialize();
 
@@ -418,13 +415,23 @@ int main()
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+	// additional settings
 	glfwWindowHint(GLFW_SAMPLES, 16);
 	glEnable(GL_MULTISAMPLE);
-	//glfwSwapInterval(1); // vsync
+	glfwSwapInterval(1); // vsync
 	mainWindow.swapBuffers();
 	glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glEnable(GL_FRAMEBUFFER_SRGB);
 
 //<>=========================================================================================================<>
+// frame buffer setup
+
+	framebufferHDR = FrameBuffer(GL_TEXTURE16, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_LINEAR, mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
+
+//<>=========================================================================================================<>
+// prep
 
 	DirectionalLight mainLight;
 	glm::mat4 projection;
@@ -442,14 +449,9 @@ int main()
 
 	CreateLights(*pointLights, *spotLights, &pointLightCount, &spotLightCount);
 	CreateShaders();
-	skybox = SkyBox("Textures/skybox", "Shaders/skybox.vert", "Shaders/skybox.frag");
-    mainScene.load();
-
-
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glEnable(GL_FRAMEBUFFER_SRGB);
-
+	mainScene.loadNewFileLocation("Models/default.FLS");
+	mainScene.skybox = SkyBox("Textures/skybox", "Shaders/skybox.vert", "Shaders/skybox.frag");
+   
 //<>=========================================================================================================<>
 // (immediate mode graphic user interface)  ---------  IMGUI
 
@@ -496,7 +498,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		glfwPollEvents();		
-		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange()); // fix later to stop xchange while not clicked
+		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 		camera.keyControl(mainWindow.getKeys(), deltaTime);
 
 		DirectionalShadowMapPass(&mainLight);
@@ -523,7 +525,8 @@ int main()
 
 
 	}
-//<>=========================================================================================================<>// EXIT
+//<>=========================================================================================================<>
+// EXIT
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
@@ -534,3 +537,49 @@ int main()
 
 	return 0;
 }
+
+/*
+
+
+
+
+
+	vec2 offsets[9] = vec2[](
+		 vec2(-offset , offset),
+		 vec2( 0.0f   , offset),
+		 vec2( offset , offset),
+		 vec2(-offset , 0.0f  ),
+		 vec2( 0.0f   , 0.0f  ),
+		 vec2( offset , 0.0f  ),
+		 vec2(-offset ,-offset),
+		 vec2( 0.0f   ,-offset),
+		 vec2( offset ,-offset)
+	);
+
+	float kernel[9] = float[](
+		1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0,
+		2.0 / 16.0, 4.0 / 16.0, 2.0 / 16.0,
+		1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0
+	);
+
+	vec3 sampleTex[9];
+	for(int i = 0; i < 9; i++) {
+		sampleTex[i] = vec3(texture(theTextureDiffuse, TexCoords.st + offsets[i]));
+	}
+
+	vec3 col = vec3(0.0f);
+	for (int i = 0; i < 9; i++) {
+		col += sampleTex[i] * kernel[i];
+	}
+
+	vec4 brightnessf = vec4(texture(theTextureDiffuse, TexCoords).xyz, 1.0f);
+	float brightness = (brightnessf.x + brightnessf.y + brightnessf.z) / 3.0f;
+	//FragColor = ( (vec4(col, 1.0f) * texture(theTextureDiffuse, TexCoords) ) - (1.0f - brightness)) + texture(theTextureDiffuse,TexCoords);
+
+
+
+
+
+
+
+*/
