@@ -6,7 +6,7 @@ in vec4 DirectionalLightSpacePos;
 in mat3 TBN;
 in mat3 tTBN;
 
-out vec4 colour;
+layout (location = 16) out vec4 colour;
 
 
 // variables
@@ -82,7 +82,7 @@ uniform int splitScreenType;
 layout (binding = 1) uniform sampler2D theTextureDiffuse;
 layout (binding = 4) uniform sampler2D theTextureSpecular;
 layout (binding = 5) uniform sampler2D theTextureNormal;
-layout (binding = 14) uniform sampler2D theTextureHeight;
+layout (binding = 7) uniform sampler2D theTextureHeight;
 layout (binding = 2) uniform sampler2D directionalShadowMap;
 layout (binding = 6) uniform samplerCube skyBoxTexture;
 

@@ -276,11 +276,13 @@ void RenderPass(glm::mat4 projectionMatrix,
 				PointLight *pointLights, 
 				SpotLight *spotLights) {
 
-	glBindFramebuffer(GL_FRAMEBUFFER, framebufferHDR.GetFBO());
+	//glBindFramebuffer(GL_FRAMEBUFFER, framebufferHDR.FBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glViewport(0, 0, 3840, 2160);
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glDisable(GL_STENCIL_TEST);
 	glStencilMask(0x00);
 
 	shaderList[0].UseShader();
@@ -314,33 +316,48 @@ void RenderPass(glm::mat4 projectionMatrix,
 	shaderList[0].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
 	shaderList[0].Validate();
 
+	framebuffershader.SetTextureScreenSpace(16);
+
+
+/*	*/
+
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
+
 	mainScene.skybox.bindCubeMapTexture(); // TEXTURE UNIT 6
+
 	RenderScene();	
 
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
+	//framebufferHDR.BindTexture(GL_TEXTURE16);
 	mainScene.skybox.DrawSkyBox(viewMatrix, projectionMatrix);
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
 
+/**/
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 	glClear(GL_COLOR_BUFFER_BIT);
+	glDisable(GL_STENCIL_TEST);
+	glDisable(GL_DEPTH_TEST);
 
 	framebuffershader.UseShader();
-
+	framebuffershader.SetTextureScreenSpace(16);
+	
+	framebufferHDR.BindTexture(GL_TEXTURE16);
 	glBindVertexArray(screenQuadVAO);
-	framebufferHDR.colorTexture.UseTexture();
-	glDisable(GL_DEPTH_TEST);
-	glBindTexture(GL_TEXTURE_2D, framebufferHDR.colorTexture.GetTextureID());
+	glBindTexture(GL_TEXTURE_2D, framebufferHDR.texColorBuffer);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glEnable(GL_DEPTH_TEST);
+
+
 
 }
 
@@ -421,10 +438,11 @@ int main()
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	// additional settings
+// additional settings
+
 	glfwWindowHint(GLFW_SAMPLES, 16);
 	glEnable(GL_MULTISAMPLE);
-	glfwSwapInterval(1); // vsync
+	//glfwSwapInterval(1); // vsync
 	mainWindow.swapBuffers();
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_CULL_FACE);
@@ -455,7 +473,7 @@ int main()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
 	// framebufferHDR = FrameBuffer(GL_TEXTURE15, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_LINEAR, mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
-	framebufferHDR = FrameBuffer(GL_TEXTURE15, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR, mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
+	framebufferHDR = FrameBuffer(GL_TEXTURE16, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR, 3840, 2160);
 
 //<>=========================================================================================================<>
 // prep

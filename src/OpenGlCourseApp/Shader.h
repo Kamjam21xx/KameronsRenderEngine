@@ -43,6 +43,7 @@ public:
 	GLuint GetFarPlanelocation() const ;
 	GLuint GetSplitScreenIsOnLocation() const ;
 	GLuint GetSplitScreenTypeLocation() const ;
+	GLuint GetTextureScreenSpaceLocation() const;
 
 	void UseShader();
 	void ClearShader();
@@ -61,6 +62,7 @@ public:
 	void SetTextureSkyBox(GLuint textureUnit);
 	void SetSplitScreenIsOn(GLboolean splitScreenIsOn);
 	void SetSplitScreenType(GLuint splitScreenType);
+	void SetTextureScreenSpace(GLuint textureUnit);
 	
 	~Shader();
 
@@ -75,7 +77,8 @@ private:
 		uniformTextureDiffuse, uniformTextureSpecular, uniformTextureMetal, uniformTextureNormal, uniformTextureHeight,
 		uniformTextureSkyBox,
 		uniformDirectionalLightTransform, uniformDirectionalShadowMap,
-		uniformOmniLightPos, uniformFarPlane, uniformSplitScreenIsOn, uniformSplitScreenType;
+		uniformOmniLightPos, uniformFarPlane, uniformSplitScreenIsOn, uniformSplitScreenType,
+		uniformTextureScreenSpace;
 
 	GLuint uniformLightMatrices[6];
 

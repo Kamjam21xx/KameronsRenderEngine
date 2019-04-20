@@ -203,6 +203,7 @@ void Shader::CompileProgram()
 		uniformOmniShadowMap[i].farPlane = glGetUniformLocation(shaderID, locBuff);
 	}
 
+	uniformTextureScreenSpace = glGetUniformLocation(shaderID, "screenSpaceTexture");
 	
 }
 
@@ -265,6 +266,10 @@ GLuint Shader::GetSplitScreenIsOnLocation() const
 GLuint Shader::GetSplitScreenTypeLocation() const
 {
 	return uniformSplitScreenType;
+}
+GLuint Shader::GetTextureScreenSpaceLocation() const
+{
+	return uniformTextureScreenSpace;
 }
 
 void Shader::SetDirectionalLight(DirectionalLight * dLight) 
@@ -362,6 +367,10 @@ void Shader::SetSplitScreenIsOn(GLboolean splitScreenIsOn)
 void Shader::SetSplitScreenType(GLuint splitScreenType) 
 {
 	glUniform1i(uniformSplitScreenType, splitScreenType);
+}
+void Shader::SetTextureScreenSpace(GLuint textureUnit)
+{
+	glUniform1i(uniformTextureScreenSpace, textureUnit);
 }
 
 void Shader::UseShader() 
