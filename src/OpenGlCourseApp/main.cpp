@@ -48,10 +48,10 @@
 	x check and eliminate win lib include
 	x setup FrameBuffer class
 	x add GetSkyBox() to the scene class and fix implementation in main
+	x simplify RenderPass() by moving part of it to a new function in main "RenderToQuad()"
 
 
-
-	//////////D///O///N///T//////F///O///R///G///E///T////////////////////////////////////////////////////////
+	//////////   D   O   N   T      F   O   R   G   E   T   //////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	- IMPLEMENT RULE OF 5       wasted 2 days from not implementing or being ignorant of the copy constructor
@@ -63,6 +63,7 @@
 
 
 
+	- improve and standardize naming conventions as youre working through stuff
 	- eliminate wasteful pass by values and other odds and ends
 	- change include paths - per deccers advice
 	- fix error checks printf %s with 2 parameters is wrong - per deccers advice
