@@ -16,6 +16,7 @@ class Scene
 public:
 	// possibly add skybox , keep loading functionality for the skybox a member of itself
 	SkyBox skybox;
+
 	std::vector <Model> objects;	
 	
 	Scene();
@@ -26,11 +27,14 @@ public:
 	void loadSceneFile();
 	void render();
 
+	SkyBox* GetSkyBoxPtr();
+
 	~Scene();
 
 private:
 	
 	std::string sceneFileLocation;
+	
 
 };
 

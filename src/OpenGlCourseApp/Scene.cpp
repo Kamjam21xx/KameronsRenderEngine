@@ -123,6 +123,11 @@ void Scene::render() {
 	
 }
 
+SkyBox* Scene::GetSkyBoxPtr()
+{
+	return &skybox;
+}
+
 
 
 	// rework load() with producer consumer in 2 threads

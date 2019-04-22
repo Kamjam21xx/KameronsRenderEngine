@@ -10,12 +10,8 @@ class FrameBuffer
 {
 public:
 
-	GLuint FBO, RBO, texColorBuffer, bufferTextureUnit;
-	Texture colorTexture;
-
-
 	FrameBuffer();
-	//FrameBuffer(GLenum textureUnit, GLint width, GLint height);
+	FrameBuffer(GLenum textureUnit, GLint width, GLint height);
 	FrameBuffer(GLenum textureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height);
 
     void Init(GLuint textureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height);
@@ -24,6 +20,9 @@ public:
 	void BindAndSetTexture(GLenum textureUnit);
 
 	void SetTextureUnit(GLenum textureUnit);
+
+	GLuint GetBufferTextureUnit() const;
+	GLuint GetTexColorBuffer() const;
 	GLuint GetFBO() const;
 	GLuint GetRBO() const;
 
@@ -31,7 +30,12 @@ public:
 
 private:
 
+	GLuint FBO, RBO, texColorBuffer, bufferTextureUnit;
 	GLint bufferWidth, bufferHeight;
+
+	FrameBuffer(FrameBuffer *framebuffer) {
+		// FrameBuffer copy constructor may not be called
+	}
 
 };
 

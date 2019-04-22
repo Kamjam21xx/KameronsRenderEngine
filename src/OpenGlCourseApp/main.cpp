@@ -46,9 +46,24 @@
 	x encapsulate loading for skybox and simplify functions/construction
 	x encapsulate skybox inside scene class
 	x check and eliminate win lib include
+	x setup FrameBuffer class
+	x add GetSkyBox() to the scene class and fix implementation in main
+
+
+
+	//////////D///O///N///T//////F///O///R///G///E///T////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	- IMPLEMENT RULE OF 5       wasted 2 days from not implementing or being ignorant of the copy constructor
-	- add GetSkyBox() to the scene class
+	- optimize ---- getting chopp results in terms of updating the 0'th framebuffer
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+	- eliminate wasteful pass by values and other odds and ends
 	- change include paths - per deccers advice
 	- fix error checks printf %s with 2 parameters is wrong - per deccers advice
 	- stop xChange and yChange for mouse input while not clicked, if first clicked, change is 0.0f
@@ -57,7 +72,6 @@
 	- eliminate matrix multiplication in vertex shader for faster execution speed - per jodies advice
 	- make the scene class encapsulate more to clean up the code and make it more understandable
 	- finish shader baker class "ShaderHandler" and work it in
-	- setup FrameBuffer class
 	- setup more GUI functionality 
 	- make GUI more efficient and pretty with tabs
 	- clean shaders
@@ -69,7 +83,8 @@
 	- setup deffered rendering
 	- add pbr mode, pipeline, shaders, and GUI manip
 	- implement fast fourier transform
-	- implement reflection
+	- implement full reflection reflection
+	- implement multiple shaders and shader changing in the GUI
 	- reinstate alpha and blending and add sort algorithm and seperate shader 
 	- implement auto alpha detection for if the alpha channel is used, and use correct texture loader. flip bit flag for hasAlpha
 	- add mouse smoothing WHILE CONTROLING CAMERA
@@ -255,7 +270,6 @@ void DirectionalShadowMapPass(DirectionalLight* light) {
 	
 	RenderScene();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//glBindFramebuffer(GL_FRAMEBUFFER, framebufferHDR.FBO);
 }
 
 void OmniShadowMapPass(PointLight *light) {
@@ -263,9 +277,7 @@ void OmniShadowMapPass(PointLight *light) {
 	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
 	light->GetShadowMap()->Write();
 
-
 	glClear(GL_DEPTH_BUFFER_BIT);
-	//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
 	uniformModel = omniShadowShader.GetModelLocation();
 	uniformOmniLightPos = omniShadowShader.GetOmniLightLocation();
@@ -279,7 +291,6 @@ void OmniShadowMapPass(PointLight *light) {
 	omniShadowShader.Validate();
 
 	RenderScene();
-	//glBindFramebuffer(GL_FRAMEBUFFER, framebufferHDR.FBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -291,8 +302,7 @@ void RenderPass(glm::mat4 projectionMatrix,
 				PointLight *pointLights, 
 				SpotLight *spotLights) {
 
-																			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferHDR.FBO);
-
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferHDR.GetFBO());
 	glViewport(0, 0, 3840, 2160);
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -308,12 +318,10 @@ void RenderPass(glm::mat4 projectionMatrix,
 	uniformEyeDirection = shaderList[0].GetEyeDirectionLocation();
 	uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
 	uniformSpecularPower = shaderList[0].GetSpecularPowerLocation();
-
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 	glUniform3f(uniformEyeDirection, camera.getCameraDirection().x, camera.getCameraDirection().y, camera.getCameraDirection().z);
-
 	shaderList[0].SetSplitScreenIsOn(splitScreenIsOn);
 	shaderList[0].SetSplitScreenType(splitScreenType);
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
@@ -336,14 +344,14 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 
-	mainScene.skybox.bindCubeMapTexture(); // TEXTURE UNIT 6
+	mainScene.GetSkyBoxPtr()->bindCubeMapTexture(); // TEXTURE UNIT 6
 
 	RenderScene();	
 
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
-	mainScene.skybox.DrawSkyBox(viewMatrix, projectionMatrix);
+	mainScene.GetSkyBoxPtr()->DrawSkyBox(viewMatrix, projectionMatrix);
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
@@ -364,7 +372,7 @@ void RenderPass(glm::mat4 projectionMatrix,
 	framebuffershader.SetTextureScreenSpace(18);
 																			
 	glBindVertexArray(screenQuadVAO);
-	glBindTexture(GL_TEXTURE_2D, framebufferHDR.texColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, framebufferHDR.GetTexColorBuffer());
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glEnable(GL_DEPTH_TEST);
 
@@ -546,11 +554,6 @@ int main()
 		if (spin >= 360.00f) { spin = 0.0f; }
 
 		// Main GL Calls
-		glBindFramebuffer(GL_FRAMEBUFFER, framebufferHDR.FBO);
-		glViewport(0, 0, 3840, 2160);
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 		glfwPollEvents();		
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 		camera.keyControl(mainWindow.getKeys(), deltaTime);
