@@ -39,9 +39,7 @@
 
 /*	 gotta give thanks to the Graphics Programming discord group for helping me learn and fix things when im stuck
 
-
 	to do list
-
 	- CODE REVIEW! when most of this is done
 
 	x eliminate direct paths
@@ -49,6 +47,7 @@
 	x encapsulate skybox inside scene class
 	x check and eliminate win lib include
 
+	- add GetSkyBox() to the scene class
 	- change include paths - per deccers advice
 	- fix error checks printf %s with 2 parameters is wrong - per deccers advice
 	- stop xChange and yChange for mouse input while not clicked, if first clicked, change is 0.0f
@@ -73,6 +72,11 @@
 	- reinstate alpha and blending and add sort algorithm and seperate shader 
 	- implement auto alpha detection for if the alpha channel is used, and use correct texture loader. flip bit flag for hasAlpha
 	- add mouse smoothing WHILE CONTROLING CAMERA
+	- add particles
+	- add voxel based volume rendering
+	- add voxel based fluid simulation
+	- add particle simulation
+	- create water shader with FFT
 	- add hotkey/keyBinding editor
 	- add smooth acceleration to camera movement
 	- add sort algorithm for baked shader functionality
@@ -82,6 +86,7 @@
 	
 	CLEAN UP MAIN
 	+ much more
+
 */
 
 /*
@@ -285,8 +290,8 @@ void RenderPass(glm::mat4 projectionMatrix,
 				PointLight *pointLights, 
 				SpotLight *spotLights) {
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferHDR.FBO);
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+																			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferHDR.FBO);
+	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glViewport(0, 0, 3840, 2160);
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
@@ -311,7 +316,7 @@ void RenderPass(glm::mat4 projectionMatrix,
 
 	shaderList[0].SetSplitScreenIsOn(splitScreenIsOn);
 	shaderList[0].SetSplitScreenType(splitScreenType);
-	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
+																			// (*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
 	shaderList[0].SetTextureDiffuse(1);
 	shaderList[0].SetTextureSpecular (4);
 	// shaderList[0].SetTextureMetal(8); 
@@ -319,12 +324,13 @@ void RenderPass(glm::mat4 projectionMatrix,
 	shaderList[0].SetTextureHeight(7);
 	shaderList[0].SetDirectionalShadowMap(2); // 2
 	shaderList[0].SetTextureSkyBox(6);	
-	shaderList[0].SetDirectionalLight(mainLight);
-	shaderList[0].SetPointLights(pointLights, (*pointLightCount), 8, 0);
-	shaderList[0].SetSpotLights(spotLights, (*spotLightCount), 8 + (*pointLightCount), (*pointLightCount));
-	shaderList[0].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
+																			// shaderList[0].SetDirectionalLight(mainLight);
+																			// shaderList[0].SetPointLights(pointLights, (*pointLightCount), 8, 0);
+																			// shaderList[0].SetSpotLights(spotLights, (*spotLightCount), 8 + (*pointLightCount), (*pointLightCount));
+																			// shaderList[0].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
 	shaderList[0].Validate();
-	//shaderList[0].SetTextureScreenSpace(18);
+	// shaderList[0].SetTextureScreenSpace(18);
+
 /**/
 
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -332,15 +338,15 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 
-	mainScene.skybox.bindCubeMapTexture(); // TEXTURE UNIT 6
+																			// mainScene.skybox.bindCubeMapTexture(); // TEXTURE UNIT 6
 
 	RenderScene();	
 
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
-	//framebufferHDR.BindTexture(GL_TEXTURE16);
-	mainScene.skybox.DrawSkyBox(viewMatrix, projectionMatrix);
+	// framebufferHDR.BindTexture(GL_TEXTURE16);
+																			// mainScene.skybox.DrawSkyBox(viewMatrix, projectionMatrix);
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
@@ -355,10 +361,10 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_DEPTH_TEST);
 
-	framebuffershader.UseShader();
-	
-	framebuffershader.SetTextureScreenSpace(18);
-	framebufferHDR.BindTexture(GL_TEXTURE18);
+																			framebuffershader.UseShader();
+																			
+																			framebuffershader.SetTextureScreenSpace(18);
+																			framebufferHDR.BindTexture(GL_TEXTURE18);
 	glBindVertexArray(screenQuadVAO);
 	glBindTexture(GL_TEXTURE_2D, framebufferHDR.texColorBuffer);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
