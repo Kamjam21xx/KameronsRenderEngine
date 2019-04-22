@@ -242,6 +242,7 @@ void DirectionalShadowMapPass(DirectionalLight* light) {
 	
 	RenderScene();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, framebufferHDR.FBO);
 }
 
 void OmniShadowMapPass(PointLight *light) {
@@ -265,6 +266,7 @@ void OmniShadowMapPass(PointLight *light) {
 	omniShadowShader.Validate();
 
 	RenderScene();
+	//glBindFramebuffer(GL_FRAMEBUFFER, framebufferHDR.FBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -276,8 +278,8 @@ void RenderPass(glm::mat4 projectionMatrix,
 				PointLight *pointLights, 
 				SpotLight *spotLights) {
 
-	//glBindFramebuffer(GL_FRAMEBUFFER, framebufferHDR.FBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferHDR.FBO);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glViewport(0, 0, 3840, 2160);
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
@@ -316,10 +318,7 @@ void RenderPass(glm::mat4 projectionMatrix,
 	shaderList[0].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
 	shaderList[0].Validate();
 
-	framebuffershader.SetTextureScreenSpace(16);
-
-
-/*	*/
+/**/
 
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
@@ -341,23 +340,22 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glDisable(GL_STENCIL_TEST);
 
 /**/
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_DEPTH_TEST);
 
 	framebuffershader.UseShader();
-	framebuffershader.SetTextureScreenSpace(16);
 	
-	framebufferHDR.BindTexture(GL_TEXTURE16);
+	framebuffershader.SetTextureScreenSpace(0);
+	framebufferHDR.BindTexture(GL_TEXTURE18);
 	glBindVertexArray(screenQuadVAO);
 	glBindTexture(GL_TEXTURE_2D, framebufferHDR.texColorBuffer);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-
 	glEnable(GL_DEPTH_TEST);
-
-
 
 }
 
@@ -439,15 +437,15 @@ int main()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 // additional settings
-
-	glfwWindowHint(GLFW_SAMPLES, 16);
-	glEnable(GL_MULTISAMPLE);
+	//glfwWindowHint(GLFW_SAMPLES, 16);
+	//glEnable(GL_MULTISAMPLE);
 	//glfwSwapInterval(1); // vsync
 	mainWindow.swapBuffers();
-	glEnable(GL_DEBUG_OUTPUT);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_DEBUG_OUTPUT);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 	glEnable(GL_FRAMEBUFFER_SRGB);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 //<>=========================================================================================================<>
 // frame buffer setup
@@ -525,19 +523,19 @@ int main()
 	while (!mainWindow.getShouldClose()) {
 		
 		// Other scene variables
-
 		deltaTime = DeltaTime();
 
-		// junk JUNK
-		glm::vec3 ALP = camera.getCameraPosition();
-		ALP = glm::vec3(ALP.x, ALP.y - 0.275f, ALP.z + 0.275f);
-		pointLights[1].SetPosition(ALP);
-		// junk JUNK
+			// junk JUNK
+			glm::vec3 ALP = camera.getCameraPosition();
+			ALP = glm::vec3(ALP.x, ALP.y - 0.275f, ALP.z + 0.275f);
+			pointLights[1].SetPosition(ALP);
+			// junk JUNK
 
 		spin += spinModifier;
 		if (spin >= 360.00f) { spin = 0.0f; }
 
 		// Main GL Calls
+		glBindFramebuffer(GL_FRAMEBUFFER, framebufferHDR.FBO);
 		glViewport(0, 0, 3840, 2160);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

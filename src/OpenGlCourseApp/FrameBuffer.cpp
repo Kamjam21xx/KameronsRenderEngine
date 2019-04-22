@@ -5,6 +5,7 @@ FrameBuffer::FrameBuffer()
 
 }
 /*
+
 FrameBuffer::FrameBuffer(GLuint textureUnit, GLint width, GLint height)
 {
 	glGenFramebuffers(1, &FBO);
@@ -64,25 +65,36 @@ FrameBuffer::FrameBuffer(GLuint textureUnit, GLenum internalFormat, GLenum forma
 
 	bufferTextureUnit = textureUnit;
 
+
 	glGenFramebuffers(1, &FBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 	
+
 	// create a color attachment texture
 	glGenTextures(1, &texColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
-	
+
+
 	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
 	glGenRenderbuffers(1, &RBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height); // use a single renderbuffer object for both a depth AND stencil buffer.
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO); // now actually attach it
-	// now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		printf("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+
+
+	GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, buffers);
+	
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) 
+	{
+		printf("FrameBuffer object : framebuffer incomplete!");
+	}
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -121,6 +133,16 @@ GLuint FrameBuffer::GetRBO() const
 
 FrameBuffer::~FrameBuffer()
 {	
-	glDeleteRenderbuffers(1, &RBO);
-	glDeleteFramebuffers(1, &FBO);
+	if (RBO) 
+	{
+		glDeleteRenderbuffers(1, &RBO);
+	}
+	if (FBO) 
+	{
+		glDeleteFramebuffers(1, &FBO);
+	}
+	if (texColorBuffer) 
+	{
+		glDeleteTextures(1, &texColorBuffer);
+	}
 }

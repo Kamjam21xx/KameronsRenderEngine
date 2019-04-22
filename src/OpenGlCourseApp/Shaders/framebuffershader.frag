@@ -2,7 +2,7 @@
 
 in vec2 TexCoords;
 
-layout (location = 0) out vec4 FragColor;
+out vec4 FragColor;
 
 layout (binding = 16) uniform sampler2D screenSpaceTexture;
 
@@ -12,5 +12,6 @@ const float offset = 1.0 / 300.0;
 
 void main() 
 {
-	FragColor = texture(screenSpaceTexture, TexCoords);
+	FragColor = vec4(0.0,0.0,0.0,0.0);
+	FragColor.xyz = texture(screenSpaceTexture, TexCoords).xyz;
 }

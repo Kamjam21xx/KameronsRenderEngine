@@ -6,7 +6,7 @@ in vec4 DirectionalLightSpacePos;
 in mat3 TBN;
 in mat3 tTBN;
 
-layout (location = 16) out vec4 colour;
+layout (location = 0) out vec4 colour;
 
 
 // variables

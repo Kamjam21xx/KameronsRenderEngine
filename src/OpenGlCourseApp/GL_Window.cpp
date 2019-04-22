@@ -8,7 +8,8 @@ GL_Window::GL_Window()
 	width = 800;
 	height = 600;
 
-	for (size_t i = 0; i < 1024; ++i) {
+	for (size_t i = 0; i < 1024; ++i) 
+{
 		keys[i] = 0;
 	}
 }
@@ -21,7 +22,8 @@ GL_Window::GL_Window(GLint windowWidth, GLint windowHeight)
 	mouseFirstMoved = true;
 	sensitivity = 0.25f;
 
-	for (size_t i = 0; i < 1024; ++i) {
+	for (size_t i = 0; i < 1024; ++i) 
+	{
 		keys[i] = 0;
 	}
 }
@@ -34,13 +36,16 @@ GL_Window::GL_Window(GLint windowWidth, GLint windowHeight, GLfloat sensitivity)
 	mouseFirstMoved = true;
 	sensitivity = 0.25f;
 
-	for (size_t i = 0; i < 1024; ++i) {
+	for (size_t i = 0; i < 1024; ++i) 
+{
 		keys[i] = 0;
 	}
 }
 
-int GL_Window::Initialize() {
-		if (!glfwInit()) {											// initialize GLFW
+int GL_Window::Initialize() 
+{
+		if (!glfwInit()) 
+		{											// initialize GLFW
 			glfwTerminate();
 		}
 

@@ -37,7 +37,6 @@ void Shader::CreateFromFiles(const char* vertexLocation, const char* geometryLoc
 	fragmentString = ReadFile(fragmentLocation);
 	geometryString = ReadFile(geometryLocation);
 
-
 	const char* vertexCode = vertexString.c_str();
 	const char* geometryCode = geometryString.c_str();
 	const char* fragmentCode = fragmentString.c_str();
@@ -61,7 +60,7 @@ std::string Shader::ReadFile(const char* fileLocation)
 
 	return content;
 }
-void Shader::CompileShader(const char* vertexCode, const char* fragmentCode) 
+void Shader::CompileShader(const char* vertexCode, const char* fragmentCode) // refactor for NULL const char* and checks or not idk
 {
 	shaderID = glCreateProgram();
 	if (!shaderID) {
