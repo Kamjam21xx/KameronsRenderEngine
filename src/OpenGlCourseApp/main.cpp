@@ -164,47 +164,6 @@ unsigned short int pointLightCount = 0;
 unsigned int screenQuadVAO, screenQuadVBO;
 
 
-void calcAverageNormals(unsigned int * indices, unsigned int indiceCount, GLfloat * vertices, unsigned int verticeCount, unsigned int vLength, unsigned int normalOffset) {
-	glm::vec3 v1;
-	glm::vec3 v2;
-	glm::vec3 normal;
-	unsigned int in0;
-	unsigned int in1;
-	unsigned int in2;
-
-	for (size_t i = 0; i < indiceCount; i += 3) {
-		in0 = indices[i + 0] * vLength;
-		in1 = indices[i + 1] * vLength;
-		in2 = indices[i + 2] * vLength;
-		
-		v1 = glm::vec3(vertices[in1 + 0] - vertices[in0 + 0],
-					   vertices[in1 + 1] - vertices[in0 + 1],
-					   vertices[in1 + 2] - vertices[in0 + 2]
-		);
-		v2 = glm::vec3(vertices[in2 + 0] - vertices[in0 + 0],  
-					   vertices[in2 + 1] - vertices[in0 + 1],
-					   vertices[in2 + 2] - vertices[in0 + 2]
-		);
-		
-		normal = glm::cross(v1, v2);
-		normal = glm::normalize(normal);
-
-		in0 += normalOffset; in1 += normalOffset; in2 += normalOffset;
-		vertices[in0] += normal.x ; vertices[in0 + 1] += normal.y ; vertices[in0 + 2] += normal.z;
-		vertices[in1] += normal.x ; vertices[in1 + 1] += normal.y ; vertices[in1 + 2] += normal.z;
-		vertices[in2] += normal.x ; vertices[in2 + 1] += normal.y ; vertices[in2 + 2] += normal.z;
-	}
-
-	for (size_t i = 0; i < verticeCount / vLength; i++) {
-		unsigned int nOffset = i * vLength + normalOffset; 
-		glm::vec3 vec(vertices[nOffset], vertices[nOffset + 1], vertices[nOffset + 2]);
-		vec = glm::normalize(vec);
-		vertices[nOffset + 0] = vec.x; 
-		vertices[nOffset + 1] = vec.y;
-		vertices[nOffset + 2] = vec.z;
-	}
-} // phong average
-
 void CreateShaders() {
 	Shader *shader1 = new Shader();
 	shader1->CreateFromFiles(vShader, fShader);
@@ -228,7 +187,6 @@ void CreateShaders() {
 }
 
 void RenderScene() {
-
 	for (auto element = mainScene.objects.begin() ; element != mainScene.objects.end(); ++element) {
 		glm::mat4 model = glm::mat4(1.0);
 
@@ -294,6 +252,25 @@ void OmniShadowMapPass(PointLight *light) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void RenderToQuad() {
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glDisable(GL_STENCIL_TEST);
+	glDisable(GL_DEPTH_TEST);
+
+	framebuffershader.UseShader();
+
+	framebufferHDR.BindTexture(GL_TEXTURE18);
+	framebuffershader.SetTextureScreenSpace(18);
+
+	glBindVertexArray(screenQuadVAO);
+	glBindTexture(GL_TEXTURE_2D, framebufferHDR.GetTexColorBuffer());
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glEnable(GL_DEPTH_TEST);
+}
+
 void RenderPass(glm::mat4 projectionMatrix, 
 				glm::mat4 viewMatrix, 
 				unsigned short int* pointLightCount, 
@@ -301,6 +278,7 @@ void RenderPass(glm::mat4 projectionMatrix,
 				DirectionalLight* mainLight, 
 				PointLight *pointLights, 
 				SpotLight *spotLights) {
+	// keep this function long until shader handler and scene is more complete
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferHDR.GetFBO());
 	glViewport(0, 0, 3840, 2160);
@@ -337,8 +315,6 @@ void RenderPass(glm::mat4 projectionMatrix,
 	shaderList[0].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
 	shaderList[0].Validate();
 
-/**/
-
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
@@ -356,25 +332,6 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
-
-/**/
-
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glDisable(GL_STENCIL_TEST);
-	glDisable(GL_DEPTH_TEST);
-
-	framebuffershader.UseShader();
-																			
-	framebufferHDR.BindTexture(GL_TEXTURE18);
-	framebuffershader.SetTextureScreenSpace(18);
-																			
-	glBindVertexArray(screenQuadVAO);
-	glBindTexture(GL_TEXTURE_2D, framebufferHDR.GetTexColorBuffer());
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glEnable(GL_DEPTH_TEST);
 
 }
 
