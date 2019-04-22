@@ -51,7 +51,7 @@
 	x simplify RenderPass() by moving part of it to a new function in main "RenderToQuad()"
 
 
-	//////////   D   O   N   T      F   O   R   G   E   T   //////////////////////////////////////////////////
+	//////////   D   O   N   T      F   O   R   G   E   T   ///////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	- IMPLEMENT RULE OF 5       wasted 2 days from not implementing or being ignorant of the copy constructor
@@ -334,6 +334,8 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
 
+	RenderToQuad();
+
 }
 
 void CreateLights(PointLight &pointLightsR, 
@@ -414,13 +416,13 @@ int main()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 // additional settings
-	//glfwWindowHint(GLFW_SAMPLES, 16);
-	//glEnable(GL_MULTISAMPLE);
-	//glfwSwapInterval(1); // vsync
+	glfwWindowHint(GLFW_SAMPLES, 16);
+	glEnable(GL_MULTISAMPLE);
+	glfwSwapInterval(1); // vsync
 	mainWindow.swapBuffers();
-	//glEnable(GL_DEBUG_OUTPUT);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
+	glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	glEnable(GL_FRAMEBUFFER_SRGB);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
