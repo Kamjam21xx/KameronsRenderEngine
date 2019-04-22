@@ -86,8 +86,8 @@ FrameBuffer::FrameBuffer(GLuint textureUnit, GLenum internalFormat, GLenum forma
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO); // now actually attach it
 
 
-	GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, buffers);
+	GLenum buffers[] = { GL_COLOR_ATTACHMENT0 , GL_DEPTH_STENCIL_ATTACHMENT };
+	glDrawBuffers(2, buffers);
 	
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) 

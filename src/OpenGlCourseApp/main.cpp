@@ -37,25 +37,32 @@
 #include "GraphicUI.h"
 #include "FrameBuffer.h"
 
-/*
+/*	 gotta give thanks to the Graphics Programming discord group for helping me learn and fix things when im stuck
+
+
 	to do list
 
 	- CODE REVIEW! when most of this is done
 
+	x eliminate direct paths
 	x encapsulate loading for skybox and simplify functions/construction
 	x encapsulate skybox inside scene class
-	-> stop xChange and yChange for mouse input while not clicked, if first clicked, change is 0.0f
-	-> make materials encapsulate references to textures
-	-> make texture packing functionality for faster gpu stuff
-	-> eliminate matrix multiplication in vertex shader for faster execution speed
-	-> make the scene class encapsulate more to clean up the code and make it more understandable
+	x check and eliminate win lib include
+
+	- change include paths - per deccers advice
+	- fix error checks printf %s with 2 parameters is wrong - per deccers advice
+	- stop xChange and yChange for mouse input while not clicked, if first clicked, change is 0.0f
+	- make materials encapsulate references to textures 
+	- make texture packing functionality for faster gpu stuff 
+	- eliminate matrix multiplication in vertex shader for faster execution speed - per jodies advice
+	- make the scene class encapsulate more to clean up the code and make it more understandable
 	- finish shader baker class "ShaderHandler" and work it in
 	- setup FrameBuffer class
 	- setup more GUI functionality 
 	- make GUI more efficient and pretty with tabs
 	- clean shaders
-	-> pack texture data into fewer texture units with no unused channels
-	->add metal to scene, model, texture, shaders and shader class
+	- pack texture data into fewer texture units with no unused channels
+	- add metal to scene, model, texture, shaders and shader class
 	- fix directional light and fix to camera
 	- fix spotlight edge calculations
 	- setup hdri and post processing buffer
@@ -63,15 +70,15 @@
 	- add pbr mode, pipeline, shaders, and GUI manip
 	- implement fast fourier transform
 	- implement reflection
-	-> reinstate alpha and blending and add sort algorithm and seperate shader 
-	-> implement auto alpha detection for if the alpha channel is used, and use correct texture loader. flip bit flag for hasAlpha
+	- reinstate alpha and blending and add sort algorithm and seperate shader 
+	- implement auto alpha detection for if the alpha channel is used, and use correct texture loader. flip bit flag for hasAlpha
 	- add mouse smoothing WHILE CONTROLING CAMERA
-	-> add hotkey/keyBinding editor
+	- add hotkey/keyBinding editor
 	- add smooth acceleration to camera movement
 	- add sort algorithm for baked shader functionality
-	-> add audio engine
-	-> add event handling
-	-> add physics engine
+	- add audio engine
+	- add event handling
+	- add physics engine
 	
 	CLEAN UP MAIN
 	+ much more
@@ -317,7 +324,7 @@ void RenderPass(glm::mat4 projectionMatrix,
 	shaderList[0].SetSpotLights(spotLights, (*spotLightCount), 8 + (*pointLightCount), (*pointLightCount));
 	shaderList[0].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
 	shaderList[0].Validate();
-
+	//shaderList[0].SetTextureScreenSpace(18);
 /**/
 
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -350,7 +357,7 @@ void RenderPass(glm::mat4 projectionMatrix,
 
 	framebuffershader.UseShader();
 	
-	framebuffershader.SetTextureScreenSpace(0);
+	framebuffershader.SetTextureScreenSpace(18);
 	framebufferHDR.BindTexture(GL_TEXTURE18);
 	glBindVertexArray(screenQuadVAO);
 	glBindTexture(GL_TEXTURE_2D, framebufferHDR.texColorBuffer);
