@@ -18,6 +18,7 @@ public:
 	//FrameBuffer(GLenum textureUnit, GLint width, GLint height);
 	FrameBuffer(GLenum textureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height);
 
+    void Init(GLuint textureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height);
 	void BindTexture();
 	void BindTexture(GLenum textureUnit);
 	void BindAndSetTexture(GLenum textureUnit);

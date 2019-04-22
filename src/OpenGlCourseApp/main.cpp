@@ -47,6 +47,7 @@
 	x encapsulate skybox inside scene class
 	x check and eliminate win lib include
 
+	- IMPLEMENT RULE OF 5       wasted 2 days from not implementing or being ignorant of the copy constructor
 	- add GetSkyBox() to the scene class
 	- change include paths - per deccers advice
 	- fix error checks printf %s with 2 parameters is wrong - per deccers advice
@@ -291,7 +292,6 @@ void RenderPass(glm::mat4 projectionMatrix,
 				SpotLight *spotLights) {
 
 																			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferHDR.FBO);
-	// glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glViewport(0, 0, 3840, 2160);
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
@@ -316,20 +316,18 @@ void RenderPass(glm::mat4 projectionMatrix,
 
 	shaderList[0].SetSplitScreenIsOn(splitScreenIsOn);
 	shaderList[0].SetSplitScreenType(splitScreenType);
-																			// (*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
+	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
 	shaderList[0].SetTextureDiffuse(1);
 	shaderList[0].SetTextureSpecular (4);
-	// shaderList[0].SetTextureMetal(8); 
 	shaderList[0].SetTextureNormal(5);
 	shaderList[0].SetTextureHeight(7);
 	shaderList[0].SetDirectionalShadowMap(2); // 2
 	shaderList[0].SetTextureSkyBox(6);	
-																			// shaderList[0].SetDirectionalLight(mainLight);
-																			// shaderList[0].SetPointLights(pointLights, (*pointLightCount), 8, 0);
-																			// shaderList[0].SetSpotLights(spotLights, (*spotLightCount), 8 + (*pointLightCount), (*pointLightCount));
-																			// shaderList[0].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
+	shaderList[0].SetDirectionalLight(mainLight);
+	shaderList[0].SetPointLights(pointLights, (*pointLightCount), 8, 0);
+	shaderList[0].SetSpotLights(spotLights, (*spotLightCount), 8 + (*pointLightCount), (*pointLightCount));
+	shaderList[0].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
 	shaderList[0].Validate();
-	// shaderList[0].SetTextureScreenSpace(18);
 
 /**/
 
@@ -338,15 +336,14 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 
-																			// mainScene.skybox.bindCubeMapTexture(); // TEXTURE UNIT 6
+	mainScene.skybox.bindCubeMapTexture(); // TEXTURE UNIT 6
 
 	RenderScene();	
 
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
-	// framebufferHDR.BindTexture(GL_TEXTURE16);
-																			// mainScene.skybox.DrawSkyBox(viewMatrix, projectionMatrix);
+	mainScene.skybox.DrawSkyBox(viewMatrix, projectionMatrix);
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
@@ -361,10 +358,11 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_DEPTH_TEST);
 
-																			framebuffershader.UseShader();
+	framebuffershader.UseShader();
 																			
-																			framebuffershader.SetTextureScreenSpace(18);
-																			framebufferHDR.BindTexture(GL_TEXTURE18);
+	framebufferHDR.BindTexture(GL_TEXTURE18);
+	framebuffershader.SetTextureScreenSpace(18);
+																			
 	glBindVertexArray(screenQuadVAO);
 	glBindTexture(GL_TEXTURE_2D, framebufferHDR.texColorBuffer);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -484,7 +482,7 @@ int main()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
 	// framebufferHDR = FrameBuffer(GL_TEXTURE15, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_LINEAR, mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
-	framebufferHDR = FrameBuffer(GL_TEXTURE16, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR, 3840, 2160);
+	framebufferHDR.Init(GL_TEXTURE16, GL_SRGB, GL_RGB, GL_UNSIGNED_BYTE, GL_LINEAR, 3840, 2160);
 
 //<>=========================================================================================================<>
 // prep

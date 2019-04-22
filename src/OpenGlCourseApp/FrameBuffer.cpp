@@ -62,22 +62,25 @@ FrameBuffer::FrameBuffer(GLuint textureUnit, GLenum internalFormat, GLenum forma
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 */
-
+}
+void FrameBuffer::Init(GLuint textureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height)
+{
+	// set texture unit for auto binding from main
 	bufferTextureUnit = textureUnit;
 
-
+	// generate framebuffer
 	glGenFramebuffers(1, &FBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-	
 
 	// create a color attachment texture
 	glGenTextures(1, &texColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
 
+	// bind framebuffer, then bind texture to framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
 
 	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
 	glGenRenderbuffers(1, &RBO);
@@ -85,16 +88,18 @@ FrameBuffer::FrameBuffer(GLuint textureUnit, GLenum internalFormat, GLenum forma
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height); // use a single renderbuffer object for both a depth AND stencil buffer.
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO); // now actually attach it
 
+	// GLenum buffers[] = { GL_COLOR_ATTACHMENT0 };
+	// glDrawBuffers(1, buffers);
 
-	GLenum buffers[] = { GL_COLOR_ATTACHMENT0 , GL_DEPTH_STENCIL_ATTACHMENT };
-	glDrawBuffers(2, buffers);
-	
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
+
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE) 
+	if (status != GL_FRAMEBUFFER_COMPLETE)
 	{
 		printf("FrameBuffer object : framebuffer incomplete!");
 	}
-	
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
