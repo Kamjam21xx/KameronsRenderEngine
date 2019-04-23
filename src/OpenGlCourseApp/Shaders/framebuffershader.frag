@@ -5,12 +5,11 @@ in vec2 TexCoords;
 out vec4 FragColor;
 
 layout (binding = 16) uniform sampler2D screenSpaceTexture;
+// add secondary colorBuffer binding
 
 uniform float gammaLevel;
 
 const float offset = 1.0 / 300.0;
-
-// create new uniform in the shader class for the screenspace texture
 
 void main() 
 {
@@ -18,6 +17,7 @@ void main()
 
 	// reinhards tone mapping 
 	vec3 mapped = hdrColor / (hdrColor + vec3(1.0f));
+
 	// gamma correction
 	mapped = pow(mapped, vec3(1.0f / gammaLevel));
 

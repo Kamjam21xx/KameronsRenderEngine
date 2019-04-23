@@ -36,8 +36,11 @@
 #include "Scene.h"
 #include "GraphicUI.h"
 #include "FrameBuffer.h"
+#include "DualFrameBuffer.h"
 
 /*	 gotta give thanks to the Graphics Programming discord group for helping me learn and fix things when im stuck
+
+	FYI all hand typed, no auto get/set etc
 
 	to do list
 	- CODE REVIEW! when most of this is done
@@ -50,9 +53,10 @@
 	x add GetSkyBox() to the scene class and fix implementation in main
 	x simplify RenderPass() by moving part of it to a new function in main "RenderToQuad()"
 	x added gamma slider and uniform 
+	x added DualFrameBuffer class ..... might be a bad call, but it keeps the standard FrameBuffer class easy to use and simple, as well as other things
 
 
-	//////////   D   O   N   T      F   O   R   G   E   T   ///////////////////////////////////////////////////////
+	//////////   D   O   N   T      F   O   R   G   E   T   //////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	- IMPLEMENT RULE OF 5       wasted 2 days from not implementing or being ignorant of the copy constructor
@@ -60,6 +64,7 @@
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 	- add post process prebuilt shader buffer and select different shaders based on ImGui selection
@@ -101,7 +106,10 @@
 	- add audio engine
 	- add event handling
 	- add physics engine
-	
+	- possibly implement extra shaders to avoid hacking good shaders and not fixing them	
+
+
+
 	CLEAN UP MAIN
 	+ much more
 
@@ -117,6 +125,7 @@ const float toRadians = 3.14159265 / 180.0;
 
 GL_Window mainWindow;
 FrameBuffer framebufferHDR;
+DualFrameBuffer dualFramebufferHDR;
 Camera camera;
 
 Scene mainScene;
@@ -257,7 +266,8 @@ void OmniShadowMapPass(PointLight *light) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void RenderToQuad() {
+void RenderToQuad() 
+{
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
@@ -298,7 +308,6 @@ void SetAndUseMainShader(unsigned short int i, glm::mat4 projectionMatrix, glm::
 
 	shaderList[i].SetSplitScreenIsOn(splitScreenIsOn);
 	shaderList[i].SetSplitScreenType(splitScreenType);
-	//shaderList[i].SetGamma(gamma);
 
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
 	shaderList[i].SetTextureDiffuse(1);
@@ -399,6 +408,7 @@ void CreateLights(PointLight &pointLightsR,
 		32.0f); 
 	(*spotLightCount)++;
 	spotLights[0].SetLightRange(80.0f);
+
 */	
 }
 
@@ -460,8 +470,10 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
-	// framebufferHDR.Init(GL_TEXTURE16, GL_SRGB, GL_RGB, GL_UNSIGNED_BYTE, GL_LINEAR, 3840, 2160);
+
 	framebufferHDR.Init(GL_TEXTURE16, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
+
+	//dualFramebufferHDR.Init(GL_TEXTURE17, GL_TEXTURE18, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
 
 //<>=========================================================================================================<>
 // prep

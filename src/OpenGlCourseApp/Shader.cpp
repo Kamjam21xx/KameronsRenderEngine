@@ -116,6 +116,7 @@ void Shader::CompileProgram()
 	uniformProjection = glGetUniformLocation(shaderID, "projection");
 	uniformModel = glGetUniformLocation(shaderID, "model");
 	uniformView = glGetUniformLocation(shaderID, "view");
+
 	uniformDirectionalLight.uniformColor = glGetUniformLocation(shaderID, "directionalLight.base.colour");
 	uniformDirectionalLight.uniformAmbientIntensity = glGetUniformLocation(shaderID, "directionalLight.base.ambientIntensity");
 	uniformDirectionalLight.uniformDirection = glGetUniformLocation(shaderID, "directionalLight.direction");
@@ -124,9 +125,6 @@ void Shader::CompileProgram()
 	uniformSpecularPower = glGetUniformLocation(shaderID, "material.specularPower");
 	uniformEyePosition = glGetUniformLocation(shaderID, "eyePosition");
 	uniformEyeDirection = glGetUniformLocation(shaderID, "eyeDirection");
-	uniformSplitScreenIsOn = glGetUniformLocation(shaderID, "splitScreenIsOn");
-	uniformSplitScreenType = glGetUniformLocation(shaderID, "splitScreenType");
-	uniformGamma = glGetUniformLocation(shaderID, "gammaLevel");
 
 	uniformPointLightCount = glGetUniformLocation(shaderID, "pointLightCount");
 
@@ -203,8 +201,12 @@ void Shader::CompileProgram()
 		uniformOmniShadowMap[i].farPlane = glGetUniformLocation(shaderID, locBuff);
 	}
 
+	uniformSplitScreenIsOn = glGetUniformLocation(shaderID, "splitScreenIsOn");
+	uniformSplitScreenType = glGetUniformLocation(shaderID, "splitScreenType");
+	uniformGamma = glGetUniformLocation(shaderID, "gammaLevel");
+
 	uniformTextureScreenSpace = glGetUniformLocation(shaderID, "screenSpaceTexture");
-	
+	uniformTextureScreenSpaceTwo = glGetUniformLocation(shaderID, "screenSpaceTextureTwo");
 }
 
 GLuint Shader::GetDiffuseIntensityLocation() const
@@ -270,6 +272,10 @@ GLuint Shader::GetSplitScreenTypeLocation() const
 GLuint Shader::GetTextureScreenSpaceLocation() const
 {
 	return uniformTextureScreenSpace;
+}
+GLuint Shader::GetTextureScreenSpaceTwoLocation() const
+{
+	return uniformTextureScreenSpaceTwo;
 }
 GLuint Shader::GetGammaLocation() const
 {
@@ -375,6 +381,10 @@ void Shader::SetSplitScreenType(GLuint splitScreenType)
 void Shader::SetTextureScreenSpace(GLuint textureUnit)
 {
 	glUniform1i(uniformTextureScreenSpace, textureUnit);
+}
+void Shader::SetTextureScreenSpaceTwo(GLuint textureUnit)
+{
+	glUniform1i(uniformTextureScreenSpaceTwo, textureUnit);
 }
 void Shader::SetGamma(GLfloat gammaLevel)
 {
