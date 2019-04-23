@@ -88,7 +88,7 @@ void GraphicUI::EditPLights(PointLight *pLights, unsigned short int lightCount)
 		float pLightDiffuse = pLights[i].GetDiffuseIntensity();
 		float pLightAmbient = pLights[i].GetAmbientIntensity();
 		float pLightRange = pLights[i].GetRange();
-		ImVec4 pLightColor = ImVec4(pLights[i].GetLightColorRed() / 4.0f, pLights[i].GetLightColorGreen() / 4.0f, pLights[i].GetLightColorBlue() / 4.0f, 1.00f);
+		ImVec4 pLightColor = ImVec4(pLights[i].GetLightColorRed() / 8.0f, pLights[i].GetLightColorGreen() / 8.0f, pLights[i].GetLightColorBlue() / 8.0f, 1.00f);
 
 		// make GUI
 		ImGui::Text(" ");
@@ -101,7 +101,7 @@ void GraphicUI::EditPLights(PointLight *pLights, unsigned short int lightCount)
 		pLights[i].SetDiffuseIntensity(pLightDiffuse);
 		pLights[i].SetAmbientIntensity(pLightAmbient);
 		pLights[i].SetLightRange(pLightRange);
-		pLights[i].SetLightColor(pLightColor.x * 4.0f, pLightColor.y * 4.0f, pLightColor.z * 4.0f);
+		pLights[i].SetLightColor(pLightColor.x * 8.0f, pLightColor.y * 8.0f, pLightColor.z * 8.0f);
 
 		ImGui::PopID();
 	}
@@ -230,12 +230,8 @@ void GraphicUI::EditGamma(GLfloat *gamma)
 
 	if (enableGammaEdit)
 	{
-		float tempGamma = (*gamma);
-
 		ImGui::SameLine();
-		ImGui::SliderFloat("Gamma", &tempGamma, 0.001f, 4.000f);
-
-		(*gamma) = (GLfloat)tempGamma;
+		ImGui::SliderFloat("Gamma", gamma, 0.001f, 4.000f);
 	}
 }
 void GraphicUI::EditVerticalSync()

@@ -56,7 +56,7 @@
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	- IMPLEMENT RULE OF 5       wasted 2 days from not implementing or being ignorant of the copy constructor
-	- optimize ---- getting chopp results in terms of updating the 0'th framebuffer
+	- optimize ---- getting choppy results in terms of updating the 0'th framebuffer
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -266,6 +266,7 @@ void RenderToQuad() {
 	glDisable(GL_DEPTH_TEST);
 
 	framebuffershader.UseShader();
+	framebuffershader.SetGamma(gamma);
 
 	framebufferHDR.BindTexture(GL_TEXTURE18);
 	framebuffershader.SetTextureScreenSpace(18);
@@ -297,7 +298,7 @@ void SetAndUseMainShader(unsigned short int i, glm::mat4 projectionMatrix, glm::
 
 	shaderList[i].SetSplitScreenIsOn(splitScreenIsOn);
 	shaderList[i].SetSplitScreenType(splitScreenType);
-	shaderList[i].SetGamma(gamma);
+	//shaderList[i].SetGamma(gamma);
 
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
 	shaderList[i].SetTextureDiffuse(1);
@@ -440,13 +441,13 @@ int main()
 // frame buffer setup
 
 	float quadVertices[] = {
-	-1.0f,  1.0f,  0.0f, 1.0f,
-	-1.0f, -1.0f,  0.0f, 0.0f,
-	 1.0f, -1.0f,  1.0f, 0.0f,
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
 
-	-1.0f,  1.0f,  0.0f, 1.0f,
-	 1.0f, -1.0f,  1.0f, 0.0f,
-	 1.0f,  1.0f,  1.0f, 1.0f
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
+		 1.0f,  1.0f,  1.0f, 1.0f
 	};
 
 	glGenVertexArrays(1, &screenQuadVAO);
@@ -459,8 +460,8 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
-	// framebufferHDR = FrameBuffer(GL_TEXTURE15, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_LINEAR, mainWindow.getBufferWidth(), mainWindow.getBufferHeight());
-	framebufferHDR.Init(GL_TEXTURE16, GL_SRGB, GL_RGB, GL_UNSIGNED_BYTE, GL_LINEAR, 3840, 2160);
+	// framebufferHDR.Init(GL_TEXTURE16, GL_SRGB, GL_RGB, GL_UNSIGNED_BYTE, GL_LINEAR, 3840, 2160);
+	framebufferHDR.Init(GL_TEXTURE16, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
 
 //<>=========================================================================================================<>
 // prep

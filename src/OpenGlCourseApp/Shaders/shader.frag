@@ -77,7 +77,7 @@ uniform vec3 eyeDirection;
 
 uniform bool splitScreenIsOn;
 uniform int splitScreenType;
-uniform float gammaLevel;
+//uniform float gammaLevel;
 
 // textures
 layout (binding = 1) uniform sampler2D theTextureDiffuse;
@@ -400,8 +400,8 @@ void main()
 	//}		
 	
 	// Gamma	
-	float gamma = gammaLevel;
-	colour.rgb = pow(colour.rgb, vec3(1.0/gamma));	
+	//float gamma = gammaLevel;
+	//colour.rgb = pow(colour.rgb, vec3(1.0/gamma));	
 	// END_MAIN_DEFINITION
 
 
