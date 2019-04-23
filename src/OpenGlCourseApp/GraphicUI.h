@@ -35,8 +35,9 @@ public:
 	void EditScene(GLfloat *spin);
 	void EditSceneSpin(GLfloat *spin);
 
-	void EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType);
+	void EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma);
 	void EditFiltering();
+	void EditGamma(GLfloat *gamma);
 	void EditVerticalSync();
 	void EditSplitScreen(GLboolean *splitScreenIsOn, GLuint *splitScreenType);
 
@@ -47,7 +48,7 @@ private:
 	
 	GLFWwindow *window;
 
-	bool enableSpin, enableVerticalSync, enableEditFiltering;
+	bool enableSpin, enableVerticalSync, enableEditFiltering, enableGammaEdit;
 
 	GLint filteringLevel;
 	GLfloat stateSaveSpin;

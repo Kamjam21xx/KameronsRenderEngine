@@ -126,6 +126,7 @@ void Shader::CompileProgram()
 	uniformEyeDirection = glGetUniformLocation(shaderID, "eyeDirection");
 	uniformSplitScreenIsOn = glGetUniformLocation(shaderID, "splitScreenIsOn");
 	uniformSplitScreenType = glGetUniformLocation(shaderID, "splitScreenType");
+	uniformGamma = glGetUniformLocation(shaderID, "gammaLevel");
 
 	uniformPointLightCount = glGetUniformLocation(shaderID, "pointLightCount");
 
@@ -270,6 +271,10 @@ GLuint Shader::GetTextureScreenSpaceLocation() const
 {
 	return uniformTextureScreenSpace;
 }
+GLuint Shader::GetGammaLocation() const
+{
+	return uniformGamma;
+}
 
 void Shader::SetDirectionalLight(DirectionalLight * dLight) 
 {
@@ -370,6 +375,10 @@ void Shader::SetSplitScreenType(GLuint splitScreenType)
 void Shader::SetTextureScreenSpace(GLuint textureUnit)
 {
 	glUniform1i(uniformTextureScreenSpace, textureUnit);
+}
+void Shader::SetGamma(GLfloat gammaLevel)
+{
+	glUniform1f(uniformGamma, gammaLevel);
 }
 
 void Shader::UseShader() 

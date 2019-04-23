@@ -165,6 +165,7 @@ void GraphicUI::EditSceneSpin(GLfloat *spin)
 
 	if (enableSpin) 
 	{
+		ImGui::SameLine();
 		ImGui::SliderFloat("Spin", spin, -1.0f, 1.0f);
 	}
 	else 
@@ -174,14 +175,14 @@ void GraphicUI::EditSceneSpin(GLfloat *spin)
 
 }
 
-void GraphicUI::EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType) 
+void GraphicUI::EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma) 
 {
 	ImGui::Begin("Render Settings");
 
 	EditVerticalSync();
 	EditSplitScreen(splitScreenIsOn, splitScreenType);
-	
-	//EditFiltering(); // does not work
+	EditGamma(gamma);
+	// EditFiltering(); // does not work
 
 	ImGui::End();
 }
@@ -194,6 +195,7 @@ void GraphicUI::EditFiltering()
 
 	if (enableEditFiltering)
 	{
+		ImGui::SameLine();
 		ImGui::SliderInt("Filtering Level", &filteringLevel, 0.0f, 32.0f);
 
 		if (filteringLevel < 4)
@@ -218,6 +220,23 @@ void GraphicUI::EditFiltering()
 		}
 	}
 	return;
+}
+void GraphicUI::EditGamma(GLfloat *gamma)
+{
+	if (ImGui::Button("Edit Gamma"))
+	{
+		enableGammaEdit = !enableGammaEdit;
+	}
+
+	if (enableGammaEdit)
+	{
+		float tempGamma = (*gamma);
+
+		ImGui::SameLine();
+		ImGui::SliderFloat("Gamma", &tempGamma, 0.001f, 4.000f);
+
+		(*gamma) = (GLfloat)tempGamma;
+	}
 }
 void GraphicUI::EditVerticalSync()
 {

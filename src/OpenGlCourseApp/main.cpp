@@ -158,6 +158,7 @@ GLfloat spin;
 
 GLboolean splitScreenIsOn = false;
 GLuint splitScreenType = 0;
+GLfloat gamma = 1.0f;
 
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
@@ -295,6 +296,8 @@ void SetAndUseMainShader(unsigned short int i, glm::mat4 projectionMatrix, glm::
 
 	shaderList[i].SetSplitScreenIsOn(splitScreenIsOn);
 	shaderList[i].SetSplitScreenType(splitScreenType);
+	shaderList[i].SetGamma(gamma);
+
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
 	shaderList[i].SetTextureDiffuse(1);
 	shaderList[i].SetTextureSpecular (4);
@@ -306,6 +309,7 @@ void SetAndUseMainShader(unsigned short int i, glm::mat4 projectionMatrix, glm::
 	shaderList[i].SetPointLights(pointLights, (*pointLightCount), 8, 0);
 	shaderList[i].SetSpotLights(spotLights, (*spotLightCount), 8 + (*pointLightCount), (*pointLightCount));
 	shaderList[i].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
+
 	shaderList[i].Validate();
 }
 
@@ -537,7 +541,7 @@ int main()
 
 		graphicUserInterface.EditLights(pointLights, NULL, NULL, pointLightCount, NULL, false, true, false);
 		graphicUserInterface.EditScene(&spinModifier);
-		graphicUserInterface.EditRenderSettings(&splitScreenIsOn, &splitScreenType);
+		graphicUserInterface.EditRenderSettings(&splitScreenIsOn, &splitScreenType, &gamma);
 		graphicUserInterface.DisplayInfo();
 		
 		graphicUserInterface.End();
