@@ -49,6 +49,7 @@
 	x setup FrameBuffer class
 	x add GetSkyBox() to the scene class and fix implementation in main
 	x simplify RenderPass() by moving part of it to a new function in main "RenderToQuad()"
+	x added gamma slider and uniform 
 
 
 	//////////   D   O   N   T      F   O   R   G   E   T   ///////////////////////////////////////////////////////
@@ -61,7 +62,7 @@
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
+	- add post process prebuilt shader buffer and select different shaders based on ImGui selection
 	- implement GUI for changing multisampling and for turning on and off v-sync
 	- improve and standardize naming conventions as youre working through stuff
 	- eliminate wasteful pass by values and other odds and ends
