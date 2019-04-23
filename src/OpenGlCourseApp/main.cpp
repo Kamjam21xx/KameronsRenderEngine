@@ -62,7 +62,7 @@
 
 
 
-
+	- implement GUI for changing multisampling and for turning on and off v-sync
 	- improve and standardize naming conventions as youre working through stuff
 	- eliminate wasteful pass by values and other odds and ends
 	- change include paths - per deccers advice
@@ -135,6 +135,8 @@ GLuint uniformProjection = 0,
 	   uniformSpecularPower = 0,
 	   uniformOmniLightPos = 0,
 	   uniformFarPlane = 0;
+
+unsigned short int currentShader = 0;
 
 // main shader program hard locations
 static const char* vShader = "Shaders/shader.vert";
@@ -272,14 +274,44 @@ void RenderToQuad() {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void RenderPass(glm::mat4 projectionMatrix, 
-				glm::mat4 viewMatrix, 
-				unsigned short int* pointLightCount, 
-				unsigned short int* spotLightCount, 
-				DirectionalLight* mainLight, 
-				PointLight *pointLights, 
-				SpotLight *spotLights) {
-	// keep this function long until shader handler and scene is more complete
+void SetAndUseMainShader(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
+						 unsigned short int* pointLightCount, unsigned short int* spotLightCount,
+						 DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights)
+{
+	shaderList[i].UseShader();
+
+	uniformModel = shaderList[i].GetModelLocation();
+	uniformProjection = shaderList[i].GetProjectionLocation();
+	uniformView = shaderList[i].GetViewLocation();
+	uniformEyePosition = shaderList[i].GetEyePositionLocation();
+	uniformEyeDirection = shaderList[i].GetEyeDirectionLocation();
+	uniformSpecularIntensity = shaderList[i].GetSpecularIntensityLocation();
+	uniformSpecularPower = shaderList[i].GetSpecularPowerLocation();
+
+	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+	glUniform3f(uniformEyeDirection, camera.getCameraDirection().x, camera.getCameraDirection().y, camera.getCameraDirection().z);
+
+	shaderList[i].SetSplitScreenIsOn(splitScreenIsOn);
+	shaderList[i].SetSplitScreenType(splitScreenType);
+	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
+	shaderList[i].SetTextureDiffuse(1);
+	shaderList[i].SetTextureSpecular (4);
+	shaderList[i].SetTextureNormal(5);
+	shaderList[i].SetTextureHeight(7);
+	shaderList[i].SetDirectionalShadowMap(2); // 2
+	shaderList[i].SetTextureSkyBox(6);	
+	shaderList[i].SetDirectionalLight(mainLight);
+	shaderList[i].SetPointLights(pointLights, (*pointLightCount), 8, 0);
+	shaderList[i].SetSpotLights(spotLights, (*spotLightCount), 8 + (*pointLightCount), (*pointLightCount));
+	shaderList[i].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
+	shaderList[i].Validate();
+}
+
+void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, 
+				unsigned short int* pointLightCount, unsigned short int* spotLightCount,
+				DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights) {
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferHDR.GetFBO());
 	glViewport(0, 0, 3840, 2160);
@@ -288,33 +320,7 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glDisable(GL_STENCIL_TEST);
 	glStencilMask(0x00);
 
-	shaderList[0].UseShader();
-
-	uniformModel = shaderList[0].GetModelLocation();
-	uniformProjection = shaderList[0].GetProjectionLocation();
-	uniformView = shaderList[0].GetViewLocation();
-	uniformEyePosition = shaderList[0].GetEyePositionLocation();
-	uniformEyeDirection = shaderList[0].GetEyeDirectionLocation();
-	uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
-	uniformSpecularPower = shaderList[0].GetSpecularPowerLocation();
-	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-	glUniform3f(uniformEyeDirection, camera.getCameraDirection().x, camera.getCameraDirection().y, camera.getCameraDirection().z);
-	shaderList[0].SetSplitScreenIsOn(splitScreenIsOn);
-	shaderList[0].SetSplitScreenType(splitScreenType);
-	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
-	shaderList[0].SetTextureDiffuse(1);
-	shaderList[0].SetTextureSpecular (4);
-	shaderList[0].SetTextureNormal(5);
-	shaderList[0].SetTextureHeight(7);
-	shaderList[0].SetDirectionalShadowMap(2); // 2
-	shaderList[0].SetTextureSkyBox(6);	
-	shaderList[0].SetDirectionalLight(mainLight);
-	shaderList[0].SetPointLights(pointLights, (*pointLightCount), 8, 0);
-	shaderList[0].SetSpotLights(spotLights, (*spotLightCount), 8 + (*pointLightCount), (*pointLightCount));
-	shaderList[0].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
-	shaderList[0].Validate();
+	SetAndUseMainShader(currentShader, projectionMatrix, viewMatrix, pointLightCount, spotLightCount, mainLight, pointLights, spotLights);
 
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
@@ -335,7 +341,6 @@ void RenderPass(glm::mat4 projectionMatrix,
 	glDisable(GL_STENCIL_TEST);
 
 	RenderToQuad();
-
 }
 
 void CreateLights(PointLight &pointLightsR, 

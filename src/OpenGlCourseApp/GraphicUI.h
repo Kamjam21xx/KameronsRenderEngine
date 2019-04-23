@@ -37,6 +37,7 @@ public:
 
 	void EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType);
 	void EditFiltering();
+	void EditVerticalSync();
 	void EditSplitScreen(GLboolean *splitScreenIsOn, GLuint *splitScreenType);
 
 
@@ -46,8 +47,9 @@ private:
 	
 	GLFWwindow *window;
 
-	bool enableSpin;
+	bool enableSpin, enableVerticalSync, enableEditFiltering;
 
+	GLint filteringLevel;
 	GLfloat stateSaveSpin;
 
 	// possible take addresses per function call

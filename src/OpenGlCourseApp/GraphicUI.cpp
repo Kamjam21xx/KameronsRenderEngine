@@ -5,6 +5,12 @@
 GraphicUI::GraphicUI(GLFWwindow *windowPtr)
 {
 	window = windowPtr;
+
+	enableSpin = false;
+	enableVerticalSync = true;
+	enableEditFiltering = false;
+
+	GLint filteringLevel = 16;
 }
 
 
@@ -36,7 +42,7 @@ void GraphicUI::DisplayInfo()
 
 void GraphicUI::EditLights(PointLight *pLights,SpotLight *sLights, DirectionalLight *dLight, unsigned short int pLightCount, unsigned short int sLightCount, bool dLightEdit, bool pLightEdit, bool sLightEdit) 
 {
-	// rework checks to || "or" to increase execution speed.
+	// rework checks to || "or" to increase execution speed if possible.
 	ImGui::Begin("Light Editor");
 	if (dLightEdit && (dLight != NULL)) 
 	{
@@ -172,13 +178,79 @@ void GraphicUI::EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScre
 {
 	ImGui::Begin("Render Settings");
 
+	EditVerticalSync();
 	EditSplitScreen(splitScreenIsOn, splitScreenType);
+	
+	//EditFiltering(); // does not work
 
 	ImGui::End();
 }
 void GraphicUI::EditFiltering() 
 {
+	if (ImGui::Button("Edit Filtering"))
+	{
+		enableEditFiltering = !enableEditFiltering;
+	}
 
+	if (enableEditFiltering)
+	{
+		ImGui::SliderInt("Filtering Level", &filteringLevel, 0.0f, 32.0f);
+
+		if (filteringLevel < 4)
+		{
+			glfwWindowHint(GLFW_SAMPLES, 0);
+		}
+		else if (filteringLevel < 8)
+		{
+			glfwWindowHint(GLFW_SAMPLES, 4);
+		}
+		else if (filteringLevel < 16)
+		{
+			glfwWindowHint(GLFW_SAMPLES, 8);
+		}
+		else if (filteringLevel < 32)
+		{
+			glfwWindowHint(GLFW_SAMPLES, 16);
+		}
+		else
+		{
+			glfwWindowHint(GLFW_SAMPLES, 32);
+		}
+	}
+	return;
+}
+void GraphicUI::EditVerticalSync()
+{
+	if (ImGui::Button("Toggle vsync"))
+	{
+		switch (enableVerticalSync)
+		{
+			case 0: 
+				enableVerticalSync = true;
+				glfwSwapInterval(1);
+				break;
+
+			case 1: 
+				enableVerticalSync = false;
+				glfwSwapInterval(0);
+				break;
+		}
+	}
+
+	switch (enableVerticalSync)
+	{
+		case 0:
+			ImGui::SameLine();
+			ImGui::Text("off");
+			break;
+
+		case 1:
+			ImGui::SameLine();
+			ImGui::Text("on");
+			break;
+	}
+
+	return;
 }
 void GraphicUI::EditSplitScreen(GLboolean *splitScreenIsOn, GLuint *splitScreenType) 
 {
