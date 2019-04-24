@@ -46,7 +46,7 @@ void FrameBuffer::Init(GLuint textureUnit, GLenum internalFormat, GLenum format,
 
 	// set color attachment 
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-	glReadBuffer(GL_COLOR_ATTACHMENT0);
+	glReadBuffer(GL_NONE);
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)

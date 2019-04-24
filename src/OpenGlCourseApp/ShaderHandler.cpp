@@ -15,15 +15,17 @@ ShaderHandler::ShaderHandler()
 	diffuseTU = 1;
 	specularTU = 4;
 	normalTU = 5;
-	heightTU = 14;
+	heightTU = 7;
 	directionalShadowTU = 2;
 	skyboxTU = 6;
+	screenSpaceTU = 17;
+	screenSpaceTwoTU = 18;
 }
 
-void ShaderHandler::LoadShaderSource() 
+void ShaderHandler::LoadShaderSource(std::string vertShaderLocation, std::string fragShaderLocation) 
 {
-	vertexShader = ReadFile(/*xXxXxXxXX*/);
-	fragmentShader = ReadFile(/*xXxXxXxXX*/);
+	vertexShader = ReadFile(vertShaderLocation);
+	fragmentShader = ReadFile(fragShaderLocation);
 	//geometryShader = ReadFile();
 	//tesselationShader = ReadFile();
 }

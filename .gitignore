@@ -60,3 +60,12 @@ src/OpenGlCourseApp/x64/Debug/RenderEngine.tlog/unsuccessfulbuild
 src/OpenGlCourseApp/x64/Debug/vc141.idb
 src/OpenGlCourseApp/x64/Debug/vc141.pdb
 /src/.vs/RenderEngine/v15
+*.css
+*.html
+*.csv
+/src/OpenGlCourseApp/Shaders/LocMetricsPie.png
+/src/OpenGlCourseApp/Shaders/LocMetricsPie.jpg
+/src/OpenGlCourseApp/misc/LocMetricsPie.png
+/src/OpenGlCourseApp/misc/LocMetricsPie.jpg
+/src/OpenGlCourseApp/LocMetricsPie.png
+/src/OpenGlCourseApp/LocMetricsPie.jpg

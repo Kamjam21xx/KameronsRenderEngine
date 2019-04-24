@@ -6,7 +6,7 @@ out vec4 FragColor;
 
 layout (binding = 17) uniform sampler2D screenSpaceTexture;
 layout (binding = 18) uniform sampler2D screenSpaceTextureTwo;
-// add secondary colorBuffer binding
+// setup secondary fragment shader and setup shaderHandler for this
 
 uniform float gammaLevel;
 

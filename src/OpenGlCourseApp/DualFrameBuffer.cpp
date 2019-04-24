@@ -50,6 +50,7 @@ void DualFrameBuffer::Init(GLuint textureUnitOne, GLenum textureUnitTwo, GLenum 
 	// set draw buffers and color attachments
 	GLenum buffers[]{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, buffers);
+	glReadBuffer(GL_NONE);
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)

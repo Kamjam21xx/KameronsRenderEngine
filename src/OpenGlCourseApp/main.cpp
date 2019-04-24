@@ -54,6 +54,7 @@
 	x simplify RenderPass() by moving part of it to a new function in main "RenderToQuad()"
 	x added gamma slider and uniform 
 	x added DualFrameBuffer class ..... might be a bad call, but it keeps the standard FrameBuffer class easy to use and simple, as well as other things
+	x implement GUI for changing multisampling and for turning on and off v-sync
 
 
 	//////////   D   O   N   T      F   O   R   G   E   T   //////////////////////////////////////////////////
@@ -67,8 +68,15 @@
 
 
 
+	- use v to mark done instead of x / move to a todo.md on github 
+	- add thread handler / make multithreaded (at a later date)
+	- automate more hardcoded numbers
+	- add resolution setting
+	- add start menu
+	- change default camera direction and position, so the demo starts viewing the entire scene at a 45
+	- add configuration class
+	- make DualFrameBuffer class into MultiFrameBuffer class, and make it more automated
 	- add post process prebuilt shader buffer and select different shaders based on ImGui selection
-	- implement GUI for changing multisampling and for turning on and off v-sync
 	- improve and standardize naming conventions as youre working through stuff
 	- eliminate wasteful pass by values and other odds and ends
 	- change include paths - per deccers advice
@@ -135,6 +143,7 @@ Shader directionalShadowShader;
 Shader omniShadowShader;
 Shader outlineShader;
 Shader framebuffershader;
+Shader dualFramebuffershader;
 
 GLuint uniformProjection = 0,
 	   uniformModel = 0,
@@ -157,6 +166,8 @@ static const char* outlineVShader = "Shaders/outline.vert";
 static const char* outlineFShader = "Shaders/outline.frag";
 static const char* FBVShader = "Shaders/framebuffershader.vert";
 static const char* FBFShader = "Shaders/framebuffershader.frag";
+static const char* DFBVShader = "Shaders/dualFramebuffershader.vert";
+static const char* DFBFShader = "Shaders/dualFramebuffershader.frag";
 
 Material shineMaterial;
 Material dullMaterial;
@@ -198,6 +209,9 @@ void CreateShaders() {
 
 	framebuffershader = Shader();
 	framebuffershader.CreateFromFiles(FBVShader, FBFShader);
+
+	dualFramebuffershader = Shader();
+	dualFramebuffershader.CreateFromFiles(DFBVShader, DFBFShader);
 }
 
 void RenderScene() {
@@ -268,6 +282,8 @@ void OmniShadowMapPass(PointLight *light) {
 
 void RenderToQuad() 
 {
+	// could make framebuffer / dualframebuffer children of a base class and treat them in a generic manner for automatic use
+
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
@@ -275,14 +291,22 @@ void RenderToQuad()
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_DEPTH_TEST);
 
-	framebuffershader.UseShader();
-	framebuffershader.SetGamma(gamma);
-
-	framebufferHDR.BindTexture(GL_TEXTURE18);
-	framebuffershader.SetTextureScreenSpace(18);
+		// framebuffershader.UseShader();
+		// framebuffershader.SetGamma(gamma);
+	dualFramebuffershader.UseShader();
+	dualFramebuffershader.SetGamma(gamma);
+	
+		// framebufferHDR.BindTexture(GL_TEXTURE18);
+		// framebuffershader.SetTextureScreenSpace(18);
+	dualFramebuffershader.SetTextureScreenSpace(17);
+	dualFramebuffershader.SetTextureScreenSpaceTwo(18);
+	dualFramebufferHDR.BindTextures(GL_TEXTURE17, GL_TEXTURE18);
 
 	glBindVertexArray(screenQuadVAO);
-	glBindTexture(GL_TEXTURE_2D, framebufferHDR.GetTexColorBuffer());
+
+		// framebufferHDR.BindTexture();
+	//dualFramebufferHDR.BindTextures();
+
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glEnable(GL_DEPTH_TEST);
 }
@@ -328,11 +352,12 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 				unsigned short int* pointLightCount, unsigned short int* spotLightCount,
 				DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights) {
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferHDR.GetFBO());
+	// glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferHDR.GetFBO());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dualFramebufferHDR.GetFBO());
+	
 	glViewport(0, 0, 3840, 2160);
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glDisable(GL_STENCIL_TEST);
 	glStencilMask(0x00);
 
 	SetAndUseMainShader(currentShader, projectionMatrix, viewMatrix, pointLightCount, spotLightCount, mainLight, pointLights, spotLights);
@@ -349,7 +374,9 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
+
 	mainScene.GetSkyBoxPtr()->DrawSkyBox(viewMatrix, projectionMatrix);
+
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
@@ -471,9 +498,9 @@ int main()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
 
-	framebufferHDR.Init(GL_TEXTURE16, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
+	//framebufferHDR.Init(GL_TEXTURE18, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
 
-	//dualFramebufferHDR.Init(GL_TEXTURE17, GL_TEXTURE18, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
+	dualFramebufferHDR.Init(GL_TEXTURE17, GL_TEXTURE18, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
 
 //<>=========================================================================================================<>
 // prep
@@ -508,7 +535,7 @@ int main()
 
 	io.Fonts->Clear();
 
-	ImFont* font = io.Fonts->AddFontFromFileTTF(u8"C:\\Users\\Kameron\\Documents\\GitHub\\KameronsRenderEngine\\src\\OpenGlCourseApp\\misc\\fonts\\Karla-Regular.ttf", 22.0f);
+	ImFont* font = io.Fonts->AddFontFromFileTTF(u8"misc/fonts/Karla-Regular.ttf", 22.0f);
 	
 	io.Fonts->Build();
 

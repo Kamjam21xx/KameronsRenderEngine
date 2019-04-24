@@ -18,7 +18,7 @@ class ShaderHandler									// rename ShaderSource
 public:
 	ShaderHandler();
 
-	void LoadShaderSource();
+	void LoadShaderSource(std::string vertShaderSource, std::string fragShaderSource);
 
 	void ClearAllSource();
 	void ClearVertexSource();
@@ -36,7 +36,7 @@ public:
 	const char* GetGeometrySourcePtr();
 	const char* GetTesselationSourcePtr();
 
-	std::string ReadFile();
+	std::string ReadFile(std::string fileLocation);
 
 
 	void SetDLight();
@@ -105,6 +105,14 @@ public:
 	{ 
 		return skyboxTU; 
 	}
+	GLuint GetScreenSpaceTU()
+	{
+		return screenSpaceTU;
+	}
+	GLuint GetScreenSpaceTwoTU()
+	{
+		return screenSpaceTwoTU;
+	}
 
 /*
 
@@ -116,6 +124,8 @@ public:
 	// set functions to elimate as many uniforms as possible/reasonable
 */
 	// setup material class so the two can work together
+
+
 	~ShaderHandler();
 
 private:
@@ -130,14 +140,18 @@ private:
 		   normalTU,
 		   heightTU,
 		   directionalShadowTU,
-		   skyboxTU;
+		   skyboxTU,
+		   screenSpaceTU,
+		   screenSpaceTwoTU;
 
 	bool toggleDiffuseTex,
 		 toggleSpecularTex,
 		 toggleNormalTex,
 		 togglePOM,
 		 toggleSkyBoxReflection,
-		 toggleGamma;
+		 toggleGamma,
+		 toggleScreenSpaceTex,
+		 toggleScreenSpaceTexTwo;
 	
 	GLfloat gamma, 
 			heightPOM;

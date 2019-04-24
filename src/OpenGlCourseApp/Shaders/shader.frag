@@ -7,7 +7,7 @@ in mat3 TBN;
 in mat3 tTBN;
 
 layout (location = 0) out vec4 colour;
-
+layout (location = 1) out vec4 bloom; 
 
 // variables
 const int MAX_POINT_LIGHTS = 3;
@@ -362,41 +362,43 @@ void main()
 	// uniform int splitScreenType;			
 	//if(gl_FragCoord.x > 1920)
 	//{
-		if(splitScreenIsOn) 
+
+	if(splitScreenIsOn) 
+	{
+		if(splitScreenType == 0)
 		{
-			if(splitScreenType == 0)
-			{
-				colour.rgb = diffuse.rgb;
-			}
-			else if(splitScreenType == 1)
-			{
-				colour.rgb = specular.rgb;
-			}
-			else if(splitScreenType == 2)
-			{
-				colour.rgb = reflection.rgb;
-			}
-			else if(splitScreenType == 3)
-			{
-				colour.rgb = shadowFactor.rgb;
-			}
-			else if(splitScreenType == 4)
-			{
-				colour.rgb = Normal.rgb;
-			}
-			else if(splitScreenType == 5)
-			{
-				colour.rgb = NormalTexture.rgb;
-			}
-			else if(splitScreenType == 6)
-			{
-				colour.rgb = vec3(texture(theTextureHeight, TexCoord).r);
-			}
-			else
-			{
-				colour = shadowFactor * reflection;
-			}
+			colour.rgb = diffuse.rgb;
 		}
+		else if(splitScreenType == 1)
+		{
+			colour.rgb = specular.rgb;
+		}
+		else if(splitScreenType == 2)
+		{
+			colour.rgb = reflection.rgb;
+		}
+		else if(splitScreenType == 3)
+		{
+			colour.rgb = shadowFactor.rgb;
+		}
+		else if(splitScreenType == 4)
+		{
+			colour.rgb = Normal.rgb;
+		}
+		else if(splitScreenType == 5)
+		{
+			colour.rgb = NormalTexture.rgb;
+		}
+		else if(splitScreenType == 6)
+		{
+			colour.rgb = vec3(texture(theTextureHeight, TexCoord).r);
+		}
+		else
+		{
+			colour = shadowFactor * reflection;
+		}
+	}
+
 	//}		
 	
 	// Gamma	

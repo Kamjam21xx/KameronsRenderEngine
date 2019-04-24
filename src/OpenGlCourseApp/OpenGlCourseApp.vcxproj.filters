@@ -262,6 +262,12 @@
     <None Include="..\libraries\imgui\.editorconfig">
       <Filter>imGUI</Filter>
     </None>
+    <None Include="Shaders\dualFramebuffershader.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\dualFramebuffershader.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Models\SimpleModel\BASE_COLOR.png">
