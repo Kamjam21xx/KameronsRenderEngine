@@ -7,7 +7,6 @@ in mat3 TBN;
 in mat3 tTBN;
 
 layout (location = 0) out vec4 colour;
-layout (location = 1) out vec4 bloom; 
 
 // variables
 const int MAX_POINT_LIGHTS = 3;
@@ -351,7 +350,6 @@ void main()
 	// Channel_mixing
 	colour = shadowFactor * diffuse * reflection;
 	// END_MAIN_DEFINITION
-
 
 
 
