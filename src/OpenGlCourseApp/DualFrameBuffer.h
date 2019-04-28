@@ -32,8 +32,8 @@ public:
 
 private:
 
-	GLuint FBO, RBO;
-
+	GLuint FBO;
+	GLuint RBO;
 	GLuint texColorBuffers[2];
 	GLuint bufferTextureUnits[2];
 

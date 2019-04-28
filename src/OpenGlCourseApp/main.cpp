@@ -91,6 +91,7 @@ GLfloat spin;
 GLboolean splitScreenIsOn = false;
 GLuint splitScreenType = 0;
 GLfloat gamma = 1.0f;
+GLfloat bloomThreshold = 1.0f;
 
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
@@ -191,7 +192,12 @@ void OmniShadowMapPass(PointLight *light) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void RenderToQuadGetBloom() 
+void BloomBlurPass()
+{
+
+}
+
+void RenderToQuadApplyBloom() 
 {
 	// could make framebuffer / dualframebuffer children of a base class and treat them in a generic manner for automatic use
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // switch this to the other dual fbo thing and then do a final render to quad
@@ -201,17 +207,21 @@ void RenderToQuadGetBloom()
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_DEPTH_TEST);
 
-	framebuffershader.UseShader();
-	framebuffershader.SetGamma(gamma);
-	framebufferHDR.BindTexture(GL_TEXTURE17);
-	framebuffershader.SetTextureScreenSpace(17);
+	dualFramebuffershader.UseShader();
+	dualFramebuffershader.SetGamma(gamma);
+
+
+	dualFramebufferHDR.BindTexture(0);
+	dualFramebufferHDR.BindTexture(1);
+	dualFramebuffershader.SetTextureScreenSpace(18);
+	dualFramebuffershader.SetTextureScreenSpaceTwo(19);
 
 	glBindVertexArray(screenQuadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glEnable(GL_DEPTH_TEST);
 }
 
-void SetAndUseMainShader(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
+void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 						 unsigned short int* pointLightCount, unsigned short int* spotLightCount,
 						 DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights)
 {
@@ -232,6 +242,8 @@ void SetAndUseMainShader(unsigned short int i, glm::mat4 projectionMatrix, glm::
 
 	shaderList[i].SetSplitScreenIsOn(splitScreenIsOn);
 	shaderList[i].SetSplitScreenType(splitScreenType);
+	shaderList[i].SetGamma(gamma);
+	shaderList[i].SetBloomThreshold(bloomThreshold);
 
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
 	shaderList[i].SetTextureDiffuse(1);
@@ -245,6 +257,7 @@ void SetAndUseMainShader(unsigned short int i, glm::mat4 projectionMatrix, glm::
 	shaderList[i].SetSpotLights(spotLights, (*spotLightCount), 8 + (*pointLightCount), (*pointLightCount));
 	shaderList[i].SetDirectionalLightTransform(&(*mainLight).CalculateLightTransform());
 
+
 	shaderList[i].Validate();
 }
 
@@ -252,14 +265,14 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 				unsigned short int* pointLightCount, unsigned short int* spotLightCount,
 				DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights) {
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferHDR.GetFBO());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dualFramebufferHDR.GetFBO());
 	
 	glViewport(0, 0, 3840, 2160);
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glStencilMask(0x00);
 
-	SetAndUseMainShader(currentShader, projectionMatrix, viewMatrix, pointLightCount, spotLightCount, mainLight, pointLights, spotLights);
+	MainRenderSetup(currentShader, projectionMatrix, viewMatrix, pointLightCount, spotLightCount, mainLight, pointLights, spotLights);
 
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
@@ -274,18 +287,27 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
 
-	mainScene.GetSkyBoxPtr()->DrawSkyBox(viewMatrix, projectionMatrix);
+	mainScene.GetSkyBoxPtr()->DrawSkyBox(viewMatrix, projectionMatrix, gamma, bloomThreshold);
 
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
 
-	RenderToQuadGetBloom(); // make it take the dualFrameBuffer object
+	// BloomBlurPass();
+
+	RenderToQuadApplyBloom(); // make it take the dualFrameBuffer object
 
 
-
-
+	// add bloom with the blur n stuff
+	/*
+	
+	
+		
+	
+	
+	*/
+	
 
 	/*
 	// this will be the final render 
@@ -403,7 +425,8 @@ int main()
 //<>=========================================================================================================<>
 // frame buffer setup
 
-	float quadVertices[] = {
+	float quadVertices[] = 
+	{
 		-1.0f,  1.0f,  0.0f, 1.0f,
 		-1.0f, -1.0f,  0.0f, 0.0f,
 		 1.0f, -1.0f,  1.0f, 0.0f,
@@ -508,7 +531,7 @@ int main()
 
 		graphicUserInterface.EditLights(pointLights, NULL, NULL, pointLightCount, NULL, false, true, false);
 		graphicUserInterface.EditScene(&spinModifier);
-		graphicUserInterface.EditRenderSettings(&splitScreenIsOn, &splitScreenType, &gamma);
+		graphicUserInterface.EditRenderSettings(&splitScreenIsOn, &splitScreenType, &gamma, &bloomThreshold);
 		graphicUserInterface.DisplayInfo();
 		
 		graphicUserInterface.End();

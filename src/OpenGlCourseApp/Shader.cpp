@@ -204,6 +204,7 @@ void Shader::CompileProgram()
 	uniformSplitScreenIsOn = glGetUniformLocation(shaderID, "splitScreenIsOn");
 	uniformSplitScreenType = glGetUniformLocation(shaderID, "splitScreenType");
 	uniformGamma = glGetUniformLocation(shaderID, "gammaLevel");
+	uniformBloomThreshold = glGetUniformLocation(shaderID, "bloomThreshold");
 
 	uniformTextureScreenSpace = glGetUniformLocation(shaderID, "screenSpaceTexture");
 	uniformTextureScreenSpaceTwo = glGetUniformLocation(shaderID, "screenSpaceTextureTwo");
@@ -280,6 +281,10 @@ GLuint Shader::GetTextureScreenSpaceTwoLocation() const
 GLuint Shader::GetGammaLocation() const
 {
 	return uniformGamma;
+}
+GLuint Shader::GetBloomThresholdLocation() const
+{
+	return uniformBloomThreshold;
 }
 
 void Shader::SetDirectionalLight(DirectionalLight * dLight) 
@@ -389,6 +394,10 @@ void Shader::SetTextureScreenSpaceTwo(GLuint textureUnit)
 void Shader::SetGamma(GLfloat gammaLevel)
 {
 	glUniform1f(uniformGamma, gammaLevel);
+}
+void Shader::SetBloomThreshold(GLfloat bloomThreshold)
+{
+	glUniform1f(uniformBloomThreshold, bloomThreshold);
 }
 
 void Shader::UseShader() 

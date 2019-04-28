@@ -25,7 +25,7 @@ public:
 
 	void bindCubeMapTexture() const ;
 	void unbinedCubeMapTexture() const ;
-	void DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) const ;
+	void DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloat gamma, GLfloat bloomThreshold) const ;
 
 	// make functions to clear memory without destructing
 

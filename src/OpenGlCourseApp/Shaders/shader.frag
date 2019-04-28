@@ -7,6 +7,7 @@ in mat3 TBN;
 in mat3 tTBN;
 
 layout (location = 0) out vec4 colour;
+layout (location = 1) out vec4 highlights;
 
 // variables
 const int MAX_POINT_LIGHTS = 3;
@@ -76,7 +77,8 @@ uniform vec3 eyeDirection;
 
 uniform bool splitScreenIsOn;
 uniform int splitScreenType;
-//uniform float gammaLevel;
+uniform float gammaLevel;
+uniform float bloomThreshold;
 
 // textures
 layout (binding = 1) uniform sampler2D theTextureDiffuse;
@@ -188,6 +190,7 @@ float CalcShadowFactor(vec4 DirectionalLightSpacePos)
 	
 	float shadow = 0.0;
 	vec2 texelSize = 1.0 / textureSize(directionalShadowMap, 0);
+
 	for(int x = -1; x <= 1; ++x)
 	{
 		for(int y = -1; y <= 1; ++y)
@@ -310,6 +313,31 @@ vec4 reflectSky()
 
 	return skyReflection;
 }
+vec4 GetHighlights(vec4 colorSample)
+{
+	vec4 sampleColor = colorSample;
+
+	float brightness = dot(colorSample.rgb, vec3(0.2126f, 0.7512f, 0.0722f));
+
+	vec4 highlightColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	if(brightness > bloomThreshold)
+	{
+		highlightColor = colorSample;
+	}
+	
+	return vec4(highlightColor.xyz, 1.0f);
+}
+vec4 ApplyGammaToneMapping(vec3 hdrColor)
+{
+	// reinhards tone mapping 
+	vec3 mapped = hdrColor / (hdrColor + vec3(1.0f));
+
+	// gamma correction
+	mapped = pow(mapped, vec3(1.0f / gammaLevel));
+
+	return vec4(mapped, 1.0f);
+}
 
 void main()
 {
@@ -347,13 +375,17 @@ void main()
 	// END_MAIN_DEFINITION
 
 
-	// Channel_mixing
+	// Channel_mixing + gamma + tonemapping + highlights
 	colour = shadowFactor * diffuse * reflection;
+
+	colour = ApplyGammaToneMapping(colour.xyz);
 	// END_MAIN_DEFINITION
 
 
-
-
+	// 
+	highlights = GetHighlights(colour);
+	//highlights.rgb = Normal.rgb;
+	// END_MAIN_DEFINITION
 
 	// dont make splitScreen Function
 	// uniform bool splitScreenIsOn;

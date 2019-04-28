@@ -121,13 +121,15 @@ void SkyBox::unbinedCubeMapTexture() const
 	// add it if i need it i guess
 }
 
-void SkyBox::DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) const
+void SkyBox::DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloat gamma, GLfloat bloomThreshold) const
 {
 	viewMatrix = glm::mat4(glm::mat3(viewMatrix));
 
-	//glDepthMask(GL_FALSE);
+	// glDepthMask(GL_FALSE);
 
 	skyShader->UseShader();
+	skyShader->SetGamma(gamma);
+	skyShader->SetBloomThreshold(bloomThreshold);
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -139,7 +141,7 @@ void SkyBox::DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) const
 	
 	skyMesh->RenderMesh();
 
-	//glDepthMask(GL_TRUE);
+	// glDepthMask(GL_TRUE);
 }
 
 SkyBox::~SkyBox()

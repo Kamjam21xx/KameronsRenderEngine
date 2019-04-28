@@ -175,13 +175,14 @@ void GraphicUI::EditSceneSpin(GLfloat *spin)
 
 }
 
-void GraphicUI::EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma) 
+void GraphicUI::EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma, GLfloat *bloomThreshold) 
 {
 	ImGui::Begin("Render Settings");
 
 	EditVerticalSync();
 	EditSplitScreen(splitScreenIsOn, splitScreenType);
 	EditGamma(gamma);
+	EditBloom(bloomThreshold);
 	// EditFiltering(); // does not work
 
 	ImGui::End();
@@ -232,6 +233,19 @@ void GraphicUI::EditGamma(GLfloat *gamma)
 	{
 		ImGui::SameLine();
 		ImGui::SliderFloat("Gamma", gamma, 0.001f, 4.000f);
+	}
+}
+void GraphicUI::EditBloom(GLfloat *bloomThreshold)
+{
+	if (ImGui::Button("Edit Bloom"))
+	{
+		enableBloomEdit = !enableBloomEdit;
+	}
+
+	if (enableBloomEdit)
+	{
+		ImGui::SameLine();
+		ImGui::SliderFloat("Bloom Threshold", bloomThreshold, 0.001f, 1.0f);
 	}
 }
 void GraphicUI::EditVerticalSync()
