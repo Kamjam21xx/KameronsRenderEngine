@@ -1,6 +1,10 @@
 # KameronsRenderEngine
 OpenGL render engine
 
+Here is a link to my portfolio. There is a blog tab that ill be adding too, strictly for graphics programming.
+https://kamjam66xx.wixsite.com/briggsmedia
+
+
 i will be adding documentation when it gets more complete. i imagine ill eventually just have a high level api for games/graphics. 
 i plan on adding my audio and physics engine after the graphics are solid.
 
