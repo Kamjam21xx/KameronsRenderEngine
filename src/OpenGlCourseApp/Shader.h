@@ -47,6 +47,7 @@ public:
 	GLuint GetTextureScreenSpaceTwoLocation() const;
 	GLuint GetGammaLocation() const ;
 	GLuint GetBloomThresholdLocation() const ;
+	GLuint GetHorizontalLocation() const ;
 
 	void UseShader();
 	void ClearShader();
@@ -69,6 +70,7 @@ public:
 	void SetTextureScreenSpaceTwo(GLuint textureUnit);
 	void SetGamma(GLfloat gammaLevel);
 	void SetBloomThreshold(GLfloat bloomThreshold);
+	void SetHorizontal(GLboolean isHorizontal);
 
 
 	~Shader();
@@ -86,7 +88,7 @@ private:
 		   uniformDirectionalLightTransform, uniformDirectionalShadowMap,
 		   uniformOmniLightPos, uniformFarPlane, uniformSplitScreenIsOn, uniformSplitScreenType,
 		   uniformTextureScreenSpace, uniformTextureScreenSpaceTwo,
-		   uniformGamma, uniformBloomThreshold;
+		   uniformGamma, uniformBloomThreshold, uniformHorizontal;
 
 	GLuint uniformLightMatrices[6];
 

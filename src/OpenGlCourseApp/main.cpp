@@ -38,12 +38,13 @@
 #include "FrameBuffer.h"
 #include "DualFrameBuffer.h"
 
-
+// linear interpolation == free lunch
+// possibly make a bokeh bloom blur shader that takes advantage of linear interpolation to keep it light
 
 const float toRadians = 3.14159265 / 180.0;
 
 GL_Window mainWindow;
-FrameBuffer framebufferHDR;
+FrameBuffer framebufferBlur;
 DualFrameBuffer dualFramebufferHDR;
 Camera camera;
 
@@ -53,7 +54,7 @@ std::vector<Shader> shaderList;
 Shader directionalShadowShader;
 Shader omniShadowShader;
 Shader outlineShader;
-Shader framebuffershader;
+Shader framebufferBlurShader;
 Shader dualFramebuffershader;
 
 GLuint uniformProjection = 0,
@@ -75,8 +76,8 @@ static const char* olvShader = "Shaders/olfshader.vert";
 static const char* olfShader = "Shaders/olfshader.frag";
 static const char* outlineVShader = "Shaders/outline.vert";
 static const char* outlineFShader = "Shaders/outline.frag";
-static const char* FBVShader = "Shaders/framebuffershader.vert";
-static const char* FBFShader = "Shaders/framebuffershader.frag";
+static const char* FBBVShader = "Shaders/framebufferBlur.vert";
+static const char* FBBFShader = "Shaders/framebufferBlur.frag";
 static const char* DFBVShader = "Shaders/dualFramebuffershader.vert";
 static const char* DFBFShader = "Shaders/dualFramebuffershader.frag";
 
@@ -119,8 +120,8 @@ void CreateShaders() {
 											"Shaders/omni_shadow_map.frag"
 	);
 
-	framebuffershader = Shader();
-	framebuffershader.CreateFromFiles(FBVShader, FBFShader);
+	framebufferBlurShader = Shader();
+	framebufferBlurShader.CreateFromFiles(FBBVShader, FBBFShader);
 
 	dualFramebuffershader = Shader();
 	dualFramebuffershader.CreateFromFiles(DFBVShader, DFBFShader);
@@ -194,6 +195,17 @@ void OmniShadowMapPass(PointLight *light) {
 
 void BloomBlurPass()
 {
+	/*
+	glBindFramebuffer(GL_FRAMEBUFFER, framebufferBlur.GetFBO());
+
+	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glDisable(GL_STENCIL_TEST);
+	glDisable(GL_DEPTH_TEST);
+
+	framebufferBlurShader.UseShader();
+	//framebufferBlurShader.SetHorizontal(i);
+*/
 
 }
 
@@ -294,42 +306,10 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
 
-	// BloomBlurPass();
+	BloomBlurPass();
 
-	RenderToQuadApplyBloom(); // make it take the dualFrameBuffer object
+	RenderToQuadApplyBloom();
 
-
-	// add bloom with the blur n stuff
-	/*
-	
-	
-		
-	
-	
-	*/
-	
-
-	/*
-	// this will be the final render 
-
-
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glDisable(GL_STENCIL_TEST);
-	glDisable(GL_DEPTH_TEST);
-
-	dualFramebuffershader.UseShader();
-	dualFramebuffershader.SetGamma(gamma);
-	dualFramebuffershader.SetTextureScreenSpace(18);
-	dualFramebuffershader.SetTextureScreenSpaceTwo(19);
-	dualFramebufferHDR.BindTextures(GL_TEXTURE17, GL_TEXTURE18);
-
-	glBindVertexArray(screenQuadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glEnable(GL_DEPTH_TEST);
-
-	*/
 
 }
 
@@ -447,7 +427,7 @@ int main()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
 
-	framebufferHDR.Init(GL_TEXTURE17, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
+	framebufferBlur.Init(GL_TEXTURE19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
 
 	dualFramebufferHDR.Init(GL_TEXTURE18, GL_TEXTURE19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
 

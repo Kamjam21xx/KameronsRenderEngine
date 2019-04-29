@@ -134,7 +134,7 @@ void Shader::CompileProgram()
 		uniformPointLight[i].uniformColor = glGetUniformLocation(shaderID, locBuff);
 		snprintf(locBuff, sizeof(locBuff), "pointLights[%i].base.ambientIntensity", i);
 		uniformPointLight[i].uniformAmbientIntensity = glGetUniformLocation(shaderID, locBuff);
-		snprintf(locBuff, sizeof(locBuff), "pointLights[%i].base.diffusionIntensity", i);
+		snprintf(locBuff, sizeof(locBuff), "pointLights[%i].base.diffuseIntensity", i);
 		uniformPointLight[i].uniformDiffuseIntensity = glGetUniformLocation(shaderID, locBuff);
 
 		snprintf(locBuff, sizeof(locBuff), "pointLights[%i].position", i);
@@ -155,7 +155,7 @@ void Shader::CompileProgram()
 		uniformSpotLight[i].uniformColor = glGetUniformLocation(shaderID, locBuff);
 		snprintf(locBuff, sizeof(locBuff), "spotLights[%i].base.base.ambientIntensity", i);
 		uniformSpotLight[i].uniformAmbientIntensity = glGetUniformLocation(shaderID, locBuff);
-		snprintf(locBuff, sizeof(locBuff), "spotLights[%i].base.base.diffusionIntensity", i);
+		snprintf(locBuff, sizeof(locBuff), "spotLights[%i].base.base.diffuseIntensity", i);
 		uniformSpotLight[i].uniformDiffuseIntensity = glGetUniformLocation(shaderID, locBuff);
 
 		snprintf(locBuff, sizeof(locBuff), "spotLights[%i].base.position", i);
@@ -205,6 +205,7 @@ void Shader::CompileProgram()
 	uniformSplitScreenType = glGetUniformLocation(shaderID, "splitScreenType");
 	uniformGamma = glGetUniformLocation(shaderID, "gammaLevel");
 	uniformBloomThreshold = glGetUniformLocation(shaderID, "bloomThreshold");
+	uniformHorizontal = glGetUniformLocation(shaderID, "isHorizontal");
 
 	uniformTextureScreenSpace = glGetUniformLocation(shaderID, "screenSpaceTexture");
 	uniformTextureScreenSpaceTwo = glGetUniformLocation(shaderID, "screenSpaceTextureTwo");
@@ -285,6 +286,10 @@ GLuint Shader::GetGammaLocation() const
 GLuint Shader::GetBloomThresholdLocation() const
 {
 	return uniformBloomThreshold;
+}
+GLuint Shader::GetHorizontalLocation() const
+{
+	return uniformHorizontal;
 }
 
 void Shader::SetDirectionalLight(DirectionalLight * dLight) 
@@ -398,6 +403,10 @@ void Shader::SetGamma(GLfloat gammaLevel)
 void Shader::SetBloomThreshold(GLfloat bloomThreshold)
 {
 	glUniform1f(uniformBloomThreshold, bloomThreshold);
+}
+void Shader::SetHorizontal(GLboolean isHorizontal)
+{
+	glUniform1i(uniformHorizontal, isHorizontal);
 }
 
 void Shader::UseShader() 

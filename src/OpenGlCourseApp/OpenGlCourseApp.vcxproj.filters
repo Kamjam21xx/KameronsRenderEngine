@@ -232,12 +232,6 @@
     <None Include="Shaders\outline.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="Shaders\framebuffershader.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="Shaders\framebuffershader.vert">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="Shaders\skybox.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
@@ -266,6 +260,12 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="Shaders\dualFramebuffershader.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\framebufferBlur.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\framebufferBlur.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

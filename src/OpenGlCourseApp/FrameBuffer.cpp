@@ -1,5 +1,8 @@
 #include "FrameBuffer.h"
 
+// add shader attachments to framebuffer class, for ease of use. aka... "blurBuffer.UseShader()" 
+// atleast if it still makes sense down the road. 
+
 FrameBuffer::FrameBuffer()
 {
 

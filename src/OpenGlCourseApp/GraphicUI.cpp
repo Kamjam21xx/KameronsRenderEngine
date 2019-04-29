@@ -69,7 +69,7 @@ void GraphicUI::EditDLight(DirectionalLight *dLight)
 	ImVec4 dLightColor = ImVec4(dLight->GetLightColorRed(), dLight->GetLightColorBlue(), dLight->GetLightColorGreen(), 1.0f);
 
 	// make GUI
-	ImGui::SliderFloat("Diffuse", &dLightDiffuse, 0.0f, 2.0f);
+	ImGui::SliderFloat("Diffuse", &dLightDiffuse, 0.0f, 100.0f);
 	ImGui::SliderFloat("Ambient", &dLightAmbient, 0.0f, 0.2f);
 	ImGui::ColorEdit3("Color", (float*)&dLightColor);
 
@@ -92,9 +92,9 @@ void GraphicUI::EditPLights(PointLight *pLights, unsigned short int lightCount)
 
 		// make GUI
 		ImGui::Text(" ");
-		ImGui::SliderFloat("Diffuse", &pLightDiffuse, 0.0f, 20.0f);
-		ImGui::SliderFloat("Ambient", &pLightAmbient, 0.0f, 0.2f);
-		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 1000.0f);
+		ImGui::SliderFloat("Diffuse", &pLightDiffuse, 0.0f, 100.0f);
+		ImGui::SliderFloat("Ambient", &pLightAmbient, 0.0f, 1.0f);
+		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 100.0f);
 		ImGui::ColorEdit3("Color", (float*)&pLightColor);
 
 		// Set member variable values to variable values
@@ -120,9 +120,9 @@ void GraphicUI::EditSLights(SpotLight *sLights, unsigned short int lightCount)
 
 		// make GUI
 		ImGui::Text(" ");
-		ImGui::SliderFloat("Diffuse", &pLightDiffuse, 0.0f, 20.0f);
-		ImGui::SliderFloat("Ambient", &pLightAmbient, 0.0f, 0.2f);
-		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 1000.0f);
+		ImGui::SliderFloat("Diffuse", &pLightDiffuse, 0.0f, 100.0f);
+		ImGui::SliderFloat("Ambient", &pLightAmbient, 0.0f, 1.0f);
+		ImGui::SliderFloat("Range", &pLightRange, 0.0f, 100.0f);
 		ImGui::ColorEdit3("Color", (float*)&pLightColor);
 
 		// Set member variable values to variable values

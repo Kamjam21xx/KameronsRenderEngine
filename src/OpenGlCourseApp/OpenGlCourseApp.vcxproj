@@ -272,8 +272,8 @@
     <None Include="Shaders\directional_shadow_map.vert" />
     <None Include="Shaders\dualFramebuffershader.frag" />
     <None Include="Shaders\dualFramebuffershader.vert" />
-    <None Include="Shaders\framebuffershader.frag" />
-    <None Include="Shaders\framebuffershader.vert" />
+    <None Include="Shaders\framebufferBlur.frag" />
+    <None Include="Shaders\framebufferBlur.vert" />
     <None Include="Shaders\omni_shadow_map.frag" />
     <None Include="Shaders\omni_shadow_map.geom" />
     <None Include="Shaders\omni_shadow_map.vert" />

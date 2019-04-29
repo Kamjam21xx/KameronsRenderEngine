@@ -427,6 +427,7 @@ void main()
 		{
 			colour = shadowFactor * reflection;
 		}
+		colour = ApplyGammaToneMapping(colour.xyz);
 	}
 
 	//}		
