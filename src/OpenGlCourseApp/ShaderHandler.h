@@ -15,6 +15,9 @@ class ShaderHandler									// rename ShaderSource
 	// could use reverse finds, but im keeping them normal finds for readability. 
 	// keepin it simple
 
+	// use preprocessor statements and SCRAP EVERYTHING (most everything)
+	// defines elif ifndef etc
+
 public:
 	ShaderHandler();
 

@@ -41,6 +41,17 @@
 // linear interpolation == free lunch
 // possibly make a bokeh bloom blur shader that takes advantage of linear interpolation to keep it light
 
+//<>==========<> TEMP <>==========<>//
+//<>==========<> TEMP <>==========<>// HACKING IT IN
+//<>==========<> TEMP <>==========<>//
+
+unsigned int pingpongFBO[2];
+unsigned int pingpongBuffer[2];
+
+//<>==========<> TEMP <>==========<>//
+//<>==========<> TEMP <>==========<>//
+//<>==========<> TEMP <>==========<>//
+
 const float toRadians = 3.14159265 / 180.0;
 
 GL_Window mainWindow;
@@ -93,6 +104,7 @@ GLboolean splitScreenIsOn = false;
 GLuint splitScreenType = 0;
 GLfloat gamma = 1.0f;
 GLfloat bloomThreshold = 1.0f;
+unsigned short int numOfBloomPasses = 5;
 
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
@@ -102,7 +114,8 @@ unsigned short int pointLightCount = 0;
 unsigned int screenQuadVAO, screenQuadVBO;
 
 
-void CreateShaders() {
+void CreateShaders() 
+{
 	Shader *shader1 = new Shader();
 	shader1->CreateFromFiles(vShader, fShader);
 	shaderList.push_back(*shader1);
@@ -127,7 +140,8 @@ void CreateShaders() {
 	dualFramebuffershader.CreateFromFiles(DFBVShader, DFBFShader);
 }
 
-void RenderScene() {
+void RenderScene() 
+{
 	for (auto element = mainScene.objects.begin() ; element != mainScene.objects.end(); ++element) {
 		glm::mat4 model = glm::mat4(1.0);
 
@@ -143,7 +157,8 @@ void RenderScene() {
 	}
 }
 
-void RenderSceneStencil() {
+void RenderSceneStencil() 
+{
 	for (auto element = mainScene.objects.begin(); element != mainScene.objects.end(); ++element) {
 		glm::mat4 model = glm::mat4(1.0);
 
@@ -155,7 +170,8 @@ void RenderSceneStencil() {
 	}
 }
 
-void DirectionalShadowMapPass(DirectionalLight* light) {
+void DirectionalShadowMapPass(DirectionalLight* light) 
+{
 	directionalShadowShader.UseShader();
 	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
 	light->GetShadowMap()->Write();
@@ -171,7 +187,8 @@ void DirectionalShadowMapPass(DirectionalLight* light) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void OmniShadowMapPass(PointLight *light) {
+void OmniShadowMapPass(PointLight *light) 
+{
 	omniShadowShader.UseShader();
 	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
 	light->GetShadowMap()->Write();
@@ -193,20 +210,42 @@ void OmniShadowMapPass(PointLight *light) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void BloomBlurPass()
+void BloomBlurPass() // re-write to blur then downsize then blur etc and pack everything in a neat class or something
 {
-	/*
-	glBindFramebuffer(GL_FRAMEBUFFER, framebufferBlur.GetFBO());
-
-	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glDisable(GL_STENCIL_TEST);
-	glDisable(GL_DEPTH_TEST);
+	unsigned short int iterations = 2 * numOfBloomPasses - 1;
+	bool isHorizontal = true;
+	bool first_iteration = true;
 
 	framebufferBlurShader.UseShader();
-	//framebufferBlurShader.SetHorizontal(i);
-*/
 
+	glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[isHorizontal]);
+	framebufferBlurShader.SetHorizontal(isHorizontal);
+	dualFramebufferHDR.BindTexture(1);
+
+	glBindVertexArray(screenQuadVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glEnable(GL_DEPTH_TEST);
+
+	isHorizontal = !isHorizontal;
+
+	glViewport(0, 0, 1920, 1080);
+	for (unsigned short int i = 0; i < iterations; ++i)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[isHorizontal]);
+		framebufferBlurShader.SetHorizontal(isHorizontal);
+
+		glActiveTexture(GL_TEXTURE17);
+		glBindTexture(GL_TEXTURE_2D, pingpongBuffer[!isHorizontal]);
+		
+		glBindVertexArray(screenQuadVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glEnable(GL_DEPTH_TEST);
+
+		isHorizontal = !isHorizontal;
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, 3840, 2160);
 }
 
 void RenderToQuadApplyBloom() 
@@ -226,7 +265,7 @@ void RenderToQuadApplyBloom()
 	dualFramebufferHDR.BindTexture(0);
 	dualFramebufferHDR.BindTexture(1);
 	dualFramebuffershader.SetTextureScreenSpace(18);
-	dualFramebuffershader.SetTextureScreenSpaceTwo(19);
+	dualFramebuffershader.SetTextureScreenSpaceTwo(17);
 
 	glBindVertexArray(screenQuadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -239,6 +278,7 @@ void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4
 {
 	shaderList[i].UseShader();
 
+
 	uniformModel = shaderList[i].GetModelLocation();
 	uniformProjection = shaderList[i].GetProjectionLocation();
 	uniformView = shaderList[i].GetViewLocation();
@@ -247,15 +287,18 @@ void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4
 	uniformSpecularIntensity = shaderList[i].GetSpecularIntensityLocation();
 	uniformSpecularPower = shaderList[i].GetSpecularPowerLocation();
 
+
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 	glUniform3f(uniformEyeDirection, camera.getCameraDirection().x, camera.getCameraDirection().y, camera.getCameraDirection().z);
 
+
 	shaderList[i].SetSplitScreenIsOn(splitScreenIsOn);
 	shaderList[i].SetSplitScreenType(splitScreenType);
 	shaderList[i].SetGamma(gamma);
 	shaderList[i].SetBloomThreshold(bloomThreshold);
+
 
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
 	shaderList[i].SetTextureDiffuse(1);
@@ -275,11 +318,11 @@ void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4
 
 void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, 
 				unsigned short int* pointLightCount, unsigned short int* spotLightCount,
-				DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights) {
-
+				DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights) 
+{
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dualFramebufferHDR.GetFBO());
 	
-	glViewport(0, 0, 3840, 2160);
+	glViewport(0, 0, 3840, 2160); // maybe make it a lower upscaled resolution. idk.
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glStencilMask(0x00);
@@ -306,18 +349,17 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
 
+	// add shader swapping in ImGui 
 	BloomBlurPass();
 
 	RenderToQuadApplyBloom();
-
-
 }
 
 void CreateLights(PointLight &pointLightsR, 
 				  SpotLight &spotLightsR, 
 				  unsigned short int *pointLightCount, 
-				  unsigned short int *spotLightCount) {
-
+				  unsigned short int *spotLightCount) 
+{
 	// make plain text loader for lights, add to scene.
 	// added shadow detail var for ease testing
 	GLint shadowDetail = 4;
@@ -363,7 +405,6 @@ void CreateLights(PointLight &pointLightsR,
 		32.0f); 
 	(*spotLightCount)++;
 	spotLights[0].SetLightRange(80.0f);
-
 */	
 }
 
@@ -430,6 +471,58 @@ int main()
 	framebufferBlur.Init(GL_TEXTURE19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
 
 	dualFramebufferHDR.Init(GL_TEXTURE18, GL_TEXTURE19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
+
+
+
+
+
+
+	//<>==========<> TEMP <>==========<>//
+	//<>==========<> TEMP <>==========<>// HACKING IT IN
+	//<>==========<> TEMP <>==========<>// rename and rework into a class.
+	// probs make a parent base class for all the different children/ sub classes----- 3 or 4 types.
+	// normal FBO
+	// multi render target FBO
+	// multi FBO FBO
+	// custom
+	// or...... just throw the multi FBO idea into a data structure instead of a class
+
+
+	glGenFramebuffers(2, pingpongFBO);
+	glGenTextures(2, pingpongBuffer);
+
+	for (unsigned int i = 0; i < 2; ++i)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
+		glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
+
+		glTexImage2D(
+			GL_TEXTURE_2D, 0, GL_RGB16F,
+			1920, 1080,
+			0, GL_RGB, GL_FLOAT, NULL
+		);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0);
+	}
+
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//<>==========<> TEMP <>==========<>//
+	//<>==========<> TEMP <>==========<>//
+	//<>==========<> TEMP <>==========<>//
+
+
+
+
+
 
 //<>=========================================================================================================<>
 // prep

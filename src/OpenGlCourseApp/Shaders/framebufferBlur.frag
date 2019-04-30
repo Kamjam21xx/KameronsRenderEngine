@@ -1,49 +1,54 @@
 #version 430
 
-in vec2 TexCoords;
+// implement graphites tips at a later date for super speedy and manipulatable code
 
-layout (location = 1) out vec4 Result;
+in vec2 TexCoords;
+in vec2 TexelSize;
+
+out vec4 FragColor;
 
 layout (binding = 19) uniform sampler2D screenSpaceTextureTwo;
 
 // uniforms variables
 uniform bool isHorizontal;
-uniform float weights[5] = float [] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+// float weights[5] = float [] (0.227027f, 0.1945946f, 0.1216216f, 0.054054f, 0.016216f);// can use
 
-
-vec4 SeperatedGaussianBlur(vec3 inputColor, vec2 stepSize)
+vec4 GaussianBlur(vec3 inputColor, vec2 stepSize) // bake shaders for different resolutions so that multiplication doesnt need to be uselessly done in the shader for every pixel
 {
+// could do stepsizes in the vertex shader.... idk
 	if(isHorizontal)
 	{
-		for(int i = 1; i < 5; ++i)
-		{
-			inputColor += texture(image, TexCoords + vec2(stepSize.x * i, 0.0)).rgb * weights[i];
-			inputColor += texture(image, TexCoords - vec2(stepSize.x * i, 0.0)).rgb * weights[i];
-		}
+		inputColor += texture(screenSpaceTextureTwo, TexCoords + vec2(stepSize.x * 1, 0.0f)).rgb * 0.1945946f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords - vec2(stepSize.x * 1, 0.0f)).rgb * 0.1945946f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords + vec2(stepSize.x * 2, 0.0f)).rgb * 0.1216216f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords - vec2(stepSize.x * 2, 0.0f)).rgb * 0.1216216f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords + vec2(stepSize.x * 3, 0.0f)).rgb * 0.054054f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords - vec2(stepSize.x * 3, 0.0f)).rgb * 0.054054f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords + vec2(stepSize.x * 4, 0.0f)).rgb * 0.016216f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords - vec2(stepSize.x * 4, 0.0f)).rgb * 0.016216f;
+
 	}
 	else
 	{
-		for(int i = 1; i < 5; ++i)
-		{
-			inputColor += texture(image, TexCoords + vec2(stepSize.y * i, 0.0)).rgb * weights[i];
-			inputColor += texture(image, TexCoords - vec2(stepSize.y * i, 0.0)).rgb * weights[i];
-		}
+
+		inputColor += texture(screenSpaceTextureTwo, TexCoords + vec2(0.0f, stepSize.y * 1)).rgb * 0.1945946f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords - vec2(0.0f, stepSize.y * 1)).rgb * 0.1945946f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords + vec2(0.0f, stepSize.y * 2)).rgb * 0.1216216f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords - vec2(0.0f, stepSize.y * 2)).rgb * 0.1216216f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords + vec2(0.0f, stepSize.y * 3)).rgb * 0.054054f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords - vec2(0.0f, stepSize.y * 3)).rgb * 0.054054f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords + vec2(0.0f, stepSize.y * 4)).rgb * 0.016216f;
+		inputColor += texture(screenSpaceTextureTwo, TexCoords - vec2(0.0f, stepSize.y * 4)).rgb * 0.016216f;
+
 	}
 
 	return vec4(inputColor, 1.0f);
 }
-vec2 GetTexelSize()
-{
-	return 1.0f / textureSize(screeSpaceTextureTwo, 0);
-}
+
 
 void main() 
 {
-	// get the size of a texel to use as an offset to TexCoords, for sampling.
-	vec2 texelSize = GetTexelSize();
-
-	// get initial value to work on.
-	vec3 highlightSample = texture(screenSpaceTexture, TexCoords).xyz * weight[0];
+	vec3 highlightSample = texture(screenSpaceTextureTwo, TexCoords).xyz * 0.227027f; // doesnt work if []
 	
-	Result = SeperatedGaussianBlur(highlightSample, texelSize);
+	FragColor = GaussianBlur(highlightSample, TexelSize);
 }
