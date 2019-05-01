@@ -82,9 +82,7 @@ uniform float bloomThreshold;
 
 // textures
 layout (binding = 1) uniform sampler2D theTextureDiffuse;
-layout (binding = 4) uniform sampler2D theTextureSpecular;
 layout (binding = 5) uniform sampler2D theTextureNormal;
-layout (binding = 7) uniform sampler2D theTextureHeight;
 layout (binding = 2) uniform sampler2D directionalShadowMap;
 layout (binding = 6) uniform samplerCube skyBoxTexture;
 

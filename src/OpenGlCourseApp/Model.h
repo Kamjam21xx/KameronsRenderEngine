@@ -34,11 +34,11 @@ private:
 
 	std::vector<Mesh*> meshList;
 	
-	std::vector<Texture*> textureListDiffuse;
-	std::vector<Texture*> textureListSpecular;
+	std::vector<Texture*> textureListChannelOne;
+	std::vector<Texture*> textureListChannelTwo;
 
-	std::vector<Texture*> textureListNormal;
-	std::vector<Texture*> textureListHeight;
+	std::vector<Texture*> textureListChannelThree;
+	std::vector<Texture*> textureListChannelFour;
 	
 	std::vector<unsigned int> meshToTex;
 

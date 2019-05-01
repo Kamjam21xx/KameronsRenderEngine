@@ -28,8 +28,6 @@ public:
 	void UseTexture() const;
 	void ClearTexture();
 
-	
-
 	void SetTextureUnit(GLuint glTextureUnit);
 	int GetWidth() const;
 	int GetHeight() const;

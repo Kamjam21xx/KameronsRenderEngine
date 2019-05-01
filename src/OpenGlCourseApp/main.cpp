@@ -302,9 +302,7 @@ void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4
 
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
 	shaderList[i].SetTextureDiffuse(1);
-	shaderList[i].SetTextureSpecular (4);
 	shaderList[i].SetTextureNormal(5);
-	shaderList[i].SetTextureHeight(7);
 	shaderList[i].SetDirectionalShadowMap(2); // 2
 	shaderList[i].SetTextureSkyBox(6);	
 	shaderList[i].SetDirectionalLight(mainLight);
@@ -472,11 +470,6 @@ int main()
 
 	dualFramebufferHDR.Init(GL_TEXTURE18, GL_TEXTURE19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
 
-
-
-
-
-
 	//<>==========<> TEMP <>==========<>//
 	//<>==========<> TEMP <>==========<>// HACKING IT IN
 	//<>==========<> TEMP <>==========<>// rename and rework into a class.
@@ -486,7 +479,6 @@ int main()
 	// multi FBO FBO
 	// custom
 	// or...... just throw the multi FBO idea into a data structure instead of a class
-
 
 	glGenFramebuffers(2, pingpongFBO);
 	glGenTextures(2, pingpongBuffer);
@@ -518,11 +510,6 @@ int main()
 	//<>==========<> TEMP <>==========<>//
 	//<>==========<> TEMP <>==========<>//
 	//<>==========<> TEMP <>==========<>//
-
-
-
-
-
 
 //<>=========================================================================================================<>
 // prep

@@ -32,21 +32,23 @@ void Model::LoadModel(const std::string& fileName, GLenum drawType, std::string 
 
 }
 
-void Model::RenderModel() const {
-	for (size_t i = 0; i < meshList.size(); ++i) {
+void Model::RenderModel() const 
+{
+	for (size_t i = 0; i < meshList.size(); ++i) 
+	{
 		unsigned int materialIndex = meshToTex[i];
 		
-		if (materialIndex < textureListDiffuse.size() && textureListDiffuse[materialIndex]) {
-			textureListDiffuse[materialIndex]->UseTexture();
+		if (materialIndex < textureListChannelOne.size() && textureListChannelOne[materialIndex]) {
+			textureListChannelOne[materialIndex]->UseTexture();
 		}
-		if (materialIndex < textureListSpecular.size() && textureListSpecular[materialIndex]) {
-			textureListSpecular[materialIndex]->UseTexture();
+		if (materialIndex < textureListChannelTwo.size() && textureListChannelTwo[materialIndex]) {
+			textureListChannelTwo[materialIndex]->UseTexture();
 		}
-		if (materialIndex < textureListNormal.size() && textureListNormal[materialIndex]) {
-			textureListNormal[materialIndex]->UseTexture();
+		if (materialIndex < textureListChannelThree.size() && textureListChannelThree[materialIndex]) {
+			textureListChannelThree[materialIndex]->UseTexture();
 		}
-		if (materialIndex < textureListHeight.size() && textureListHeight[materialIndex]) {
-			textureListHeight[materialIndex]->UseTexture();
+		if (materialIndex < textureListChannelFour.size() && textureListChannelFour[materialIndex]) {
+			textureListChannelFour[materialIndex]->UseTexture();
 		}
 
 		meshList[i]->RenderMesh();
@@ -57,36 +59,38 @@ void Model::ClearModel() { // will need to be revised with a pointer count point
 
 	// make multithreaded
 
-	for (size_t i = 0; i < meshList.size(); ++i) {
+	for (size_t i = 0; i < meshList.size(); ++i) 
+	{
 		if (meshList[i]) {
 			delete meshList[i];
 			meshList[i] = nullptr;
 		}
 
-		if (textureListDiffuse[i]) {
-			delete textureListDiffuse[i];
-			textureListDiffuse[i] = nullptr;
-		}
-	
-		if (textureListSpecular[i]) {
-			delete textureListSpecular[i];
-			textureListSpecular[i] = nullptr;
+		if (textureListChannelOne[i]) {
+			delete textureListChannelOne[i];
+			textureListChannelOne[i] = nullptr;
 		}
 
-		if (textureListNormal[i]) {
-			delete textureListNormal[i];
-			textureListNormal[i] = nullptr;
+		if (textureListChannelTwo[i]) {
+			delete textureListChannelTwo[i];
+			textureListChannelTwo[i] = nullptr;
 		}
 
-		if (textureListHeight[i]) {
-			delete textureListHeight[i];
-			textureListHeight[i] = nullptr;
+		if (textureListChannelThree[i]) {
+			delete textureListChannelThree[i];
+			textureListChannelThree[i] = nullptr;
+		}
+
+		if (textureListChannelFour[i]) {
+			delete textureListChannelFour[i];
+			textureListChannelFour[i] = nullptr;
 		}
 
 	}
 }
 
-void Model::LoadNode(aiNode *node, const aiScene *scene, GLenum drawType, bool tangents) {
+void Model::LoadNode(aiNode *node, const aiScene *scene, GLenum drawType, bool tangents) 
+{
 	for (size_t i = 0; i < node->mNumMeshes; ++i) {
 		LoadMesh(scene->mMeshes[node->mMeshes[i]], scene, drawType, tangents);
 	}
@@ -96,7 +100,8 @@ void Model::LoadNode(aiNode *node, const aiScene *scene, GLenum drawType, bool t
 	}
 }
 
-void Model::LoadMesh(aiMesh *mesh, const aiScene *scene, GLenum drawType, bool tangents) {
+void Model::LoadMesh(aiMesh *mesh, const aiScene *scene, GLenum drawType, bool tangents) 
+{
 	std::vector<GLfloat> vertices;
 	std::vector<unsigned int> indices;
 
@@ -156,90 +161,35 @@ void Model::LoadMesh(aiMesh *mesh, const aiScene *scene, GLenum drawType, bool t
 	meshToTex.push_back(mesh->mMaterialIndex);
 }
 
-void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::string specularTexture, std::string normalTexture, std::string heightTexture) {
-	textureListDiffuse.resize(scene->mNumMaterials);
-	textureListSpecular.resize(scene->mNumMaterials);
-	textureListNormal.resize(scene->mNumMaterials);
-	textureListHeight.resize(scene->mNumMaterials);
+void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::string specularTexture, std::string normalTexture, std::string heightTexture) 
+{
+	// Can add extra texture channels if need be, cleaned up a touch for now.
+	textureListChannelOne.resize(scene->mNumMaterials);
+	textureListChannelTwo.resize(scene->mNumMaterials);
+
 
 	for (size_t i = 0; i < scene->mNumMaterials; i++) {
 		aiMaterial *material = scene->mMaterials[i];
 
 
-		textureListDiffuse[i] = nullptr;
-		if (!textureListDiffuse[i]) 
+		textureListChannelOne[i] = nullptr;
+		if (!textureListChannelOne[i]) 
 		{
 			const char* textureFile = colorTexture.c_str();
 			const char* textureFileTwo = specularTexture.c_str();
 
-			textureListDiffuse[i] = new Texture(textureFile);
-			textureListDiffuse[i]->MergeLoadTexture(GL_TEXTURE1, textureFileTwo);
+			textureListChannelOne[i] = new Texture(textureFile);
+			textureListChannelOne[i]->MergeLoadTexture(GL_TEXTURE1, textureFileTwo);
 		}
 
-
-		textureListSpecular[i] = nullptr;
-		if (specularTexture != "") {
-			if (material->GetTextureCount(aiTextureType_SPECULAR)) {
-				aiString path;
-				if (material->GetTexture(aiTextureType_SPECULAR, 0, &path) == AI_SUCCESS) {
-					int idx = std::string(path.data).rfind("\\");
-					std::string filename = std::string(path.data).substr(idx + 1);
-
-					std::string texPath = std::string("Textures/") + filename;
-
-					textureListSpecular[i] = new Texture(texPath.c_str());
-
-					if (!textureListSpecular[i]->LoadTexture(GL_TEXTURE4)) {
-						printf("Failed to load texture at: %s \n", texPath);
-						delete textureListSpecular[i];
-						textureListSpecular[i] = nullptr;
-					}
-				}
-			}
-			if (!textureListSpecular[i]) {
-				const char* textureFile = specularTexture.c_str();
-				textureListSpecular[i] = new Texture(textureFile);
-				textureListSpecular[i]->LoadTexture(GL_TEXTURE4);
-			}
-		}
-
-
-		textureListNormal[i] = nullptr;
-		if (!textureListNormal[i]) {
+		textureListChannelTwo[i] = nullptr;
+		if (!textureListChannelTwo[i]) {
 			const char* textureFile = normalTexture.c_str();
 			const char* textureFileTwo = heightTexture.c_str();
 
-			textureListNormal[i] = new Texture(textureFile);
-			textureListNormal[i]->MergeLoadTexture(GL_TEXTURE5, textureFileTwo);
+			textureListChannelTwo[i] = new Texture(textureFile);
+			textureListChannelTwo[i]->MergeLoadTexture(GL_TEXTURE5, textureFileTwo);
 		}
-	
-
-		textureListHeight[i] = nullptr;
-		if(heightTexture != "") {
-			if (material->GetTextureCount(aiTextureType_HEIGHT)) {
-				aiString path;
-				if (material->GetTexture(aiTextureType_HEIGHT, 0, &path) == AI_SUCCESS) {
-					int idx = std::string(path.data).rfind("\\"); // note worthy: reverse find to '\' 
-					std::string filename = std::string(path.data).substr(idx + 1);// from '\' to the end ==  sub-string
-
-					std::string texPath = std::string("Textures/") + filename;
-
-					textureListHeight[i] = new Texture(texPath.c_str());
-
-					if (!textureListHeight[i]->LoadTexture(GL_TEXTURE7)) {
-						printf("Failed to load texture at: %s \n", texPath);
-						delete textureListHeight[i];
-						textureListHeight[i] = nullptr; // can make a func for SAFE_DELETE( T& )
-					}
-				}
-			}
-			if (!textureListHeight[i]) {
-				const char* textureFile = heightTexture.c_str();
-				textureListHeight[i] = new Texture(textureFile);
-				textureListHeight[i]->LoadTexture(GL_TEXTURE7);
-			}
-		}
-
 
 	}
 }
@@ -279,15 +229,15 @@ Model::~Model()
 
 
 void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::string specularTexture, std::string normalTexture, std::string heightTexture) {
-	textureListDiffuse.resize(scene->mNumMaterials);
-	textureListSpecular.resize(scene->mNumMaterials);
-	textureListNormal.resize(scene->mNumMaterials);
-	textureListHeight.resize(scene->mNumMaterials);
+	textureListChannelOne.resize(scene->mNumMaterials);
+	textureListChannelThree.resize(scene->mNumMaterials);
+	textureListChannelTwo.resize(scene->mNumMaterials);
+	textureListChannelFour.resize(scene->mNumMaterials);
 
 	for (size_t i = 0; i < scene->mNumMaterials; i++) {
 		aiMaterial *material = scene->mMaterials[i];
 
-		textureListDiffuse[i] = nullptr;
+		textureListChannelOne[i] = nullptr;
 		if (colorTexture != "") {
 			if (material->GetTextureCount(aiTextureType_DIFFUSE)) {
 				aiString path;
@@ -297,23 +247,23 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 					std::string texPath = std::string("Textures/") + filename;
 
-					textureListDiffuse[i] = new Texture(texPath.c_str());
+					textureListChannelOne[i] = new Texture(texPath.c_str());
 
-					if (!textureListDiffuse[i]->LoadTexture(GL_TEXTURE1)) {
+					if (!textureListChannelOne[i]->LoadTexture(GL_TEXTURE1)) {
 						printf("Failed to load texture at: %s \n", texPath);
-						delete textureListDiffuse[i];
-						textureListDiffuse[i] = nullptr;
+						delete textureListChannelOne[i];
+						textureListChannelOne[i] = nullptr;
 					}
 				}
 			}
-			if (!textureListDiffuse[i]) {
+			if (!textureListChannelOne[i]) {
 				const char* textureFile = colorTexture.c_str();
-				textureListDiffuse[i] = new Texture(textureFile);
-				textureListDiffuse[i]->LoadTexture(GL_TEXTURE1);
+				textureListChannelOne[i] = new Texture(textureFile);
+				textureListChannelOne[i]->LoadTexture(GL_TEXTURE1);
 			}
 		}
 
-		textureListSpecular[i] = nullptr;
+		textureListChannelThree[i] = nullptr;
 		if (specularTexture != "") {
 			if (material->GetTextureCount(aiTextureType_SPECULAR)) {
 				aiString path;
@@ -323,23 +273,23 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 					std::string texPath = std::string("Textures/") + filename;
 
-					textureListSpecular[i] = new Texture(texPath.c_str());
+					textureListChannelThree[i] = new Texture(texPath.c_str());
 
-					if (!textureListSpecular[i]->LoadTexture(GL_TEXTURE4)) {
+					if (!textureListChannelThree[i]->LoadTexture(GL_TEXTURE4)) {
 						printf("Failed to load texture at: %s \n", texPath);
-						delete textureListSpecular[i];
-						textureListSpecular[i] = nullptr;
+						delete textureListChannelThree[i];
+						textureListChannelThree[i] = nullptr;
 					}
 				}
 			}
-			if (!textureListSpecular[i]) {
+			if (!textureListChannelThree[i]) {
 				const char* textureFile = specularTexture.c_str();
-				textureListSpecular[i] = new Texture(textureFile);
-				textureListSpecular[i]->LoadTexture(GL_TEXTURE4);
+				textureListChannelThree[i] = new Texture(textureFile);
+				textureListChannelThree[i]->LoadTexture(GL_TEXTURE4);
 			}
 		}
 
-		textureListNormal[i] = nullptr;
+		textureListChannelTwo[i] = nullptr;
 		if(normalTexture != "") {
 			if (material->GetTextureCount(aiTextureType_NORMALS)) {
 				aiString path;
@@ -349,23 +299,23 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 					std::string texPath = std::string("Textures/") + filename;
 
-					textureListNormal[i] = new Texture(texPath.c_str());
+					textureListChannelTwo[i] = new Texture(texPath.c_str());
 
-					if (!textureListNormal[i]->LoadTexture(GL_TEXTURE5)) {
+					if (!textureListChannelTwo[i]->LoadTexture(GL_TEXTURE5)) {
 						printf("Failed to load texture at: %s \n", texPath);
-						delete textureListNormal[i];
-						textureListNormal[i] = nullptr;
+						delete textureListChannelTwo[i];
+						textureListChannelTwo[i] = nullptr;
 					}
 				}
 			}
-			if (!textureListNormal[i]) {
+			if (!textureListChannelTwo[i]) {
 				const char* textureFile = normalTexture.c_str();
-				textureListNormal[i] = new Texture(textureFile);
-				textureListNormal[i]->LoadTexture(GL_TEXTURE5);
+				textureListChannelTwo[i] = new Texture(textureFile);
+				textureListChannelTwo[i]->LoadTexture(GL_TEXTURE5);
 			}
 		}
 
-		textureListHeight[i] = nullptr;
+		textureListChannelFour[i] = nullptr;
 		if(heightTexture != "") {
 			if (material->GetTextureCount(aiTextureType_HEIGHT)) {
 				aiString path;
@@ -375,19 +325,19 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 					std::string texPath = std::string("Textures/") + filename;
 
-					textureListHeight[i] = new Texture(texPath.c_str());
+					textureListChannelFour[i] = new Texture(texPath.c_str());
 
-					if (!textureListHeight[i]->LoadTexture(GL_TEXTURE7)) {
+					if (!textureListChannelFour[i]->LoadTexture(GL_TEXTURE7)) {
 						printf("Failed to load texture at: %s \n", texPath);
-						delete textureListHeight[i];
-						textureListHeight[i] = nullptr; // can make a func for SAFE_DELETE( T& )
+						delete textureListChannelFour[i];
+						textureListChannelFour[i] = nullptr; // can make a func for SAFE_DELETE( T& )
 					}
 				}
 			}
-			if (!textureListHeight[i]) {
+			if (!textureListChannelFour[i]) {
 				const char* textureFile = heightTexture.c_str();
-				textureListHeight[i] = new Texture(textureFile);
-				textureListHeight[i]->LoadTexture(GL_TEXTURE7);
+				textureListChannelFour[i] = new Texture(textureFile);
+				textureListChannelFour[i]->LoadTexture(GL_TEXTURE7);
 			}
 		}
 	}
