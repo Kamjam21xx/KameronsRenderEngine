@@ -36,7 +36,7 @@
 #include "Scene.h"
 #include "GraphicUI.h"
 #include "FrameBuffer.h"
-#include "DualFrameBuffer.h"
+#include "MultiFrameBuffer.h"
 
 // linear interpolation == free lunch
 // possibly make a bokeh bloom blur shader that takes advantage of linear interpolation to keep it light
@@ -56,7 +56,7 @@ const float toRadians = 3.14159265 / 180.0;
 
 GL_Window mainWindow;
 FrameBuffer framebufferBlur;
-DualFrameBuffer dualFramebufferHDR;
+MultiFrameBuffer dualFramebufferHDR;
 Camera camera;
 
 Scene mainScene;
@@ -569,10 +569,13 @@ int main()
 //<>=========================================================================================================<>
 // MAIN LOOP
 
+
+
+
 	GLfloat spinModifier = 0.0f;
 
-	while (!mainWindow.getShouldClose()) {
-		
+	while (!mainWindow.getShouldClose()) 
+	{
 		// Other scene variables
 		deltaTime = DeltaTime();
 
@@ -590,11 +593,33 @@ int main()
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 		camera.keyControl(mainWindow.getKeys(), deltaTime);
 
+
+
+
+		// FORWARD RENDERING // FORWARD RENDERING // FORWARD RENDERING // FORWARD RENDERING // FORWARD RENDERING // FORWARD RENDERING //
+
 		DirectionalShadowMapPass(&mainLight);
+
 		for (size_t i = 0; i < pointLightCount; i++) { OmniShadowMapPass(&pointLights[i]); }
 		for (size_t i = 0; i < spotLightCount; i++) { OmniShadowMapPass(&spotLights[i]); }
 
 		RenderPass(projection, camera.calculateViewMatrix(), &pointLightCount, &spotLightCount, &mainLight, pointLights, spotLights);
+
+		// FORWARD RENDERING // FORWARD RENDERING // FORWARD RENDERING // FORWARD RENDERING // FORWARD RENDERING // FORWARD RENDERING //
+		
+
+		// deffered rendering
+		/*
+		
+
+			
+
+
+		*/
+		// deffered rendering
+
+
+
 
 		glUseProgram(0);
 
@@ -611,9 +636,11 @@ int main()
 
 		// DisplayFinalFrame
 		mainWindow.swapBuffers();
-
-
 	}
+
+
+
+
 //<>=========================================================================================================<>
 // EXIT
 

@@ -89,7 +89,7 @@ layout (binding = 2) uniform sampler2D directionalShadowMap;
 layout (binding = 6) uniform samplerCube skyBoxTexture;
 
 vec4 diffuse;
-vec4 specular;
+float specular;
 
 // other
 vec3 gridSamplingDisk[20] = vec3[]
@@ -285,19 +285,19 @@ vec2 ParallaxMapping(vec2 TexCoords, vec3 eyeDir)
 	vec2 deltaTexCoords = P / layerCount;
 
 	vec2 currentTexCoords = TexCoords;
-	float currentDepthMapValue = 1.0f - float(texture(theTextureHeight, currentTexCoords).r);
+	float currentDepthMapValue = 1.0f - float(texture(theTextureNormal, currentTexCoords).a);
 
 	while(currentLayerDepth < currentDepthMapValue)
 	{
 		currentTexCoords += deltaTexCoords;
-		currentDepthMapValue = 1.0f - float(texture(theTextureHeight, currentTexCoords).r);
+		currentDepthMapValue = 1.0f - float(texture(theTextureNormal, currentTexCoords).a);
 		currentLayerDepth += layerDepth;
 	}
 
 	vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
 
 	float afterDepth = currentDepthMapValue - currentLayerDepth;
-	float beforeDepth = 1.0f - float(texture(theTextureHeight, prevTexCoords).r) - currentLayerDepth + layerDepth;
+	float beforeDepth = 1.0f - float(texture(theTextureNormal, prevTexCoords).a) - currentLayerDepth + layerDepth;
 	
 	float weight = afterDepth / (afterDepth - beforeDepth);
 	vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
@@ -341,58 +341,47 @@ vec4 ApplyGammaToneMapping(vec3 hdrColor)
 
 void main()
 {
+
 	// Parallax_occlusion_mapping
 	vec3 TangentViewPos = tTBN * eyePosition;
 	vec3 TangentFragPos = tTBN * FragPos;
 	heightScale = 0.0175f;
 	vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 	vec2 TexCoord = ParallaxMapping(TexCoord, viewDir);
-	// END_MAIN_DEFINITION
 
 
 	// Normal_mapping
 	vec3 NormalTexture = texture(theTextureNormal, TexCoord).rgb * 2.0f - 1.0f;
 	NormalTexture.xy *= -1.0f;
 	Normal = normalize(TBN * NormalTexture);
-	// END_MAIN_DEFINITION
 
     
 	// Texture_sampling
 	diffuse = texture(theTextureDiffuse, TexCoord);
-	specular = texture(theTextureSpecular, TexCoord);
-	// END_MAIN_DEFINITION
+	specular = diffuse.a;
 
 
 	// Light_calculation
 	vec4 shadowFactor = CalcPointLights();
 	// shadowFactor = CalcDirectionalLight(DirectionalLightSpacePos);
 	// shadowFactor += CalcSpotLights();
-	// END_MAIN_DEFINITION
 
 
 	// Reflection
 	vec4 reflection = reflectSky() * (specular + 0.2);
-	// END_MAIN_DEFINITION
 
 
 	// Channel_mixing + gamma + tonemapping + highlights
 	colour = shadowFactor * diffuse * reflection;
-
 	colour = ApplyGammaToneMapping(colour.xyz);
-	// END_MAIN_DEFINITION
 
 
-	// 
 	highlights = GetHighlights(colour);
 	//highlights.rgb = Normal.rgb;
-	// END_MAIN_DEFINITION
 
-	// dont make splitScreen Function
-	// uniform bool splitScreenIsOn;
-	// uniform int splitScreenType;			
-	//if(gl_FragCoord.x > 1920)
-	//{
 
+
+	// make a seperate split screen shader that gets swapped via ImGui 
 	if(splitScreenIsOn) 
 	{
 		if(splitScreenType == 0)
@@ -401,7 +390,7 @@ void main()
 		}
 		else if(splitScreenType == 1)
 		{
-			colour.rgb = specular.rgb;
+			colour.rgb = vec3(specular);
 		}
 		else if(splitScreenType == 2)
 		{
@@ -421,7 +410,7 @@ void main()
 		}
 		else if(splitScreenType == 6)
 		{
-			colour.rgb = vec3(texture(theTextureHeight, TexCoord).r);
+			colour.rgb = vec3(texture(theTextureNormal, TexCoord).a);
 		}
 		else
 		{
@@ -429,13 +418,4 @@ void main()
 		}
 		colour = ApplyGammaToneMapping(colour.xyz);
 	}
-
-	//}		
-	
-	// Gamma	
-	//float gamma = gammaLevel;
-	//colour.rgb = pow(colour.rgb, vec3(1.0/gamma));	
-	// END_MAIN_DEFINITION
-
-
 }

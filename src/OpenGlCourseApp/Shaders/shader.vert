@@ -19,6 +19,7 @@ uniform mat4 directionalLightTransform;
 
 void main()
 {
+    // fastProj(view,model) vec4(view.x * model[0].x, view.y * model[1].y, view.z * model[2].z + model[3].z, -view.z)
 	gl_Position = projection * view * model * vec4(pos, 1.0f);
 	DirectionalLightSpacePos = directionalLightTransform * model * vec4(pos, 1.0);
 	TexCoord = tex;

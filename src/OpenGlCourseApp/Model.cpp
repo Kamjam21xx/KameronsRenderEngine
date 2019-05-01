@@ -165,6 +165,128 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 	for (size_t i = 0; i < scene->mNumMaterials; i++) {
 		aiMaterial *material = scene->mMaterials[i];
 
+
+		textureListDiffuse[i] = nullptr;
+		if (!textureListDiffuse[i]) 
+		{
+			const char* textureFile = colorTexture.c_str();
+			const char* textureFileTwo = specularTexture.c_str();
+
+			textureListDiffuse[i] = new Texture(textureFile);
+			textureListDiffuse[i]->MergeLoadTexture(GL_TEXTURE1, textureFileTwo);
+		}
+
+
+		textureListSpecular[i] = nullptr;
+		if (specularTexture != "") {
+			if (material->GetTextureCount(aiTextureType_SPECULAR)) {
+				aiString path;
+				if (material->GetTexture(aiTextureType_SPECULAR, 0, &path) == AI_SUCCESS) {
+					int idx = std::string(path.data).rfind("\\");
+					std::string filename = std::string(path.data).substr(idx + 1);
+
+					std::string texPath = std::string("Textures/") + filename;
+
+					textureListSpecular[i] = new Texture(texPath.c_str());
+
+					if (!textureListSpecular[i]->LoadTexture(GL_TEXTURE4)) {
+						printf("Failed to load texture at: %s \n", texPath);
+						delete textureListSpecular[i];
+						textureListSpecular[i] = nullptr;
+					}
+				}
+			}
+			if (!textureListSpecular[i]) {
+				const char* textureFile = specularTexture.c_str();
+				textureListSpecular[i] = new Texture(textureFile);
+				textureListSpecular[i]->LoadTexture(GL_TEXTURE4);
+			}
+		}
+
+
+		textureListNormal[i] = nullptr;
+		if (!textureListNormal[i]) {
+			const char* textureFile = normalTexture.c_str();
+			const char* textureFileTwo = heightTexture.c_str();
+
+			textureListNormal[i] = new Texture(textureFile);
+			textureListNormal[i]->MergeLoadTexture(GL_TEXTURE5, textureFileTwo);
+		}
+	
+
+		textureListHeight[i] = nullptr;
+		if(heightTexture != "") {
+			if (material->GetTextureCount(aiTextureType_HEIGHT)) {
+				aiString path;
+				if (material->GetTexture(aiTextureType_HEIGHT, 0, &path) == AI_SUCCESS) {
+					int idx = std::string(path.data).rfind("\\"); // note worthy: reverse find to '\' 
+					std::string filename = std::string(path.data).substr(idx + 1);// from '\' to the end ==  sub-string
+
+					std::string texPath = std::string("Textures/") + filename;
+
+					textureListHeight[i] = new Texture(texPath.c_str());
+
+					if (!textureListHeight[i]->LoadTexture(GL_TEXTURE7)) {
+						printf("Failed to load texture at: %s \n", texPath);
+						delete textureListHeight[i];
+						textureListHeight[i] = nullptr; // can make a func for SAFE_DELETE( T& )
+					}
+				}
+			}
+			if (!textureListHeight[i]) {
+				const char* textureFile = heightTexture.c_str();
+				textureListHeight[i] = new Texture(textureFile);
+				textureListHeight[i]->LoadTexture(GL_TEXTURE7);
+			}
+		}
+
+
+	}
+}
+
+// add metal
+
+Model::~Model()
+{
+	// clean up all data via for loops at pointers
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+
+
+
+
+
+
+
+
+
+void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::string specularTexture, std::string normalTexture, std::string heightTexture) {
+	textureListDiffuse.resize(scene->mNumMaterials);
+	textureListSpecular.resize(scene->mNumMaterials);
+	textureListNormal.resize(scene->mNumMaterials);
+	textureListHeight.resize(scene->mNumMaterials);
+
+	for (size_t i = 0; i < scene->mNumMaterials; i++) {
+		aiMaterial *material = scene->mMaterials[i];
+
 		textureListDiffuse[i] = nullptr;
 		if (colorTexture != "") {
 			if (material->GetTextureCount(aiTextureType_DIFFUSE)) {
@@ -248,7 +370,7 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 			if (material->GetTextureCount(aiTextureType_HEIGHT)) {
 				aiString path;
 				if (material->GetTexture(aiTextureType_HEIGHT, 0, &path) == AI_SUCCESS) {
-					int idx = std::string(path.data).rfind("\\"); // note worthy: reverse find to '\' 
+					int idx = std::string(path.data).rfind("\\"); // note worthy: reverse find to '\'
 					std::string filename = std::string(path.data).substr(idx + 1);// from '\' to the end ==  sub-string
 
 					std::string texPath = std::string("Textures/") + filename;
@@ -271,9 +393,15 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 	}
 }
 
-// add metal
 
-Model::~Model()
-{
-	// clean up all data via for loops at pointers
-}
+
+
+
+
+
+
+
+
+
+
+*/

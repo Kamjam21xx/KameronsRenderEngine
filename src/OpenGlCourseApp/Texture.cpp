@@ -24,10 +24,13 @@ bool Texture::LoadTexture(GLenum glTextureUnit)
 {
 	unsigned char *texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
 	textureUnit = glTextureUnit;
-	if (!texData) {
+
+	if (!texData) 
+	{
 		printf("Failed to find: %s \n");
 		return false;
 	}
+
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
@@ -51,10 +54,14 @@ bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum fo
 {
 	unsigned char *texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
 	textureUnit = glTextureUnit;
-	if (!texData) {
+
+	if (!texData) 
+	{
 		printf("Failed to find: %s \n");
 		return false;
 	}
+
+
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
@@ -77,10 +84,13 @@ bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum fo
 {
 	unsigned char *texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
 	textureUnit = glTextureUnit;
-	if (!texData) {
+
+	if (!texData) 
+	{
 		printf("Failed to find: %s \n");
 		return false;
 	}
+
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
@@ -103,10 +113,13 @@ bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum fo
 {
 	unsigned char *texData = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
 	textureUnit = glTextureUnit;
-	if (!texData) {
+
+	if (!texData) 
+	{
 		printf("Failed to find: %s \n");
 		return false;
 	}
+
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
@@ -125,6 +138,59 @@ bool Texture::LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum fo
 	return true;
 }
 
+bool Texture::LoadTextureData(const char *imageData)
+{
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8); // edit func for anisotropy manipulation
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return true;
+}
+
+bool Texture::MergeLoadTexture(GLenum glTextureUnit, const char *fileLocationTwo) // implement a seperate function with an offset, because it will be heavy
+{	
+	textureUnit = glTextureUnit;
+
+	unsigned char *texDataOne = stbi_load(fileLocation, &width, &height, &bitDepth, 0);
+	unsigned char *texDataTwo = stbi_load(fileLocationTwo, &width, &height, &bitDepth, 0);
+
+	if (!texDataOne || !texDataTwo)
+	{
+		printf("Failed to merge load textures");
+		return false;
+	}
+
+	signed long int pixelComponentCount = width * height * 4;
+	std::string imageData = "";
+	imageData.resize(pixelComponentCount, ' ');
+
+	for (signed long int i = 0; i < pixelComponentCount; i += 4)
+	{
+		imageData[i + 0] = texDataOne[i + 0];
+		imageData[i + 1] = texDataOne[i + 1];
+		imageData[i + 2] = texDataOne[i + 2];
+		imageData[i + 3] = texDataTwo[i];
+	}
+
+	stbi_image_free(texDataOne);
+	stbi_image_free(texDataTwo);
+
+	const char *imageDataPtr = imageData.c_str();
+	LoadTextureData(imageDataPtr);
+
+	return true;
+}
 
 bool Texture::GenerateTextureFBO(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLint texWidth, GLint texHeight)
 {

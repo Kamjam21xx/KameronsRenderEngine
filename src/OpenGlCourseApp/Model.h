@@ -30,11 +30,13 @@ private:
 	void LoadMesh(aiMesh *mesh, const aiScene *scene, GLenum drawType, bool tangents);
 
 	void LoadMaterials(const aiScene *scene, std::string colorTexture, std::string specularTexture, std::string normalTexture, std::string heightTexture);
+	void LoadTexture(GLenum textureUnit, std::string filePath, std::vector<Texture*> *textureList);
 
 	std::vector<Mesh*> meshList;
 	
 	std::vector<Texture*> textureListDiffuse;
 	std::vector<Texture*> textureListSpecular;
+
 	std::vector<Texture*> textureListNormal;
 	std::vector<Texture*> textureListHeight;
 	
