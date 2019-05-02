@@ -48,6 +48,9 @@ public:
 	GLuint GetGammaLocation() const ;
 	GLuint GetBloomThresholdLocation() const ;
 	GLuint GetHorizontalLocation() const ;
+	GLuint GetBrightnessLocation() const;
+	GLuint GetContrastLocation() const;
+	GLuint GetSaturationLocation() const;
 
 	void UseShader();
 	void ClearShader();
@@ -71,6 +74,9 @@ public:
 	void SetGamma(GLfloat gammaLevel);
 	void SetBloomThreshold(GLfloat bloomThreshold);
 	void SetHorizontal(GLboolean isHorizontal);
+	void SetBrightness(GLfloat brightness);
+	void SetContrast(GLfloat contrast);
+	void SetSaturation(GLfloat saturation);
 
 
 	~Shader();
@@ -88,7 +94,8 @@ private:
 		   uniformDirectionalLightTransform, uniformDirectionalShadowMap,
 		   uniformOmniLightPos, uniformFarPlane, uniformSplitScreenIsOn, uniformSplitScreenType,
 		   uniformTextureScreenSpace, uniformTextureScreenSpaceTwo,
-		   uniformGamma, uniformBloomThreshold, uniformHorizontal;
+		   uniformGamma, uniformBloomThreshold, uniformHorizontal,
+		   uniformBrightness, uniformContrast, uniformSaturation;
 
 	GLuint uniformLightMatrices[6];
 

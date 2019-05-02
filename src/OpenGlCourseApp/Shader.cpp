@@ -209,6 +209,10 @@ void Shader::CompileProgram()
 
 	uniformTextureScreenSpace = glGetUniformLocation(shaderID, "screenSpaceTexture");
 	uniformTextureScreenSpaceTwo = glGetUniformLocation(shaderID, "screenSpaceTextureTwo");
+
+	uniformBrightness = glGetUniformLocation(shaderID, "brightness");
+	uniformContrast = glGetUniformLocation(shaderID, "contrast");
+	uniformSaturation = glGetUniformLocation(shaderID, "saturation");
 }
 
 GLuint Shader::GetDiffuseIntensityLocation() const
@@ -290,6 +294,18 @@ GLuint Shader::GetBloomThresholdLocation() const
 GLuint Shader::GetHorizontalLocation() const
 {
 	return uniformHorizontal;
+}
+GLuint Shader::GetBrightnessLocation() const
+{
+	return uniformBrightness;
+}
+GLuint Shader::GetContrastLocation() const
+{
+	return uniformContrast;
+}
+GLuint Shader::GetSaturationLocation() const
+{
+	return uniformSaturation;
 }
 
 void Shader::SetDirectionalLight(DirectionalLight * dLight) 
@@ -407,6 +423,18 @@ void Shader::SetBloomThreshold(GLfloat bloomThreshold)
 void Shader::SetHorizontal(GLboolean isHorizontal)
 {
 	glUniform1i(uniformHorizontal, isHorizontal);
+}
+void Shader::SetBrightness(GLfloat brightness)
+{
+	glUniform1f(uniformBrightness, brightness);
+}
+void Shader::SetContrast(GLfloat contrast)
+{
+	glUniform1f(uniformContrast, contrast);
+}
+void Shader::SetSaturation(GLfloat saturation)
+{
+	glUniform1f(uniformSaturation, saturation);
 }
 
 void Shader::UseShader() 

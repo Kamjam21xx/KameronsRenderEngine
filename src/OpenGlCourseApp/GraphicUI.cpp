@@ -175,7 +175,7 @@ void GraphicUI::EditSceneSpin(GLfloat *spin)
 
 }
 
-void GraphicUI::EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma, GLfloat *bloomThreshold) 
+void GraphicUI::EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation)
 {
 	ImGui::Begin("Render Settings");
 
@@ -183,6 +183,7 @@ void GraphicUI::EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScre
 	EditSplitScreen(splitScreenIsOn, splitScreenType);
 	EditGamma(gamma);
 	EditBloom(bloomThreshold);
+	EditBrightnessContrastSaturation(brightness, contrast, saturation);
 	// EditFiltering(); // does not work
 
 	ImGui::End();
@@ -231,7 +232,6 @@ void GraphicUI::EditGamma(GLfloat *gamma)
 
 	if (enableGammaEdit)
 	{
-		ImGui::SameLine();
 		ImGui::SliderFloat("Gamma", gamma, 0.001f, 4.000f);
 	}
 }
@@ -244,8 +244,21 @@ void GraphicUI::EditBloom(GLfloat *bloomThreshold)
 
 	if (enableBloomEdit)
 	{
-		ImGui::SameLine();
 		ImGui::SliderFloat("Bloom Threshold", bloomThreshold, 0.001f, 1.0f);
+	}
+}
+void GraphicUI::EditBrightnessContrastSaturation(GLfloat *brightness, GLfloat *contrast, GLfloat *saturation)
+{
+	if (ImGui::Button("BCT adjust"))
+	{
+		enableEditBCT = !enableEditBCT;
+	}
+
+	if (enableEditBCT)
+	{
+		ImGui::SliderFloat("Brightness", brightness, -1.0f, 1.0f);
+		ImGui::SliderFloat("Contrast", contrast, 1.0f, 3.0f);
+		ImGui::SliderFloat("Saturation", saturation, 0.0, 2.0f);
 	}
 }
 void GraphicUI::EditVerticalSync()

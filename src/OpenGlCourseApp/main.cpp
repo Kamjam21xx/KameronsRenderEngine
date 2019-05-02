@@ -41,6 +41,8 @@
 // linear interpolation == free lunch
 // possibly make a bokeh bloom blur shader that takes advantage of linear interpolation to keep it light
 
+// make a settings class maybe
+
 const float toRadians = 3.14159265 / 180.0;
 
 GL_Window mainWindow;
@@ -95,6 +97,7 @@ GLuint splitScreenType = 0;
 GLfloat gamma = 1.0f;
 GLfloat bloomThreshold = 1.0f;
 unsigned short int numOfBloomPasses = 5;
+GLfloat brightness, contrast, saturation;
 
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
@@ -249,6 +252,9 @@ void RenderToQuadApplyBloom()
 
 	dualFramebuffershader.UseShader();
 	dualFramebuffershader.SetGamma(gamma);
+	dualFramebuffershader.SetBrightness(brightness);
+	dualFramebuffershader.SetContrast(contrast);
+	dualFramebuffershader.SetSaturation(saturation);
 
 	dualFramebufferHDR.BindTexture(0);
 	dualFramebufferHDR.BindTexture(1);
@@ -565,7 +571,7 @@ int main()
 
 		graphicUserInterface.EditLights(pointLights, NULL, NULL, pointLightCount, NULL, false, true, false);
 		graphicUserInterface.EditScene(&spinModifier);
-		graphicUserInterface.EditRenderSettings(&splitScreenIsOn, &splitScreenType, &gamma, &bloomThreshold);
+		graphicUserInterface.EditRenderSettings(&splitScreenIsOn, &splitScreenType, &gamma, &bloomThreshold, &brightness, &contrast, &saturation);
 		graphicUserInterface.DisplayInfo();
 		
 		graphicUserInterface.End();

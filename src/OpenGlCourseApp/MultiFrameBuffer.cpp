@@ -123,7 +123,7 @@ void MultiFrameBuffer::AttachDepthStencilRBO(unsigned short int indexRBO, GLint 
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO[indexRBO]);
 }
 
-// leaving out checks for the sake of speed
+// leaving out checks for the sake of speed, user beware.
 void MultiFrameBuffer::BindTexture(unsigned short int index)
 {
 	glActiveTexture(textureUnits[index]);
