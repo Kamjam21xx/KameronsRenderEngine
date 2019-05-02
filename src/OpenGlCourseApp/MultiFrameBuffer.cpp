@@ -171,16 +171,18 @@ MultiFrameBuffer::~MultiFrameBuffer()
 		{
 			glDeleteFramebuffers(1, &FBO[i]);
 		}
+		if (colorBuffers[i])
+		{
+			glDeleteTextures(1, &colorBuffers[i]);
+		}
+		if (colorBuffers[i])
+		{
+			glDeleteTextures(1, &colorBuffers[i]);
+		}
+
+		textureUnits[i] = NULL;
 	}
 
-	if (colorBuffers[0])
-	{
-		glDeleteTextures(1, &colorBuffers[0]);
-	}
-	if (colorBuffers[1])
-	{
-		glDeleteTextures(1, &colorBuffers[1]);
-	}
-	textureUnits[0] = NULL;
-	textureUnits[1] = NULL;
+
+
 }
