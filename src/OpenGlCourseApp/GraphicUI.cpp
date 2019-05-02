@@ -166,7 +166,7 @@ void GraphicUI::EditSceneSpin(GLfloat *spin)
 	if (enableSpin) 
 	{
 		ImGui::SameLine();
-		ImGui::SliderFloat("Spin", spin, -1.0f, 1.0f);
+		ImGui::SliderFloat("Spin", spin, -2.0f, 2.0f);
 	}
 	else 
 	{

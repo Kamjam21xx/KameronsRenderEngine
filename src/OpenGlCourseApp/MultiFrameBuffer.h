@@ -19,7 +19,12 @@ public:
 	//		  GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height);
 
 	void Init(GLuint textureUnitOne, GLenum textureUnitTwo,
-		GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height);
+			  GLenum internalFormat, GLenum format, GLenum type, GLenum filtering,
+			  GLint width, GLint height);
+
+	void InitPingPong(GLuint textureUnit,
+					  GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, 
+					  GLint width, GLint height);
 
 	void BindTexture(unsigned short int index);
 	void BindTexture(GLenum textureUnit, unsigned short int index);
@@ -31,17 +36,18 @@ public:
 
 	GLuint GetBufferTextureUnit(unsigned short int index) const;
 	GLuint GetTexColorBuffer(unsigned short int index) const;
-	GLuint GetFBO() const;
-	GLuint GetRBO() const;
+	GLuint GetFBO(unsigned short int index) const;
+	GLuint GetRBO(unsigned short int index) const;
 
 	~MultiFrameBuffer();
 
 private:
 
-	// GLuint FBO[4];
-	// GLuint RBO[4];
-	GLuint FBO;
-	GLuint RBO;
+	bool isInstantiated;
+	
+	GLuint FBO[4];
+	GLuint RBO[4];
+
 	GLuint colorBuffers[4];
 	GLuint textureUnits[4];
 
@@ -51,6 +57,13 @@ private:
 	{
 		// FrameBuffer copy constructor may not be called
 	}
+
+	void InitTexture(unsigned short int index, GLenum internalFormat, GLint width, GLint height, GLenum format, GLenum type, GLenum filtering);
+	void AttachTextureToFBO(unsigned short int indexFBO, unsigned short int indexColor, unsigned short int indexColorAttachment);
+	void AttachTextureToFBO(unsigned short int indexFBO, unsigned short int indexColor);
+	void AttachDepthStencilRBO(unsigned short int indexRBO, GLint width, GLint height);
+
+
 
 };
 

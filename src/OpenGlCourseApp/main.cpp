@@ -41,22 +41,12 @@
 // linear interpolation == free lunch
 // possibly make a bokeh bloom blur shader that takes advantage of linear interpolation to keep it light
 
-//<>==========<> TEMP <>==========<>//
-//<>==========<> TEMP <>==========<>// HACKING IT IN
-//<>==========<> TEMP <>==========<>//
-
-unsigned int pingpongFBO[2];
-unsigned int pingpongBuffer[2];
-
-//<>==========<> TEMP <>==========<>//
-//<>==========<> TEMP <>==========<>//
-//<>==========<> TEMP <>==========<>//
-
 const float toRadians = 3.14159265 / 180.0;
 
 GL_Window mainWindow;
 FrameBuffer framebufferBlur;
 MultiFrameBuffer dualFramebufferHDR;
+MultiFrameBuffer blurBuffer;
 Camera camera;
 
 Scene mainScene;
@@ -218,7 +208,7 @@ void BloomBlurPass() // re-write to blur then downsize then blur etc and pack ev
 
 	framebufferBlurShader.UseShader();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[isHorizontal]);
+	glBindFramebuffer(GL_FRAMEBUFFER, blurBuffer.GetFBO(isHorizontal));
 	framebufferBlurShader.SetHorizontal(isHorizontal);
 	dualFramebufferHDR.BindTexture(1);
 
@@ -231,11 +221,10 @@ void BloomBlurPass() // re-write to blur then downsize then blur etc and pack ev
 	glViewport(0, 0, 1920, 1080);
 	for (unsigned short int i = 0; i < iterations; ++i)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[isHorizontal]);
+		glBindFramebuffer(GL_FRAMEBUFFER, blurBuffer.GetFBO(isHorizontal));
 		framebufferBlurShader.SetHorizontal(isHorizontal);
 
-		glActiveTexture(GL_TEXTURE17);
-		glBindTexture(GL_TEXTURE_2D, pingpongBuffer[!isHorizontal]);
+		blurBuffer.BindTexture(!isHorizontal);
 		
 		glBindVertexArray(screenQuadVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -260,7 +249,6 @@ void RenderToQuadApplyBloom()
 
 	dualFramebuffershader.UseShader();
 	dualFramebuffershader.SetGamma(gamma);
-
 
 	dualFramebufferHDR.BindTexture(0);
 	dualFramebufferHDR.BindTexture(1);
@@ -318,7 +306,7 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 				unsigned short int* pointLightCount, unsigned short int* spotLightCount,
 				DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights) 
 {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dualFramebufferHDR.GetFBO());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dualFramebufferHDR.GetFBO(0));
 	
 	glViewport(0, 0, 3840, 2160); // maybe make it a lower upscaled resolution. idk.
 	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
@@ -370,7 +358,7 @@ void CreateLights(PointLight &pointLightsR,
 		0.01f, 100.0f,
 		0.7f, 0.7f, 1.0f,
 		0.001f, 40.0f,
-		3.0f, 2.75f, 3.0f,
+		3.0f, 8.0f, 3.0f,
 		100.0f, 10.0f, -200.8f);
 	(*pointLightCount)++;
 	pointLights[0].SetLightRange(12.0f);
@@ -467,49 +455,10 @@ int main()
 
 
 	framebufferBlur.Init(GL_TEXTURE19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
-
 	dualFramebufferHDR.Init(GL_TEXTURE18, GL_TEXTURE19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
+	blurBuffer.InitPingPong(GL_TEXTURE17, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 1920, 1080);
 
-	//<>==========<> TEMP <>==========<>//
-	//<>==========<> TEMP <>==========<>// HACKING IT IN
-	//<>==========<> TEMP <>==========<>// rename and rework into a class.
-	// probs make a parent base class for all the different children/ sub classes----- 3 or 4 types.
-	// normal FBO
-	// multi render target FBO
-	// multi FBO FBO
-	// custom
-	// or...... just throw the multi FBO idea into a data structure instead of a class
 
-	glGenFramebuffers(2, pingpongFBO);
-	glGenTextures(2, pingpongBuffer);
-
-	for (unsigned int i = 0; i < 2; ++i)
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
-		glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
-
-		glTexImage2D(
-			GL_TEXTURE_2D, 0, GL_RGB16F,
-			1920, 1080,
-			0, GL_RGB, GL_FLOAT, NULL
-		);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0);
-	}
-
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-	glReadBuffer(GL_COLOR_ATTACHMENT0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	//<>==========<> TEMP <>==========<>//
-	//<>==========<> TEMP <>==========<>//
-	//<>==========<> TEMP <>==========<>//
 
 //<>=========================================================================================================<>
 // prep

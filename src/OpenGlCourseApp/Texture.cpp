@@ -158,7 +158,7 @@ bool Texture::LoadTextureData(const char *imageData)
 	return true;
 }
 
-bool Texture::MergeLoadTexture(GLenum glTextureUnit, const char *fileLocationTwo) // implement a seperate function with an offset, because it will be heavy
+bool Texture::MergeLoadTexture(GLenum glTextureUnit, const char *fileLocationTwo) // implement a seperate function with an offset, because it will be heavier
 {	
 	textureUnit = glTextureUnit;
 
