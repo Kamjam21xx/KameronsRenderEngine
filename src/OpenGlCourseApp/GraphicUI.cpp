@@ -256,9 +256,12 @@ void GraphicUI::EditBrightnessContrastSaturation(GLfloat *brightness, GLfloat *c
 
 	if (enableEditBCT)
 	{
-		ImGui::SliderFloat("Brightness", brightness, -1.0f, 1.0f);
-		ImGui::SliderFloat("Contrast", contrast, 1.0f, 3.0f);
-		ImGui::SliderFloat("Saturation", saturation, 0.0, 2.0f);
+		ImGui::SliderFloat("Brightness", brightness, -0.2f, 0.2f);
+		ImGui::SliderFloat("Contrast", contrast, 1.8f, 2.2f);
+		ImGui::SliderFloat("Saturation", saturation, 0.0, 1.0f);
+
+		//(*contrast) = Contrast + 1.5f;
+		//(*saturation) = Saturation * 2.0f;
 	}
 }
 void GraphicUI::EditVerticalSync()

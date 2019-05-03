@@ -80,6 +80,10 @@ uniform int splitScreenType;
 uniform float gammaLevel;
 uniform float bloomThreshold;
 
+uniform float brightness;
+uniform float contrast;
+uniform float saturation;
+
 // textures
 layout (binding = 1) uniform sampler2D theTextureDiffuse;
 layout (binding = 5) uniform sampler2D theTextureNormal;
@@ -107,7 +111,6 @@ vec4 CalcLightByDirection(Light light, vec3 direction, float shadowFactor)
 	
 	float diffuseFactor = max(dot(normalize(Normal), normalize(direction)), 0.0f);
 	vec4 diffuseColour = vec4(light.colour * light.diffuseIntensity * diffuseFactor, 1.0f);
-	
 	
 	vec4 specularColour = vec4(0, 0, 0, 0);
 	
@@ -336,10 +339,36 @@ vec4 ApplyGammaToneMapping(vec3 hdrColor)
 
 	return vec4(mapped, 1.0f);
 }
+mat4 CalcMatriceBCS()
+{
+	vec3 luminance = vec3(0.3086f, 0.6094f, 0.0820f);
+	float iS = 1.0f - saturation;
+	float T = (brightness * contrast) + (1.0f - contrast / 2);
+
+	vec3 r = vec3(luminance.r * iS);
+	vec3 g = vec3(luminance.g * iS);
+	vec3 b = vec3(luminance.b * iS);
+
+	r.r += saturation;
+	g.g += saturation;
+	b.b += saturation;
+
+	float BCS30 = T * r.x + T * g.x + T * b.x;
+	float BCS31 = T * r.y + T * g.y + T * b.y;
+	float BCS32 = T * r.z + T * g.z + T * b.z;
+
+	float c = contrast;
+	mat4 BCS = mat4(	c * r.x,		c * r.y,		c * r.z,		0,
+						c * g.x,		c * g.y,		c * g.z,		0,
+						c * b.x,		c * b.y,		c * b.z,		0,
+						BCS30,			 BCS31,			BCS32,			1);
+
+	return BCS;
+}
+
 
 void main()
 {
-
 	// Parallax_occlusion_mapping
 	vec3 TangentViewPos = tTBN * eyePosition;
 	vec3 TangentFragPos = tTBN * FragPos;
@@ -372,8 +401,7 @@ void main()
 	// Channel_mixing + gamma + tonemapping + highlights
 	colour = shadowFactor * diffuse * reflection;
 	colour = ApplyGammaToneMapping(colour.xyz);
-
-
+	colour = CalcMatriceBCS() * colour; // rework the function a bit to make it faster
 	highlights = GetHighlights(colour);
 	//highlights.rgb = Normal.rgb;
 

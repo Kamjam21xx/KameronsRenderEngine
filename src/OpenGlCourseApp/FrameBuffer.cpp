@@ -2,6 +2,8 @@
 
 // add shader attachments to framebuffer class, for ease of use. aka... "blurBuffer.UseShader()" 
 // atleast if it still makes sense down the road. 
+// simplify and merge with MultiFrameBuffer via inheritance
+
 
 FrameBuffer::FrameBuffer()
 {
@@ -105,7 +107,7 @@ FrameBuffer::~FrameBuffer()
 {	
 	if (RBO) 
 	{
-		glDeleteRenderbuffers(1, &RBO);
+		glDeleteTextures(1, &texColorBuffer);
 	}
 	if (FBO) 
 	{

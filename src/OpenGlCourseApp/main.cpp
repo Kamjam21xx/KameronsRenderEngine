@@ -97,7 +97,9 @@ GLuint splitScreenType = 0;
 GLfloat gamma = 1.0f;
 GLfloat bloomThreshold = 1.0f;
 unsigned short int numOfBloomPasses = 5;
-GLfloat brightness, contrast, saturation;
+GLfloat brightness = 0.0f;
+GLfloat contrast = 2.0f;
+GLfloat saturation = 0.5f;
 
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
@@ -105,6 +107,18 @@ unsigned short int spotLightCount = 0;
 unsigned short int pointLightCount = 0;
 
 unsigned int screenQuadVAO, screenQuadVBO;
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void CreateShaders() 
@@ -252,9 +266,6 @@ void RenderToQuadApplyBloom()
 
 	dualFramebuffershader.UseShader();
 	dualFramebuffershader.SetGamma(gamma);
-	dualFramebuffershader.SetBrightness(brightness);
-	dualFramebuffershader.SetContrast(contrast);
-	dualFramebuffershader.SetSaturation(saturation);
 
 	dualFramebufferHDR.BindTexture(0);
 	dualFramebufferHDR.BindTexture(1);
@@ -292,6 +303,9 @@ void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4
 	shaderList[i].SetSplitScreenType(splitScreenType);
 	shaderList[i].SetGamma(gamma);
 	shaderList[i].SetBloomThreshold(bloomThreshold);
+	shaderList[i].SetBrightness(brightness);
+	shaderList[i].SetContrast(contrast);
+	shaderList[i].SetSaturation(saturation);
 
 
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
@@ -408,6 +422,8 @@ GLfloat DeltaTime()
 
 	return deltaTime;
 }
+
+
 
 
 
@@ -595,6 +611,12 @@ int main()
 
 	return 0;
 }
+
+
+
+
+
+
 
 /*
 

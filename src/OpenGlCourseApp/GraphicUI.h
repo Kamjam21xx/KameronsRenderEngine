@@ -53,7 +53,7 @@ private:
 	bool enableSpin, enableVerticalSync, enableEditFiltering, enableGammaEdit, enableBloomEdit, enableEditBCT;
 
 	GLint filteringLevel;
-	GLfloat stateSaveSpin;
+	GLfloat stateSaveSpin, Contrast, Saturation;
 
 	// possible take addresses per function call
 	// OR store addresses for v-table lookups

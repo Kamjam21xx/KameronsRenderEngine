@@ -32,7 +32,8 @@ private:
 	GLuint FBO, RBO, texColorBuffer, bufferTextureUnit;
 	GLint bufferWidth, bufferHeight;
 
-	FrameBuffer(FrameBuffer *framebuffer) {
+	FrameBuffer(FrameBuffer *framebuffer) 
+	{
 		// FrameBuffer copy constructor may not be called
 	}
 
