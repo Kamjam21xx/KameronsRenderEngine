@@ -35,13 +35,15 @@ public:
 	void EditScene(GLfloat *spin);
 	void EditSceneSpin(GLfloat *spin);
 
-	void EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation);
+	void EditRenderSettings(bool *forwardRender, GLfloat *heightPOM, GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation);
+	void EditRenderMethod(bool *forwardRender);
 	void EditFiltering();
 	void EditGamma(GLfloat *gamma);
 	void EditBloom(GLfloat *bloomThreshold);
 	void EditBrightnessContrastSaturation(GLfloat *brightness, GLfloat *contrast, GLfloat *saturation);
 	void EditVerticalSync();
 	void EditSplitScreen(GLboolean *splitScreenIsOn, GLuint *splitScreenType);
+	void EditPOM(GLfloat *heightPOM);
 
 
 	~GraphicUI();
@@ -50,7 +52,7 @@ private:
 	
 	GLFWwindow *window;
 
-	bool enableSpin, enableVerticalSync, enableEditFiltering, enableGammaEdit, enableBloomEdit, enableEditBCT;
+	bool enableSpin, enableVerticalSync, enableEditFiltering, enableGammaEdit, enableBloomEdit, enableEditBCT, enableEditPOM;
 
 	GLint filteringLevel;
 	GLfloat stateSaveSpin, Contrast, Saturation;

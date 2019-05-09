@@ -209,10 +209,13 @@ void Shader::CompileProgram()
 
 	uniformTextureScreenSpace = glGetUniformLocation(shaderID, "screenSpaceTexture");
 	uniformTextureScreenSpaceTwo = glGetUniformLocation(shaderID, "screenSpaceTextureTwo");
+	uniformTextureScreenSpaceThree = glGetUniformLocation(shaderID, "screenSpaceTextureThree");
 
 	uniformBrightness = glGetUniformLocation(shaderID, "brightness");
 	uniformContrast = glGetUniformLocation(shaderID, "contrast");
 	uniformSaturation = glGetUniformLocation(shaderID, "saturation");
+
+	uniformHeightPOM = glGetUniformLocation(shaderID, "heightPOM");
 }
 
 GLuint Shader::GetDiffuseIntensityLocation() const
@@ -283,6 +286,10 @@ GLuint Shader::GetTextureScreenSpaceTwoLocation() const
 {
 	return uniformTextureScreenSpaceTwo;
 }
+GLuint Shader::GetTextureScreenSpaceThreeLocation() const
+{
+	return uniformTextureScreenSpaceThree;
+}
 GLuint Shader::GetGammaLocation() const
 {
 	return uniformGamma;
@@ -306,6 +313,10 @@ GLuint Shader::GetContrastLocation() const
 GLuint Shader::GetSaturationLocation() const
 {
 	return uniformSaturation;
+}
+GLuint Shader::GetHeightPOMLocation() const
+{
+	return uniformHeightPOM;
 }
 
 void Shader::SetDirectionalLight(DirectionalLight * dLight) 
@@ -412,6 +423,10 @@ void Shader::SetTextureScreenSpaceTwo(GLuint textureUnit)
 {
 	glUniform1i(uniformTextureScreenSpaceTwo, textureUnit);
 }
+void Shader::SetTextureScreenSpaceThree(GLuint textureUnit)
+{
+	glUniform1i(uniformTextureScreenSpaceThree, textureUnit);
+}
 void Shader::SetGamma(GLfloat gammaLevel)
 {
 	glUniform1f(uniformGamma, gammaLevel);
@@ -435,6 +450,10 @@ void Shader::SetContrast(GLfloat contrast)
 void Shader::SetSaturation(GLfloat saturation)
 {
 	glUniform1f(uniformSaturation, saturation);
+}
+void Shader::SetHeightPOM(GLfloat height)
+{
+	glUniform1f(uniformHeightPOM, height);
 }
 
 void Shader::UseShader() 

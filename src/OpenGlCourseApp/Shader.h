@@ -45,12 +45,14 @@ public:
 	GLuint GetSplitScreenTypeLocation() const ;
 	GLuint GetTextureScreenSpaceLocation() const ;
 	GLuint GetTextureScreenSpaceTwoLocation() const;
+	GLuint GetTextureScreenSpaceThreeLocation() const;
 	GLuint GetGammaLocation() const ;
 	GLuint GetBloomThresholdLocation() const ;
 	GLuint GetHorizontalLocation() const ;
 	GLuint GetBrightnessLocation() const;
 	GLuint GetContrastLocation() const;
 	GLuint GetSaturationLocation() const;
+	GLuint GetHeightPOMLocation() const;
 
 	void UseShader();
 	void ClearShader();
@@ -71,12 +73,14 @@ public:
 	void SetSplitScreenType(GLuint splitScreenType);
 	void SetTextureScreenSpace(GLuint textureUnit);
 	void SetTextureScreenSpaceTwo(GLuint textureUnit);
+	void SetTextureScreenSpaceThree(GLuint textureUnit);
 	void SetGamma(GLfloat gammaLevel);
 	void SetBloomThreshold(GLfloat bloomThreshold);
 	void SetHorizontal(GLboolean isHorizontal);
 	void SetBrightness(GLfloat brightness);
 	void SetContrast(GLfloat contrast);
 	void SetSaturation(GLfloat saturation);
+	void SetHeightPOM(GLfloat height);
 
 
 	~Shader();
@@ -93,9 +97,10 @@ private:
 		   uniformTextureSkyBox,
 		   uniformDirectionalLightTransform, uniformDirectionalShadowMap,
 		   uniformOmniLightPos, uniformFarPlane, uniformSplitScreenIsOn, uniformSplitScreenType,
-		   uniformTextureScreenSpace, uniformTextureScreenSpaceTwo,
+		   uniformTextureScreenSpace, uniformTextureScreenSpaceTwo, uniformTextureScreenSpaceThree,
 		   uniformGamma, uniformBloomThreshold, uniformHorizontal,
-		   uniformBrightness, uniformContrast, uniformSaturation;
+		   uniformBrightness, uniformContrast, uniformSaturation,
+		   uniformHeightPOM;
 
 	GLuint uniformLightMatrices[6];
 

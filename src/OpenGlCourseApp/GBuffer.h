@@ -9,35 +9,40 @@ class GBuffer
 public:
 	GBuffer();
 
-	void Init(GLenum PositionTU, GLenum NormalTU, GLenum ColorSpecularTU, GLint width, GLint height);
-	void Init(GLenum PositionTU, GLenum NormalTU, GLenum ColorSpecularTU, GLint width, GLint height, bool useRenderBuffer);
+	void Init(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecularTU, GLenum depthStencilTU, GLint width, GLint height);
 
 	void BindAll();
-	void BindAll(GLenum PositionTU, GLenum NormalTU, GLenum ColorSpecularTU);
-	void BindAndSetAll(GLenum PositionTU, GLenum NormalTU, GLenum ColorSpecularTU);
-	void SetAll(GLenum PositionTU, GLenum NormalTU, GLenum ColorSpecularTU);
+	void BindAll(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecularTU, GLenum DepthStencilTU);
+	void BindAndSetAll(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecularTU, GLenum DepthStencilTU);
+	void SetAll(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecularTU, GLenum DepthStencilTU);
 
 	void BindTexturePos();
 	void BindTexturePos(GLenum textureUnit);
 	void BindAndSetTexturePos(GLenum textureUnit);
-	void BindTextureNorm();
-	void BindTextureNorm(GLenum textureUnit);
-	void BindAndSetTextureNorm(GLenum textureUnit);
+	void BindTextureNormHeight();
+	void BindTextureNormHeight(GLenum textureUnit);
+	void BindAndSetTextureNormHeight(GLenum textureUnit);
 	void BindTextureColSpec();
 	void BindTextureColSpec(GLenum textureUnit);
 	void BindAndSetTextureColSpec(GLenum textureUnit);
+	void BindTextureDepthStencil();
+	void BindTextureDepthStencil(GLenum textureUnit);
+	void BindAndSetTextureDepthStencil(GLenum textureUnit);
 
 	void SetTextureUnitPos(GLenum textureUnit);
-	void SetTextureUnitNorm(GLenum textureUnit);
+	void SetTextureUnitNormHeight(GLenum textureUnit);
 	void SetTextureUnitColSpec(GLenum textureUnit);
+	void SetTextureUnitDepthStencil(GLenum textureUnit);
 
 	GLuint GetTextureUnitPos() const ;
-	GLuint GetTextureUnitNorm() const ;
+	GLuint GetTextureUnitNormHeight() const ;
 	GLuint GetTextureUnitColSpec() const ;
+	GLuint GetTextureUnitDepthStencil() const;
 
 	GLuint GetPosBuffer() const ;
-	GLuint GetNormBuffer() const ;
-	GLuint GetColSpec() const ;
+	GLuint GetNormHeightBuffer() const ;
+	GLuint GetColSpecBuffer() const ;
+	GLuint GetDepthStencilBuffer() const;
 
 	GLuint GetFBO() const ;
 	GLuint GetRBO() const ;
@@ -47,12 +52,12 @@ public:
 private:
 
 	GLuint FBO, RBO;
-	GLuint Position, Normal, ColorSpecular;
-	GLuint TextureUnitPosition, TextureUnitNormal, TextureUnitColorSpecular;
+	GLuint Position, NormalHeight, ColorSpecular, DepthStencil;
+	GLuint TextureUnitPosition, TextureUnitNormalHeight, TextureUnitColorSpecular, TextureUnitDepthStencil;
 	GLint bufferWidth, bufferHeight;
-	bool useRBO;
 
-	void AttachRBO(GLint width, GLint height);
+	void AttachDepthStencilRBO();
+	void AttachDepthStencilTex();
 	void SetTextureParameters();
 
 };

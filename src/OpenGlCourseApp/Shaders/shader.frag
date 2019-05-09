@@ -60,6 +60,7 @@ struct Material
 };
 
 
+
 // uniforms
 uniform int pointLightCount;
 uniform int spotLightCount;
@@ -83,6 +84,8 @@ uniform float bloomThreshold;
 uniform float brightness;
 uniform float contrast;
 uniform float saturation;
+
+uniform float heightPOM;
 
 // textures
 layout (binding = 1) uniform sampler2D theTextureDiffuse;
@@ -370,9 +373,9 @@ mat4 CalcMatriceBCS()
 void main()
 {
 	// Parallax_occlusion_mapping
+	heightScale = 0.0175f * heightPOM;
 	vec3 TangentViewPos = tTBN * eyePosition;
 	vec3 TangentFragPos = tTBN * FragPos;
-	heightScale = 0.0175f;
 	vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 	vec2 TexCoord = ParallaxMapping(TexCoord, viewDir);
 
@@ -416,7 +419,7 @@ void main()
 		}
 		else if(splitScreenType == 1)
 		{
-			colour.rgb = vec3(specular);
+			colour.rgb *= (texture(theTextureNormal, TexCoord).a);
 		}
 		else if(splitScreenType == 2)
 		{
@@ -432,7 +435,7 @@ void main()
 		}
 		else if(splitScreenType == 5)
 		{
-			colour.rgb = NormalTexture.rgb;
+			colour.rgb = FragPos.rgb;
 		}
 		else if(splitScreenType == 6)
 		{
@@ -444,4 +447,5 @@ void main()
 		}
 		colour = ApplyGammaToneMapping(colour.xyz);
 	}
+
 }

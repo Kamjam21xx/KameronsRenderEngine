@@ -276,11 +276,15 @@
     <None Include="Shaders\dualFramebuffershader.vert" />
     <None Include="Shaders\framebufferBlur.frag" />
     <None Include="Shaders\framebufferBlur.vert" />
+    <None Include="Shaders\mainDeferredShader.frag" />
+    <None Include="Shaders\mainDeferredShader.vert" />
     <None Include="Shaders\omni_shadow_map.frag" />
     <None Include="Shaders\omni_shadow_map.geom" />
     <None Include="Shaders\omni_shadow_map.vert" />
     <None Include="Shaders\outline.frag" />
     <None Include="Shaders\outline.vert" />
+    <None Include="Shaders\quadShaderDeferred.frag" />
+    <None Include="Shaders\quadShaderDeferred.vert" />
     <None Include="Shaders\shader.frag" />
     <None Include="Shaders\shader.vert" />
     <None Include="Shaders\skybox.frag" />

@@ -175,18 +175,27 @@ void GraphicUI::EditSceneSpin(GLfloat *spin)
 
 }
 
-void GraphicUI::EditRenderSettings(GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation)
+void GraphicUI::EditRenderSettings(bool *forwardRender, GLfloat *heightPOM, GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation)
 {
 	ImGui::Begin("Render Settings");
 
+	EditRenderMethod(forwardRender);
 	EditVerticalSync();
 	EditSplitScreen(splitScreenIsOn, splitScreenType);
 	EditGamma(gamma);
 	EditBloom(bloomThreshold);
 	EditBrightnessContrastSaturation(brightness, contrast, saturation);
+	EditPOM(heightPOM);
 	// EditFiltering(); // does not work
 
 	ImGui::End();
+}
+void GraphicUI::EditRenderMethod(bool *forwardRender)
+{
+	if (ImGui::Button("Render Method"))
+	{
+		*forwardRender = !*forwardRender;
+	}
 }
 void GraphicUI::EditFiltering() 
 {
@@ -326,6 +335,18 @@ void GraphicUI::EditSplitScreen(GLboolean *splitScreenIsOn, GLuint *splitScreenT
 		}
 
 		ImGui::SliderInt("View", (int*)splitScreenType, 0, 7);
+	}
+}
+void GraphicUI::EditPOM(GLfloat *heightPOM)
+{
+	if (ImGui::Button("Edit POM Height"))
+	{
+		enableEditPOM = !enableEditPOM;
+	}
+
+	if (enableEditPOM)
+	{
+		ImGui::SliderFloat("Bloom Threshold", heightPOM, 0.001f, 5.0f);
 	}
 }
 

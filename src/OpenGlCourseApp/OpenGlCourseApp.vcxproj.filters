@@ -274,6 +274,18 @@
     <None Include="Shaders\framebufferBlur.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="Shaders\mainDeferredShader.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\mainDeferredShader.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\quadShaderDeferred.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\quadShaderDeferred.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Models\SimpleModel\BASE_COLOR.png">
