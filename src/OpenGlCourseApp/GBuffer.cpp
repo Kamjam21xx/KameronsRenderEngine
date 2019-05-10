@@ -1,6 +1,6 @@
 #include "GBuffer.h"
 
-
+// be careful to use the correct features of the class depending on if you use an RBO or not, etc.
 
 GBuffer::GBuffer()
 {
@@ -41,19 +41,18 @@ void GBuffer::Init(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecula
 	if (TextureUnitDepthStencil == NULL)
 	{
 		AttachDepthStencilRBO();
-		GLenum attachments[3]{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-
-		glDrawBuffers(3, attachments);
-		glReadBuffer(GL_NONE);
 	}
 	else
 	{
 		AttachDepthStencilTex();
-		GLenum attachments[4]{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_DEPTH_STENCIL_ATTACHMENT };
-
-		glDrawBuffers(4, attachments);
-		glReadBuffer(GL_NONE);
 	}
+
+
+	GLenum attachments[3]{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+	glDrawBuffers(3, attachments);
+
+
+	glReadBuffer(GL_NONE);
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -247,12 +246,12 @@ void GBuffer::AttachDepthStencilTex()
 {
 	glGenTextures(1, &DepthStencil);
 	glBindTexture(GL_TEXTURE_2D, DepthStencil);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, bufferWidth, bufferHeight, 0, GL_DEPTH24_STENCIL8, GL_UNSIGNED_INT_24_8, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, bufferWidth, bufferHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
 	SetTextureParameters();
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DepthStencil, 0);
 }
 
-void GBuffer::SetTextureParameters()
+void GBuffer::SetTextureParameters() const
 {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -273,6 +272,10 @@ GBuffer::~GBuffer()
 	if (ColorSpecular)
 	{
 		glDeleteTextures(1, &ColorSpecular);
+	}
+	if (DepthStencil)
+	{
+		glDeleteTextures(1, &DepthStencil);
 	}
 	if (RBO)
 	{

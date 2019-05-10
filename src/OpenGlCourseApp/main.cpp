@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 //										STB image loader
 #define STB_IMAGE_IMPLEMENTATION
+// #define KAM_MATH_LIBRARY
 //										 standard template library
 #include <cmath>
 #include <stdio.h>
@@ -24,6 +25,7 @@
 #include <imgui_impl_opengl3.h>
 //
 #include "CommonValues.h"
+//#include "KML.h"
 //										 project 
 #include "Mesh.h"
 #include "Shader.h"
@@ -74,7 +76,9 @@ GLuint uniformProjection = 0,
 	   uniformSpecularIntensity = 0,
 	   uniformSpecularPower = 0,
 	   uniformOmniLightPos = 0,
-	   uniformFarPlane = 0;
+	   uniformFarPlane = 0,
+	   uniformInverseProjection = 0,
+	   uniformInverseView = 0;
 
 unsigned short int currentShader = 0;
 
@@ -133,7 +137,18 @@ int TEST_VALUE_IMGUI = 0;
 
 
 
+glm::mat4 calculateInverseProjection(glm::mat4 projectionMatrix)
+{
+	glm::mat4 inverseProjection = glm::mat4(0.0f);
 
+	inverseProjection[0][0] = 1.0f / projectionMatrix[0][0];
+	inverseProjection[1][1] = 1.0f / projectionMatrix[1][1];
+	inverseProjection[2][3] = 1.0f / projectionMatrix[3][2];
+	inverseProjection[3][2] = 1.0f / projectionMatrix[2][2];
+	inverseProjection[3][3] = projectionMatrix[2][2] / (projectionMatrix[3][2] * projectionMatrix[2][3]);
+
+	return inverseProjection;
+}
 void CreateShaders() 
 {
 	Shader *shader1 = new Shader();
@@ -289,7 +304,7 @@ void RenderToQuadApplyBloom()
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glEnable(GL_DEPTH_TEST);
 }
-void RenderToQuadDeferred()
+void RenderToQuadDeferred(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); 
 
@@ -299,6 +314,17 @@ void RenderToQuadDeferred()
 	glDisable(GL_DEPTH_TEST);
 
 	quadShaderDeferred.UseShader();
+
+	uniformInverseProjection = gBufferShader.GetInverseProjectionLocation();
+	uniformInverseView = gBufferShader.GetInverseViewLocation();
+
+	// glm::mat4 inverseProjection = calculateInverseProjection(projectionMatrix);
+	glm::mat4 inverseProjection = glm::inverse(projectionMatrix);
+	glm::mat4 inverseView = glm::inverse(viewMatrix);
+	glUniformMatrix4fv(uniformInverseProjection, 1, GL_FALSE, glm::value_ptr(inverseProjection));
+	glUniformMatrix4fv(uniformInverseView, 1, GL_FALSE, glm::value_ptr(inverseView));
+
+	quadShaderDeferred.SetTextureDepth(23);
 	quadShaderDeferred.SetTextureScreenSpace(TEST_VALUE_IMGUI);
 	quadShaderDeferred.SetTextureScreenSpaceTwo(21);
 	quadShaderDeferred.SetTextureScreenSpaceThree(20);
@@ -413,6 +439,7 @@ void GBufferSetup(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 	uniformEyePosition = gBufferShader.GetEyePositionLocation();
 	uniformEyeDirection = gBufferShader.GetEyeDirectionLocation();
 
+	
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
@@ -475,7 +502,7 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 	// combine bloom with color and do post processing
 	glClear(GL_STENCIL_BUFFER_BIT);
 
-	RenderToQuadDeferred();
+	RenderToQuadDeferred(projectionMatrix, viewMatrix);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -490,43 +517,7 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 
 
 
-	/*
-	
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dualFramebufferHDR.GetFBO(0));
 
-	glViewport(0, 0, 3840, 2160); // maybe make it a lower upscaled resolution. idk.
-	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glStencilMask(0x00);
-
-	MainRenderSetup(currentShader, projectionMatrix, viewMatrix, pointLightCount, spotLightCount, mainLight, pointLights, spotLights);
-
-	glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	glStencilMask(0xFF);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_STENCIL_TEST);
-
-	mainScene.GetSkyBoxPtr()->bindCubeMapTexture(); // TEXTURE UNIT 6
-
-	RenderScene();
-
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilMask(0x00);
-	glDisable(GL_DEPTH_TEST);
-
-	mainScene.GetSkyBoxPtr()->DrawSkyBox(viewMatrix, projectionMatrix, gamma, bloomThreshold);
-
-	glStencilMask(0xFF);
-	glEnable(GL_DEPTH_TEST);
-	glClear(GL_STENCIL_BUFFER_BIT);
-	glDisable(GL_STENCIL_TEST);
-
-	// add shader swapping in ImGui 
-	BloomBlurPass();
-
-	RenderToQuadApplyBloom();
-	
-	*/
 }
 void CreateLights(PointLight &pointLightsR, 
 				  SpotLight &spotLightsR, 
@@ -646,7 +637,7 @@ int main()
 	dualFramebufferHDR.Init(GL_TEXTURE18, GL_TEXTURE19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
 	blurBuffer.InitPingPong(GL_TEXTURE17, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 1920, 1080);
 
-	gBuffer.Init(GL_TEXTURE20, GL_TEXTURE21, GL_TEXTURE22, NULL, 3840, 2160);
+	gBuffer.Init(GL_TEXTURE20, GL_TEXTURE21, GL_TEXTURE22, GL_TEXTURE23, 3840, 2160);
 
 //<>=========================================================================================================<>
 // prep

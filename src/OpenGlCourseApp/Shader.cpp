@@ -114,8 +114,10 @@ void Shader::CompileProgram()
 	}
 
 	uniformProjection = glGetUniformLocation(shaderID, "projection");
+	uniformInverseProjection = glGetUniformLocation(shaderID, "inverseProjection");
 	uniformModel = glGetUniformLocation(shaderID, "model");
 	uniformView = glGetUniformLocation(shaderID, "view");
+	uniformInverseView = glGetUniformLocation(shaderID, "inverseView");
 
 	uniformDirectionalLight.uniformColor = glGetUniformLocation(shaderID, "directionalLight.base.colour");
 	uniformDirectionalLight.uniformAmbientIntensity = glGetUniformLocation(shaderID, "directionalLight.base.ambientIntensity");
@@ -210,6 +212,7 @@ void Shader::CompileProgram()
 	uniformTextureScreenSpace = glGetUniformLocation(shaderID, "screenSpaceTexture");
 	uniformTextureScreenSpaceTwo = glGetUniformLocation(shaderID, "screenSpaceTextureTwo");
 	uniformTextureScreenSpaceThree = glGetUniformLocation(shaderID, "screenSpaceTextureThree");
+	uniformTextureDepth = glGetUniformLocation(shaderID, "theTextureDepth");
 
 	uniformBrightness = glGetUniformLocation(shaderID, "brightness");
 	uniformContrast = glGetUniformLocation(shaderID, "contrast");
@@ -230,6 +233,10 @@ GLuint Shader::GetProjectionLocation() const
 {	
 	return uniformProjection;									
 }
+GLuint Shader::GetInverseProjectionLocation() const
+{
+	return uniformInverseProjection;
+}
 GLuint Shader::GetModelLocation() const
 {	
 	return uniformModel;										
@@ -238,6 +245,10 @@ GLuint Shader::GetViewLocation() const
 {	
 	return uniformView;											
 }		
+GLuint Shader::GetInverseViewLocation() const
+{
+	return uniformInverseView;
+}
 GLuint Shader::GetAmbientColorLocation() const
 {	
 	return uniformDirectionalLight.uniformColor;				
@@ -289,6 +300,10 @@ GLuint Shader::GetTextureScreenSpaceTwoLocation() const
 GLuint Shader::GetTextureScreenSpaceThreeLocation() const
 {
 	return uniformTextureScreenSpaceThree;
+}
+GLuint Shader::GetTextureDepth() const
+{
+	return uniformTextureDepth;
 }
 GLuint Shader::GetGammaLocation() const
 {
@@ -426,6 +441,10 @@ void Shader::SetTextureScreenSpaceTwo(GLuint textureUnit)
 void Shader::SetTextureScreenSpaceThree(GLuint textureUnit)
 {
 	glUniform1i(uniformTextureScreenSpaceThree, textureUnit);
+}
+void Shader::SetTextureDepth(GLuint textureUnit)
+{
+	glUniform1i(uniformTextureDepth, textureUnit);
 }
 void Shader::SetGamma(GLfloat gammaLevel)
 {

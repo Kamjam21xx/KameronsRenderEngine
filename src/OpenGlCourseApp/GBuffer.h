@@ -58,7 +58,7 @@ private:
 
 	void AttachDepthStencilRBO();
 	void AttachDepthStencilTex();
-	void SetTextureParameters();
+	void SetTextureParameters() const ;
 
 };
 

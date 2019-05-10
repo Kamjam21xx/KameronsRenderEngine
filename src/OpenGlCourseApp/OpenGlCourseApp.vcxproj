@@ -235,6 +235,7 @@
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="CommonValues.h" />
     <ClInclude Include="GBuffer.h" />
+    <ClInclude Include="KML.h" />
     <ClInclude Include="MultiFrameBuffer.h" />
     <ClInclude Include="FrameBuffer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>

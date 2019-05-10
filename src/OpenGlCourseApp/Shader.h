@@ -29,8 +29,10 @@ public:
 	std::string ReadFile(const char* fileLocation);
 
 	GLuint GetProjectionLocation() const ;
+	GLuint GetInverseProjectionLocation() const ;
 	GLuint GetModelLocation() const ;
 	GLuint GetViewLocation() const ;
+	GLuint GetInverseViewLocation() const;
 	GLuint GetAmbientIntensityLocation() const ;
 	GLuint GetAmbientColorLocation() const ;
 	GLuint GetDiffuseIntensityLocation() const ;
@@ -46,6 +48,7 @@ public:
 	GLuint GetTextureScreenSpaceLocation() const ;
 	GLuint GetTextureScreenSpaceTwoLocation() const;
 	GLuint GetTextureScreenSpaceThreeLocation() const;
+	GLuint GetTextureDepth() const;
 	GLuint GetGammaLocation() const ;
 	GLuint GetBloomThresholdLocation() const ;
 	GLuint GetHorizontalLocation() const ;
@@ -74,6 +77,7 @@ public:
 	void SetTextureScreenSpace(GLuint textureUnit);
 	void SetTextureScreenSpaceTwo(GLuint textureUnit);
 	void SetTextureScreenSpaceThree(GLuint textureUnit);
+	void SetTextureDepth(GLuint textureUnit);
 	void SetGamma(GLfloat gammaLevel);
 	void SetBloomThreshold(GLfloat bloomThreshold);
 	void SetHorizontal(GLboolean isHorizontal);
@@ -90,7 +94,7 @@ private:
 	int pointLightCount;
 	int spotLightCount;
 	GLuint shaderID, 
-		   uniformProjection, uniformModel, uniformView, 
+		   uniformProjection, uniformInverseProjection, uniformModel, uniformView, uniformInverseView, 
 		   uniformEyePosition, uniformEyeDirection,
 		   uniformSpecularIntensity, uniformSpecularPower,
 		   uniformTextureDiffuse, uniformTextureSpecular, uniformTextureMetal, uniformTextureNormal, uniformTextureHeight,
@@ -98,6 +102,7 @@ private:
 		   uniformDirectionalLightTransform, uniformDirectionalShadowMap,
 		   uniformOmniLightPos, uniformFarPlane, uniformSplitScreenIsOn, uniformSplitScreenType,
 		   uniformTextureScreenSpace, uniformTextureScreenSpaceTwo, uniformTextureScreenSpaceThree,
+		   uniformTextureDepth,
 		   uniformGamma, uniformBloomThreshold, uniformHorizontal,
 		   uniformBrightness, uniformContrast, uniformSaturation,
 		   uniformHeightPOM;

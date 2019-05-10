@@ -5,10 +5,10 @@ in vec2 TexCoord;
 
 out vec4 Colour;
 
+layout (binding = 23) uniform sampler2D theTextureDepth;
 layout (binding = 22) uniform sampler2D screenSpaceTexture;
 layout (binding = 21) uniform sampler2D screenSpaceTextureTwo;
 layout (binding = 20) uniform sampler2D screenSpaceTextureThree; 
-
 
 // lights
 struct Light
@@ -43,6 +43,8 @@ uniform float saturation;
 uniform float gammaLevel;
 
 uniform vec3 eyePosition;
+uniform mat4 inverseProjection;
+uniform mat4 inverseView;
 
 vec3  Normal;
 vec3 FragPos;
@@ -128,6 +130,19 @@ vec4 CalcPointLights()
 	
 	return totalColour;
 }
+vec3 CalcFragPosFromDepth(float depth)
+{
+	float z = depth * 2.0f - 1.0f;
+
+	vec4 clipSpacePos = vec4(TexCoord * 2.0f - 1.0f, z, 1.0f);
+	vec4 viewSpacePos = inverseProjection * clipSpacePos;
+
+	viewSpacePos /= viewSpacePos.w;
+
+	vec4 worldSpacePos = inverseView * viewSpacePos;
+
+	return worldSpacePos.xyz;
+}
 
 void main()
 {
@@ -135,7 +150,10 @@ void main()
 	vec4 sampleTex3 = texture(screenSpaceTexture, TexCoord);
 
 
-	FragPos = texture(screenSpaceTextureThree, TexCoord).rgb;
+	// FragPos = texture(screenSpaceTextureThree, TexCoord).rgb;
+	
+	float depthSample = texture(theTextureDepth, TexCoord).r;
+	FragPos = CalcFragPosFromDepth(depthSample);
 
 	vec3  Albedo = sampleTex3.rgb;
 	float Specular = sampleTex3.a;
@@ -147,6 +165,22 @@ void main()
 	vec4 lighting = CalcPointLights();
 
 	Colour = vec4(Albedo, 1.0f) * CalcPointLights();
+
+		// depth works great
+		// 
+
+
+
+	//float depth = texture(theTextureDepth, TexCoord).r;
+	//Colour.rgb = CalcFragPosFromDepth(depth);
+
+	//Colour.rgb = vec3(1.0f - texture(theTextureDepth, TexCoord).r); // testing depth
 	Colour = CalcMatriceBCS() * Colour;
 	Colour = ApplyGammaToneMapping(Colour.rgb);
 }
+
+
+
+
+
+
