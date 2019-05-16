@@ -47,10 +47,8 @@ void GBuffer::Init(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecula
 		AttachDepthStencilTex();
 	}
 
-
 	GLenum attachments[3]{ GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 	glDrawBuffers(3, attachments);
-
 
 	glReadBuffer(GL_NONE);
 
@@ -64,130 +62,138 @@ void GBuffer::Init(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecula
 
 }
 
-void GBuffer::BindAll()
+void GBuffer::BindAll() 
 {
-	glActiveTexture(TextureUnitPosition);
+	glActiveTexture(GL_TEXTURE0 + TextureUnitPosition);
 	glBindTexture(GL_TEXTURE_2D, Position);
-	glActiveTexture(TextureUnitNormalHeight);
+
+	glActiveTexture(GL_TEXTURE0 + TextureUnitNormalHeight);
 	glBindTexture(GL_TEXTURE_2D, NormalHeight);
-	glActiveTexture(TextureUnitColorSpecular);
+
+	glActiveTexture(GL_TEXTURE0 + TextureUnitColorSpecular);
 	glBindTexture(GL_TEXTURE_2D, ColorSpecular);
-	glActiveTexture(TextureUnitDepthStencil);
+
+	glActiveTexture(GL_TEXTURE0 + TextureUnitDepthStencil);
 	glBindTexture(GL_TEXTURE_2D, DepthStencil);
 }
-void GBuffer::BindAll(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecularTU, GLenum DepthStencilTU)
+void GBuffer::BindAll(unsigned short int PositionTU, unsigned short int NormalHeightTU, unsigned short int ColorSpecularTU, unsigned short int DepthStencilTU)
 {
-	glActiveTexture(PositionTU);
+	glActiveTexture(GL_TEXTURE0 + PositionTU);
 	glBindTexture(GL_TEXTURE_2D, Position);
-	glActiveTexture(NormalHeightTU);
+
+	glActiveTexture(GL_TEXTURE0 + NormalHeightTU);
 	glBindTexture(GL_TEXTURE_2D, NormalHeight);
-	glActiveTexture(ColorSpecularTU);
+
+	glActiveTexture(GL_TEXTURE0 + ColorSpecularTU);
 	glBindTexture(GL_TEXTURE_2D, ColorSpecular);
-	glActiveTexture(DepthStencilTU);
+
+	glActiveTexture(GL_TEXTURE0 + DepthStencilTU);
 	glBindTexture(GL_TEXTURE_2D, DepthStencil);
 }
-void GBuffer::BindAndSetAll(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecularTU, GLenum DepthStencilTU)
+void GBuffer::BindAndSetAll(unsigned short int PositionTU, unsigned short int NormalHeightTU, unsigned short int ColorSpecularTU, unsigned short int DepthStencilTU)
 {
 	TextureUnitPosition = PositionTU;
 	TextureUnitNormalHeight = NormalHeightTU;
 	TextureUnitColorSpecular = ColorSpecularTU;
 	TextureUnitDepthStencil = DepthStencilTU;
 
-	glActiveTexture(PositionTU);
+	glActiveTexture(GL_TEXTURE0 + PositionTU);
 	glBindTexture(GL_TEXTURE_2D, Position);
-	glActiveTexture(NormalHeightTU);
+
+	glActiveTexture(GL_TEXTURE0 + NormalHeightTU);
 	glBindTexture(GL_TEXTURE_2D, NormalHeight);
-	glActiveTexture(ColorSpecularTU);
+
+	glActiveTexture(GL_TEXTURE0 + ColorSpecularTU);
 	glBindTexture(GL_TEXTURE_2D, ColorSpecular);
-	glActiveTexture(DepthStencilTU);
+
+	glActiveTexture(GL_TEXTURE0 + DepthStencilTU);
 	glBindTexture(GL_TEXTURE_2D, DepthStencil);
 }
-void GBuffer::SetAll(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecularTU, GLenum DepthStencilTU)
+void GBuffer::SetAll(unsigned short int PositionTU, unsigned short int NormalHeightTU, unsigned short int ColorSpecularTU, unsigned short int DepthStencilTU)
 {
 	TextureUnitPosition = PositionTU;
 	TextureUnitNormalHeight = NormalHeightTU;
 	TextureUnitColorSpecular = ColorSpecularTU;
 	TextureUnitDepthStencil = DepthStencilTU;
 }
-
 void GBuffer::BindTexturePos()
 {
-	glActiveTexture(TextureUnitPosition);
+	glActiveTexture(GL_TEXTURE0 + TextureUnitPosition);
 	glBindTexture(GL_TEXTURE_2D, Position);
 }
-void GBuffer::BindTexturePos(GLenum textureUnit)
+void GBuffer::BindTexturePos(const unsigned short int textureUnit)
 {
-	glActiveTexture(textureUnit);
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, Position);
 }
-void GBuffer::BindAndSetTexturePos(GLenum textureUnit)
+void GBuffer::BindAndSetTexturePos(const unsigned short int textureUnit)
 {
 	TextureUnitPosition = textureUnit;
-	glActiveTexture(textureUnit);
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, Position);
 }
 void GBuffer::BindTextureNormHeight()
 {
-	glActiveTexture(TextureUnitNormalHeight);
+	glActiveTexture(GL_TEXTURE0 + TextureUnitNormalHeight);
 	glBindTexture(GL_TEXTURE_2D, NormalHeight);
 }
-void GBuffer::BindTextureNormHeight(GLenum textureUnit)
-{	
-	glActiveTexture(textureUnit);
+void GBuffer::BindTextureNormHeight(const unsigned short int textureUnit)
+{
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, NormalHeight);
 }
-void GBuffer::BindAndSetTextureNormHeight(GLenum textureUnit)
+void GBuffer::BindAndSetTextureNormHeight(const unsigned short int textureUnit)
 {
 	TextureUnitNormalHeight = textureUnit;
-	glActiveTexture(textureUnit);
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, NormalHeight);
 }
 void GBuffer::BindTextureColSpec()
 {
-	glActiveTexture(TextureUnitColorSpecular);
+	glActiveTexture(GL_TEXTURE0 + TextureUnitColorSpecular);
 	glBindTexture(GL_TEXTURE_2D, ColorSpecular);
 }
-void GBuffer::BindTextureColSpec(GLenum textureUnit)
+void GBuffer::BindTextureColSpec(const unsigned short int textureUnit)
 {
-	glActiveTexture(textureUnit);
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, ColorSpecular);
 }
-void GBuffer::BindAndSetTextureColSpec(GLenum textureUnit)
+void GBuffer::BindAndSetTextureColSpec(const unsigned short int textureUnit)
 {
 	TextureUnitColorSpecular = textureUnit;
-	glActiveTexture(textureUnit);
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, ColorSpecular);
 }
 void GBuffer::BindTextureDepthStencil()
 {
-	glActiveTexture(TextureUnitDepthStencil);
+	glActiveTexture(GL_TEXTURE0 + TextureUnitDepthStencil);
 	glBindTexture(GL_TEXTURE_2D, DepthStencil);
 }
-void GBuffer::BindTextureDepthStencil(GLenum textureUnit)
+void GBuffer::BindTextureDepthStencil(const unsigned short int textureUnit)
 {
-	glActiveTexture(textureUnit);
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, DepthStencil);
 }
-void GBuffer::BindAndSetTextureDepthStencil(GLenum textureUnit)
+void GBuffer::BindAndSetTextureDepthStencil(const unsigned short int textureUnit)
 {
 	TextureUnitDepthStencil = textureUnit;
-	glActiveTexture(textureUnit);
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, DepthStencil);
 }
 
-void GBuffer::SetTextureUnitPos(GLenum textureUnit)
+void GBuffer::SetTextureUnitPos(const unsigned short int textureUnit)
 {
 	TextureUnitPosition = textureUnit;
 }
-void GBuffer::SetTextureUnitNormHeight(GLenum textureUnit)
+void GBuffer::SetTextureUnitNormHeight(const unsigned short int textureUnit)
 {
 	TextureUnitNormalHeight = textureUnit;
 }
-void GBuffer::SetTextureUnitColSpec(GLenum textureUnit)
+void GBuffer::SetTextureUnitColSpec(const unsigned short int textureUnit)
 {
 	TextureUnitColorSpecular = textureUnit;
 }
-void GBuffer::SetTextureUnitDepthStencil(GLenum textureUnit)
+void GBuffer::SetTextureUnitDepthStencil(const unsigned short int textureUnit)
 {
 	TextureUnitDepthStencil = textureUnit;
 }

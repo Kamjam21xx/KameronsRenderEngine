@@ -6,20 +6,20 @@ MultiFrameBuffer::MultiFrameBuffer()
 {
 	isInstantiated = false;
 }
-MultiFrameBuffer::MultiFrameBuffer(GLuint textureUnitOne, GLenum textureUnitTwo, GLint width, GLint height)
+MultiFrameBuffer::MultiFrameBuffer(unsigned short int textureUnitOne, unsigned short int textureUnitTwo, GLshort width, GLshort height)
 {
 	Init(textureUnitOne, textureUnitTwo, GL_RGB, GL_RGB, GL_FLOAT, GL_LINEAR, width, height);
 	isInstantiated = true;
 }
-MultiFrameBuffer::MultiFrameBuffer(GLuint textureUnitOne, GLenum textureUnitTwo, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height)
+MultiFrameBuffer::MultiFrameBuffer(unsigned short int textureUnitOne, unsigned short int textureUnitTwo, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLshort width, GLshort height)
 {
 	Init(textureUnitOne, textureUnitTwo, internalFormat, format, type, filtering, width, height);
 	isInstantiated = true;
 }
 
 
-void MultiFrameBuffer::Init(GLuint textureUnitOne, GLenum textureUnitTwo,
-	GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height)
+void MultiFrameBuffer::Init(unsigned short int textureUnitOne, unsigned short int textureUnitTwo,
+	GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLshort width, GLshort height)
 {
 	if (isInstantiated)
 	{
@@ -56,8 +56,8 @@ void MultiFrameBuffer::Init(GLuint textureUnitOne, GLenum textureUnitTwo,
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }
-void MultiFrameBuffer::InitPingPong(GLuint textureUnit,
-	GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height)
+void MultiFrameBuffer::InitPingPong(unsigned short int textureUnit,
+	GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLshort width, GLshort height)
 {
 	if (isInstantiated)
 	{
@@ -126,16 +126,42 @@ void MultiFrameBuffer::AttachDepthStencilRBO(unsigned short int indexRBO, GLint 
 // leaving out checks for the sake of speed, user beware.
 void MultiFrameBuffer::BindTexture(unsigned short int index)
 {
-	glActiveTexture(textureUnits[index]);
+	glActiveTexture(GL_TEXTURE0 + textureUnits[index]);
 	glBindTexture(GL_TEXTURE_2D, colorBuffers[index]);
 }
-void MultiFrameBuffer::BindAndSetTexture(GLenum textureUnit, unsigned short int index)
+void MultiFrameBuffer::BindTexture(unsigned short int textureUnit, unsigned short int index)
+{
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
+	glBindTexture(GL_TEXTURE_2D, colorBuffers[index]);
+}
+void MultiFrameBuffer::BindAndSetTexture(unsigned short int textureUnit, unsigned short int index)
 {
 	textureUnits[index] = textureUnit;
-	glActiveTexture(textureUnit);
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, colorBuffers[index]);
 }
-void MultiFrameBuffer::SetTextureUnit(GLenum textureUnit, unsigned short int index)
+void MultiFrameBuffer::BindTextures(unsigned short int textureUnitOne, unsigned short int textureUnitTwo)
+{
+	glActiveTexture(GL_TEXTURE0 + textureUnitOne);
+	glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
+
+	glActiveTexture(GL_TEXTURE0 + textureUnitTwo);
+	glBindTexture(GL_TEXTURE_2D, colorBuffers[1]);
+}
+void MultiFrameBuffer::BindAndSetTextures(unsigned short int textureUnitOne, unsigned short int textureUnitTwo)
+{
+	textureUnits[0] = textureUnitOne;
+	textureUnits[1] = textureUnitTwo;
+
+	glActiveTexture(GL_TEXTURE0 + textureUnitOne);
+	glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
+
+	glActiveTexture(GL_TEXTURE0 + textureUnitTwo);
+	glBindTexture(GL_TEXTURE_2D, colorBuffers[1]);
+}
+
+
+void MultiFrameBuffer::SetTextureUnit(unsigned short int textureUnit, unsigned short int index)
 {
 	textureUnits[index] = textureUnit;
 }

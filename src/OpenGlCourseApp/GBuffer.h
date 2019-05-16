@@ -12,27 +12,27 @@ public:
 	void Init(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecularTU, GLenum depthStencilTU, GLint width, GLint height);
 
 	void BindAll();
-	void BindAll(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecularTU, GLenum DepthStencilTU);
-	void BindAndSetAll(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecularTU, GLenum DepthStencilTU);
-	void SetAll(GLenum PositionTU, GLenum NormalHeightTU, GLenum ColorSpecularTU, GLenum DepthStencilTU);
+	void BindAll(unsigned short int PositionTU, unsigned short int NormalHeightTU, unsigned short int ColorSpecularTU, unsigned short int DepthStencilTU);
+	void BindAndSetAll(unsigned short int PositionTU, unsigned short int NormalHeightTU, unsigned short int ColorSpecularTU, unsigned short int DepthStencilTU);
+	void SetAll(unsigned short int PositionTU, unsigned short int NormalHeightTU, unsigned short int ColorSpecularTU, unsigned short int DepthStencilTU);
 
 	void BindTexturePos();
-	void BindTexturePos(GLenum textureUnit);
-	void BindAndSetTexturePos(GLenum textureUnit);
+	void BindTexturePos(const unsigned short int textureUnit);
+	void BindAndSetTexturePos(const unsigned short int textureUnit);
 	void BindTextureNormHeight();
-	void BindTextureNormHeight(GLenum textureUnit);
-	void BindAndSetTextureNormHeight(GLenum textureUnit);
+	void BindTextureNormHeight(const unsigned short int textureUnit);
+	void BindAndSetTextureNormHeight(const unsigned short int textureUnit);
 	void BindTextureColSpec();
-	void BindTextureColSpec(GLenum textureUnit);
-	void BindAndSetTextureColSpec(GLenum textureUnit);
+	void BindTextureColSpec(const unsigned short int textureUnit);
+	void BindAndSetTextureColSpec(const unsigned short int textureUnit);
 	void BindTextureDepthStencil();
-	void BindTextureDepthStencil(GLenum textureUnit);
-	void BindAndSetTextureDepthStencil(GLenum textureUnit);
+	void BindTextureDepthStencil(const unsigned short int textureUnit);
+	void BindAndSetTextureDepthStencil(const unsigned short int textureUnit);
 
-	void SetTextureUnitPos(GLenum textureUnit);
-	void SetTextureUnitNormHeight(GLenum textureUnit);
-	void SetTextureUnitColSpec(GLenum textureUnit);
-	void SetTextureUnitDepthStencil(GLenum textureUnit);
+	void SetTextureUnitPos(const unsigned short int textureUnit);
+	void SetTextureUnitNormHeight(const unsigned short int textureUnit);
+	void SetTextureUnitColSpec(const unsigned short int textureUnit);
+	void SetTextureUnitDepthStencil(const unsigned short int textureUnit);
 
 	GLuint GetTextureUnitPos() const ;
 	GLuint GetTextureUnitNormHeight() const ;

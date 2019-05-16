@@ -12,27 +12,27 @@ class MultiFrameBuffer
 public:
 
 	MultiFrameBuffer();
-	MultiFrameBuffer(GLuint textureUnitOne, GLenum textureUnitTwo, GLint width, GLint height);
-	MultiFrameBuffer(GLuint textureUnitOne, GLenum textureUnitTwo, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height);
+	MultiFrameBuffer(unsigned short int textureUnitOne, unsigned short int textureUnitTwo, GLshort width, GLshort height);
+	MultiFrameBuffer(unsigned short int textureUnitOne, unsigned short int textureUnitTwo, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLshort width, GLshort height);
 
 	// void Init(GLuint textureUnitOne, GLenum textureUnitTwo, GLenum textureUnitThree, GLenum textureUnitFour,
 	//		  GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height);
 
-	void Init(GLuint textureUnitOne, GLenum textureUnitTwo,
-			  GLenum internalFormat, GLenum format, GLenum type, GLenum filtering,
-			  GLint width, GLint height);
+	void Init(unsigned short int textureUnitOne, unsigned short int textureUnitTwo,
+		GLenum internalFormat, GLenum format, GLenum type, GLenum filtering,
+		GLshort width, GLshort height);
 
-	void InitPingPong(GLuint textureUnit,
+	void InitPingPong(unsigned short int textureUnit,
 					  GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, 
-					  GLint width, GLint height);
+		GLshort width, GLshort height);
 
 	void BindTexture(unsigned short int index);
-	void BindTexture(GLenum textureUnit, unsigned short int index);
-	void BindAndSetTexture(GLenum textureUnit, unsigned short int index);
-	void BindTextures(GLenum textureUnitOne, GLenum textureUnitTwo);
-	void BindAndSetTextures(GLenum textureUnitOne, GLenum textureUnitTwo);
+	void BindTexture(unsigned short int textureUnit, unsigned short int index);
+	void BindAndSetTexture(unsigned short int textureUnit, unsigned short int index);
+	void BindTextures(unsigned short int textureUnitOne, unsigned short int textureUnitTwo);
+	void BindAndSetTextures(unsigned short int textureUnitOne, unsigned short int textureUnitTwo);
 
-	void SetTextureUnit(GLenum textureUnit, unsigned short int index);
+	void SetTextureUnit(unsigned short int textureUnit, unsigned short int index);
 
 	GLuint GetBufferTextureUnit(unsigned short int index) const;
 	GLuint GetTexColorBuffer(unsigned short int index) const;
@@ -40,7 +40,7 @@ public:
 	GLuint GetRBO(unsigned short int index) const;
 
 	~MultiFrameBuffer();
-
+	
 private:
 
 	bool isInstantiated;
@@ -51,7 +51,7 @@ private:
 	GLuint colorBuffers[4];
 	GLuint textureUnits[4];
 
-	GLint bufferWidth, bufferHeight;
+	GLshort bufferWidth, bufferHeight;
 
 	MultiFrameBuffer(MultiFrameBuffer *framebuffer) 
 	{

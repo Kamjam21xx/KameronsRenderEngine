@@ -44,12 +44,15 @@ void Model::RenderModel() const
 		if (materialIndex < textureListChannelTwo.size() && textureListChannelTwo[materialIndex]) {
 			textureListChannelTwo[materialIndex]->UseTexture();
 		}
+
+		/*
 		if (materialIndex < textureListChannelThree.size() && textureListChannelThree[materialIndex]) {
 			textureListChannelThree[materialIndex]->UseTexture();
 		}
 		if (materialIndex < textureListChannelFour.size() && textureListChannelFour[materialIndex]) {
 			textureListChannelFour[materialIndex]->UseTexture();
 		}
+        */
 
 		meshList[i]->RenderMesh();
 	}

@@ -48,6 +48,8 @@ uniform mat4 inverseView;
 
 vec3  Normal;
 vec3 FragPos;
+vec3 Albedo;
+float Specular;
 
 // post
 vec4 ApplyGammaToneMapping(vec3 hdrColor)
@@ -57,31 +59,24 @@ vec4 ApplyGammaToneMapping(vec3 hdrColor)
 
 	return vec4(mapped, 1.0f);
 }
-mat4 CalcMatriceBCS()
-{
-	vec3 luminance = vec3(0.3086f, 0.6094f, 0.0820f);
-	float iS = 1.0f - saturation;
-	float T = (brightness * contrast) + (1.0f - contrast / 2);
+vec4 CalcbrightnessContrastSaturation(vec4 colour){
+    float b = brightness;
+    float c = contrast;
+    float s = saturation;
+    
+    float t = c * -.5 + .5;
+    vec3 l = vec3( .3086, .6094, .0820 );
+    vec3 f = (-s * l + l) * c;
+    vec3 g = s * c + f;
 
-	vec3 r = vec3(luminance.r * iS);
-	vec3 g = vec3(luminance.g * iS);
-	vec3 b = vec3(luminance.b * iS);
+    mat4 BCS = mat4(
+        g.r, f.r, f.r, 0,
+        f.g, g.g, f.g, 0,
+        f.b, f.b, g.b, 0,
+        vec3(b + t), 1
+    );
 
-	r.r += saturation;
-	g.g += saturation;
-	b.b += saturation;
-
-	float BCS30 = T * r.x + T * g.x + T * b.x;
-	float BCS31 = T * r.y + T * g.y + T * b.y;
-	float BCS32 = T * r.z + T * g.z + T * b.z;
-
-	float c = contrast;
-	mat4 BCS = mat4(	c * r.x,		c * r.y,		c * r.z,		0,
-						c * g.x,		c * g.y,		c * g.z,		0,
-						c * b.x,		c * b.y,		c * b.z,		0,
-						BCS30,			 BCS31,			BCS32,			1);
-
-	return BCS;
+	return vec4(BCS[0].rgg * colour.r + (BCS[1].rgr * colour.g + (BCS[2].rb * colour.b + BCS[3].x).rrg), 1.0f); 
 }
 vec4 CalcPointLightByDirection(Light light, vec3 direction)
 {
@@ -105,7 +100,7 @@ vec4 CalcPointLightByDirection(Light light, vec3 direction)
 		}
 	}
 
-	return (ambientColour) * (diffuseColour + specularColour);
+	return (ambientColour) * (diffuseColour * vec4(Albedo, 1.0f) + specularColour * Specular);
 }
 vec4 CalcPointLight(PointLight pLight)
 {
@@ -150,32 +145,28 @@ void main()
 	vec4 sampleTex3 = texture(screenSpaceTexture, TexCoord);
 
 
-	// FragPos = texture(screenSpaceTextureThree, TexCoord).rgb;
-	
-	float depthSample = texture(theTextureDepth, TexCoord).r;
-	FragPos = CalcFragPosFromDepth(depthSample);
+	//FragPos = texture(screenSpaceTextureThree, TexCoord).rgb;
+	//if(TexCoord.x > 0.5)
+	//{
+		float depthSample = texture(theTextureDepth, TexCoord).r;
+		FragPos = CalcFragPosFromDepth(depthSample);
+	//}
 
-	vec3  Albedo = sampleTex3.rgb;
-	float Specular = sampleTex3.a;
+
+	Albedo = sampleTex3.rgb;
+	Specular = sampleTex3.a;
 	Normal = sampleTex2.rgb;
 	float Height = sampleTex2.a;
 
 
 
-	vec4 lighting = CalcPointLights();
 
-	Colour = vec4(Albedo, 1.0f) * CalcPointLights();
-
-		// depth works great
-		// 
-
-
-
-	//float depth = texture(theTextureDepth, TexCoord).r;
 	//Colour.rgb = CalcFragPosFromDepth(depth);
-
 	//Colour.rgb = vec3(1.0f - texture(theTextureDepth, TexCoord).r); // testing depth
-	Colour = CalcMatriceBCS() * Colour;
+
+	vec4 lighting = CalcPointLights();
+	Colour = lighting;
+	Colour = CalcbrightnessContrastSaturation(Colour);
 	Colour = ApplyGammaToneMapping(Colour.rgb);
 }
 

@@ -178,7 +178,7 @@ void GraphicUI::EditSceneSpin(GLfloat *spin)
 void GraphicUI::EditRenderSettings(bool *forwardRender, GLfloat *heightPOM, GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation)
 {
 	ImGui::Begin("Render Settings");
-
+	
 	EditRenderMethod(forwardRender);
 	EditVerticalSync();
 	EditSplitScreen(splitScreenIsOn, splitScreenType);
@@ -199,13 +199,14 @@ void GraphicUI::EditRenderMethod(bool *forwardRender)
 }
 void GraphicUI::EditFiltering() 
 {
+	/*
 	if (ImGui::Button("Edit Filtering"))
 	{
 		enableEditFiltering = !enableEditFiltering;
 	}
-
-	if (enableEditFiltering)
-	{
+	*/
+	//if (enableEditFiltering)
+	//{
 		ImGui::SameLine();
 		ImGui::SliderInt("Filtering Level", &filteringLevel, 0.0f, 32.0f);
 
@@ -229,49 +230,59 @@ void GraphicUI::EditFiltering()
 		{
 			glfwWindowHint(GLFW_SAMPLES, 32);
 		}
-	}
-	return;
+	//}
+	//return;
 }
 void GraphicUI::EditGamma(GLfloat *gamma)
 {
+	/*
 	if (ImGui::Button("Edit Gamma"))
 	{
 		enableGammaEdit = !enableGammaEdit;
 	}
-
+	
 	if (enableGammaEdit)
-	{
+	{*/
 		ImGui::SliderFloat("Gamma", gamma, 0.001f, 4.000f);
-	}
+	//}
 }
 void GraphicUI::EditBloom(GLfloat *bloomThreshold)
 {
+	/*
 	if (ImGui::Button("Edit Bloom"))
 	{
 		enableBloomEdit = !enableBloomEdit;
 	}
-
+	
 	if (enableBloomEdit)
-	{
+	{*/
 		ImGui::SliderFloat("Bloom Threshold", bloomThreshold, 0.001f, 1.0f);
-	}
+	//}
 }
 void GraphicUI::EditBrightnessContrastSaturation(GLfloat *brightness, GLfloat *contrast, GLfloat *saturation)
 {
+	/*
 	if (ImGui::Button("BCT adjust"))
 	{
 		enableEditBCT = !enableEditBCT;
 	}
-
+	
 	if (enableEditBCT)
-	{
+	{*/
+		ImGui::SliderFloat("Brightness", brightness, -0.5f, 0.5f);
+		ImGui::SliderFloat("Contrast", contrast, 0.5f, 1.5f);
+		ImGui::SliderFloat("Saturation", saturation, 0.5, 1.5f);
+
+		/*
+		
 		ImGui::SliderFloat("Brightness", brightness, -0.2f, 0.2f);
 		ImGui::SliderFloat("Contrast", contrast, 1.8f, 2.2f);
 		ImGui::SliderFloat("Saturation", saturation, 0.0, 1.0f);
 
+*/
 		//(*contrast) = Contrast + 1.5f;
 		//(*saturation) = Saturation * 2.0f;
-	}
+	//}
 }
 void GraphicUI::EditVerticalSync()
 {
@@ -313,41 +324,50 @@ void GraphicUI::EditSplitScreen(GLboolean *splitScreenIsOn, GLuint *splitScreenT
 		(*splitScreenIsOn) = !(*splitScreenIsOn);
 	}
 
-	if ((*splitScreenIsOn)) 
-	{
+	//if ((*splitScreenIsOn)) 
+	//{
 		switch ((*splitScreenType)) {
-		case 0 : ImGui::Text("Color Map");
+		case 0:  ImGui::SameLine(); 
+				 ImGui::Text("Color Map");
 				 break;
-		case 1 : ImGui::Text("Specular Map");
+		case 1 : ImGui::SameLine();
+				 ImGui::Text("Specular Map");
 				 break;
-		case 2 : ImGui::Text("Reflection");
+		case 2 : ImGui::SameLine();
+				 ImGui::Text("Reflection");
 				 break;
-		case 3 : ImGui::Text("Light Result");
+		case 3 : ImGui::SameLine();
+				 ImGui::Text("Light Result");
 				 break;
-		case 4 : ImGui::Text("Tangent Normal");
+		case 4 : ImGui::SameLine();
+				 ImGui::Text("Tangent Normal");
 				 break;
-		case 5 : ImGui::Text("Normal Map");
+		case 5 : ImGui::SameLine();
+				 ImGui::Text("Normal Map");
 				 break;
-		case 6 : ImGui::Text("Height Map");
+		case 6 : ImGui::SameLine();
+				 ImGui::Text("Height Map");
 				 break;
-		case 7 : ImGui::Text("No Diffuse Multiply");
+		case 7 : ImGui::SameLine();
+				 ImGui::Text("No Diffuse Multiply");
 				 break;
 		}
 
 		ImGui::SliderInt("View", (int*)splitScreenType, 0, 7);
-	}
+	//}
 }
 void GraphicUI::EditPOM(GLfloat *heightPOM)
 {
+	/*
 	if (ImGui::Button("Edit POM Height"))
 	{
 		enableEditPOM = !enableEditPOM;
 	}
-
+	
 	if (enableEditPOM)
-	{
+	{*/
 		ImGui::SliderFloat("Bloom Threshold", heightPOM, 0.001f, 5.0f);
-	}
+	//}
 }
 
 GraphicUI::~GraphicUI()

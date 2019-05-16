@@ -401,12 +401,21 @@ void Shader::SetTextureNormal(GLuint textureUnit)
 {
 	glUniform1i(uniformTextureNormal, textureUnit);
 }
-void Shader::SetTextureHeight(GLuint textureUnit) {
+void Shader::SetTextureHeight(GLuint textureUnit) 
+{
 	glUniform1i(uniformTextureHeight, textureUnit);
 }
 void Shader::SetDirectionalShadowMap(GLuint textureUnit) 
 { 
 	glUniform1i(uniformDirectionalShadowMap, textureUnit);
+}
+void Shader::SetInverseProjection(glm::mat4 *inverseProjectionMatrix)
+{
+	glUniformMatrix4fv(uniformInverseProjection, 1, GL_FALSE, glm::value_ptr(*inverseProjectionMatrix));
+}
+void Shader::SetInverseView(glm::mat4 *inverseViewMatrix)
+{
+	glUniformMatrix4fv(uniformInverseView, 1, GL_FALSE, glm::value_ptr(*inverseViewMatrix));
 }
 void Shader::SetDirectionalLightTransform(glm::mat4 *lTransform) 
 {

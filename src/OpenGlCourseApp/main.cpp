@@ -113,7 +113,7 @@ GLfloat gamma = 1.0f;
 GLfloat bloomThreshold = 1.0f;
 unsigned short int numOfBloomPasses = 5;
 GLfloat brightness = 0.0f;
-GLfloat contrast = 2.0f;
+GLfloat contrast = 1.0f;
 GLfloat saturation = 0.5f;
 GLfloat height = 1.0f;
 
@@ -136,7 +136,35 @@ int TEST_VALUE_IMGUI = 0;
 
 
 
+void errorCheckGL(std::string location)
+{
+	GLenum error;
+	error = glGetError();
+	if (error != GL_NO_ERROR)
+	{
+		std::string errorType = "";
 
+		switch (error)
+		{
+		case 1280: errorType = "invalid enum";
+			break;
+		case 1281: errorType = "invalid parameter";
+			break;
+		case 1282: errorType = "illegal command";
+			break;
+		case 1283: errorType = "stack overflow";
+			break;
+		case 1284: errorType = "stack underflow";
+			break;
+		case 1285: errorType = "out of memory";
+			break;
+		case 1286: errorType = "read/write to incomplete FBO";
+			break;
+		}
+
+		std::cout << location << " : ERROR : " << errorType << std::endl;
+	}
+}
 glm::mat4 calculateInverseProjection(glm::mat4 projectionMatrix)
 {
 	glm::mat4 inverseProjection = glm::mat4(0.0f);
@@ -184,14 +212,12 @@ void RenderScene()
 {
 	for (auto element = mainScene.objects.begin() ; element != mainScene.objects.end(); ++element) {
 		glm::mat4 model = glm::mat4(1.0);
-
 		model = glm::rotate(model, spin * toRadians, glm::vec3(0.0, 1.0, 0.0));
 		//model = glm::translate(model, glm::vec3(2.0, 0.85, 3.0));
 		model = glm::scale(model, glm::vec3(0.025f, 0.025f, 0.025f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-
-		dullMaterial.UseMaterial(uniformSpecularIntensity, uniformSpecularPower); // make material pointers part of the models
+		shineMaterial.UseMaterial(uniformSpecularIntensity, uniformSpecularPower); // make material pointers part of the models
 
 		(*element).RenderModel();
 	}
@@ -304,7 +330,7 @@ void RenderToQuadApplyBloom()
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glEnable(GL_DEPTH_TEST);
 }
-void RenderToQuadDeferred(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
+void RenderToQuadDeferred(glm::mat4 inverseProjectionMatrix, glm::mat4 inverseViewMatrix)
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); 
 
@@ -315,14 +341,9 @@ void RenderToQuadDeferred(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 
 	quadShaderDeferred.UseShader();
 
-	uniformInverseProjection = gBufferShader.GetInverseProjectionLocation();
-	uniformInverseView = gBufferShader.GetInverseViewLocation();
+	quadShaderDeferred.SetInverseProjection(&inverseProjectionMatrix);
+	quadShaderDeferred.SetInverseView(&inverseViewMatrix);
 
-	// glm::mat4 inverseProjection = calculateInverseProjection(projectionMatrix);
-	glm::mat4 inverseProjection = glm::inverse(projectionMatrix);
-	glm::mat4 inverseView = glm::inverse(viewMatrix);
-	glUniformMatrix4fv(uniformInverseProjection, 1, GL_FALSE, glm::value_ptr(inverseProjection));
-	glUniformMatrix4fv(uniformInverseView, 1, GL_FALSE, glm::value_ptr(inverseView));
 
 	quadShaderDeferred.SetTextureDepth(23);
 	quadShaderDeferred.SetTextureScreenSpace(TEST_VALUE_IMGUI);
@@ -336,13 +357,16 @@ void RenderToQuadDeferred(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 	quadShaderDeferred.SetContrast(contrast);
 	quadShaderDeferred.SetSaturation(saturation);
 
+
 	gBuffer.BindTexturePos(20);
 	gBuffer.BindTextureNormHeight(21);
 	gBuffer.BindTextureColSpec(22);
+	gBuffer.BindTextureDepthStencil(23);
 
 	glBindVertexArray(screenQuadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);	
+
 }
 void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 						 unsigned short int* pointLightCount, unsigned short int* spotLightCount,
@@ -438,21 +462,27 @@ void GBufferSetup(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 	uniformView = gBufferShader.GetViewLocation();
 	uniformEyePosition = gBufferShader.GetEyePositionLocation();
 	uniformEyeDirection = gBufferShader.GetEyeDirectionLocation();
-
+	
 	
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+	
+
+
 	gBufferShader.SetHeightPOM(height);
 
-	gBufferShader.SetTextureDiffuse(1);
-	gBufferShader.SetTextureNormal(5);
-	gBufferShader.SetTextureSkyBox(6);
+	gBufferShader.SetTextureDiffuse(unsigned short int(1));
+	gBufferShader.SetTextureNormal(unsigned short int(5));
+	gBufferShader.SetTextureSkyBox(unsigned short int(6));
 
 
 
 
 	gBufferShader.Validate();
+
+
+	
 }
 void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsigned short int *pointLightCount, unsigned short int *spotLightCount, DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights)
 {
@@ -469,13 +499,15 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 
-	GBufferSetup(projectionMatrix, viewMatrix);						// make a member possibly
+
+	GBufferSetup(projectionMatrix, viewMatrix);	// make a member possibly
+
+
 	glDisable(GL_STENCIL_TEST);
+
 	RenderScene();
+
 	glDisable(GL_DEPTH_TEST);
-
-	
-
 
 /*
 	// flip stencil mask behavior
@@ -502,7 +534,7 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 	// combine bloom with color and do post processing
 	glClear(GL_STENCIL_BUFFER_BIT);
 
-	RenderToQuadDeferred(projectionMatrix, viewMatrix);
+	RenderToQuadDeferred(glm::inverse(projectionMatrix), glm::inverse(viewMatrix));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -633,11 +665,11 @@ int main()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
 
-	framebufferBlur.Init(GL_TEXTURE19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
-	dualFramebufferHDR.Init(GL_TEXTURE18, GL_TEXTURE19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
-	blurBuffer.InitPingPong(GL_TEXTURE17, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 1920, 1080);
+	framebufferBlur.Init(19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
+	dualFramebufferHDR.Init(18, 19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
+	blurBuffer.InitPingPong(17, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 1920, 1080);
 
-	gBuffer.Init(GL_TEXTURE20, GL_TEXTURE21, GL_TEXTURE22, GL_TEXTURE23, 3840, 2160);
+	gBuffer.Init(20, 21, 22, 23, 3840, 2160);
 
 //<>=========================================================================================================<>
 // prep
@@ -726,9 +758,9 @@ int main()
 			DeferredRenderPass(projection, camera.calculateViewMatrix(), &pointLightCount, &spotLightCount, &mainLight, pointLights, spotLights);
 		}
 
+		
 
-
-
+		
 
 		glUseProgram(0);
 
@@ -749,6 +781,7 @@ int main()
 
 		// DisplayFinalFrame
 		mainWindow.swapBuffers();
+
 	}
 
 

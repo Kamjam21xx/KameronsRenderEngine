@@ -69,6 +69,8 @@ public:
 	void SetTextureNormal(GLuint textureUnit);
 	void SetTextureHeight(GLuint textureUnit);
 	void SetDirectionalShadowMap(GLuint textureUnit);
+	void SetInverseProjection(glm::mat4 *inverseProjectionMatrix);
+	void SetInverseView(glm::mat4 *inverseViewMatrix);
 	void SetDirectionalLightTransform(glm::mat4 *lTransform);
 	void SetLightMatrices(std::vector<glm::mat4> lightMatrices);
 	void SetTextureSkyBox(GLuint textureUnit);

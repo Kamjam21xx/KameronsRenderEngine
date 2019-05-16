@@ -64,23 +64,23 @@ void FrameBuffer::Init(GLuint textureUnit, GLenum internalFormat, GLenum format,
 
 void FrameBuffer::BindTexture()
 {
-	glActiveTexture(bufferTextureUnit);
+	glActiveTexture(GL_TEXTURE0 + bufferTextureUnit);
 	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
 }
-void FrameBuffer::BindTexture(GLenum textureUnit)
+void FrameBuffer::BindTexture(unsigned short int textureUnit)
 {
-	glActiveTexture(textureUnit);
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
 }
-void FrameBuffer::BindAndSetTexture(GLenum textureUnit)
+void FrameBuffer::BindAndSetTexture(unsigned short int textureUnit)
 {
 	bufferTextureUnit = textureUnit;
 
-	glActiveTexture(bufferTextureUnit);
+	glActiveTexture(GL_TEXTURE0 + bufferTextureUnit);
 	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
 }
 
-void FrameBuffer::SetTextureUnit(GLenum textureUnit)
+void FrameBuffer::SetTextureUnit(unsigned short int textureUnit)
 {
 	bufferTextureUnit = textureUnit;
 }

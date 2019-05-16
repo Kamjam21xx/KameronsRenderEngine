@@ -15,10 +15,10 @@ public:
     void Init(GLuint textureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint width, GLint height);
 
 	void BindTexture();
-	void BindTexture(GLenum textureUnit);
-	void BindAndSetTexture(GLenum textureUnit);
+	void BindTexture(unsigned short int textureUnit);
+	void BindAndSetTexture(unsigned short int textureUnit);
 
-	void SetTextureUnit(GLenum textureUnit);
+	void SetTextureUnit(unsigned short int textureUnit);
 
 	GLuint GetBufferTextureUnit() const;
 	GLuint GetTexColorBuffer() const;

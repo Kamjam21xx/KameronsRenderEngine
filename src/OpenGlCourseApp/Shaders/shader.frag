@@ -342,31 +342,24 @@ vec4 ApplyGammaToneMapping(vec3 hdrColor)
 
 	return vec4(mapped, 1.0f);
 }
-mat4 CalcMatriceBCS()
-{
-	vec3 luminance = vec3(0.3086f, 0.6094f, 0.0820f);
-	float iS = 1.0f - saturation;
-	float T = (brightness * contrast) + (1.0f - contrast / 2);
+vec4 CalcbrightnessContrastSaturation(vec4 Colour){
+    float b = brightness;
+    float c = contrast;
+    float s = saturation;
+    
+    float t = c * -.5 + .5;
+    vec3 l = vec3( .3086, .6094, .0820 );
+    vec3 f = (-s * l + l) * c;
+    vec3 g = s * c + f;
 
-	vec3 r = vec3(luminance.r * iS);
-	vec3 g = vec3(luminance.g * iS);
-	vec3 b = vec3(luminance.b * iS);
+    mat4 m = mat4(
+        g.r, f.r, f.r, 0,
+        f.g, g.g, f.g, 0,
+        f.b, f.b, g.b, 0,
+        vec3(b + t), 1
+    );
 
-	r.r += saturation;
-	g.g += saturation;
-	b.b += saturation;
-
-	float BCS30 = T * r.x + T * g.x + T * b.x;
-	float BCS31 = T * r.y + T * g.y + T * b.y;
-	float BCS32 = T * r.z + T * g.z + T * b.z;
-
-	float c = contrast;
-	mat4 BCS = mat4(	c * r.x,		c * r.y,		c * r.z,		0,
-						c * g.x,		c * g.y,		c * g.z,		0,
-						c * b.x,		c * b.y,		c * b.z,		0,
-						BCS30,			 BCS31,			BCS32,			1);
-
-	return BCS;
+	return vec4(m[0].rgg * Colour.r + (m[1].rgr * Colour.g + (m[2].rb * Colour.b + m[3].x).rrg), 1.0f); 
 }
 
 
@@ -404,7 +397,7 @@ void main()
 	// Channel_mixing + gamma + tonemapping + highlights
 	colour = shadowFactor * diffuse * reflection;
 	colour = ApplyGammaToneMapping(colour.xyz);
-	colour = CalcMatriceBCS() * colour; // rework the function a bit to make it faster
+	colour =  CalcbrightnessContrastSaturation(colour); // rework the function a bit to make it faster
 	highlights = GetHighlights(colour);
 	//highlights.rgb = Normal.rgb;
 
