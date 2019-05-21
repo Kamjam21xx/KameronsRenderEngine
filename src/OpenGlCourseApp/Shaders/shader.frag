@@ -342,7 +342,7 @@ vec4 ApplyGammaToneMapping(vec3 hdrColor)
 
 	return vec4(mapped, 1.0f);
 }
-vec4 CalcbrightnessContrastSaturation(vec4 Colour){
+vec4 CalcBrightnessContrastSaturation(vec4 Colour){
     float b = brightness;
     float c = contrast;
     float s = saturation;
@@ -397,7 +397,7 @@ void main()
 	// Channel_mixing + gamma + tonemapping + highlights
 	colour = shadowFactor * diffuse * reflection;
 	colour = ApplyGammaToneMapping(colour.xyz);
-	colour =  CalcbrightnessContrastSaturation(colour); // rework the function a bit to make it faster
+	colour =  CalcBrightnessContrastSaturation(colour); // rework the function a bit to make it faster
 	highlights = GetHighlights(colour);
 	//highlights.rgb = Normal.rgb;
 
@@ -440,5 +440,4 @@ void main()
 		}
 		colour = ApplyGammaToneMapping(colour.xyz);
 	}
-
 }

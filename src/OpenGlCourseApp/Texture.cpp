@@ -158,6 +158,24 @@ bool Texture::LoadTextureData(const char *imageData)
 	return true;
 }
 
+bool Texture::LoadTextureData(glm::vec3 *imageData, unsigned short int width, unsigned short int height, GLenum internalFormat, GLenum format, GLenum type)
+{
+	// used to load a texture from width, height, and vec3 per pixel for color
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, imageData);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return true;
+}
+
 bool Texture::MergeLoadTexture(GLenum glTextureUnit, const char *fileLocationTwo) // implement a seperate function with an offset, because it will be heavier
 {	
 	textureUnit = glTextureUnit;

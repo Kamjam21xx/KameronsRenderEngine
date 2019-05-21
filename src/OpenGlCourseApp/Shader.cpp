@@ -301,9 +301,13 @@ GLuint Shader::GetTextureScreenSpaceThreeLocation() const
 {
 	return uniformTextureScreenSpaceThree;
 }
-GLuint Shader::GetTextureDepth() const
+GLuint Shader::GetTextureDepthLocation() const
 {
 	return uniformTextureDepth;
+}
+GLuint Shader::GetTextureNoiseSSAOLocation() const
+{
+	return uniformTextureNoiseSSAO;
 }
 GLuint Shader::GetGammaLocation() const
 {
@@ -454,6 +458,10 @@ void Shader::SetTextureScreenSpaceThree(GLuint textureUnit)
 void Shader::SetTextureDepth(GLuint textureUnit)
 {
 	glUniform1i(uniformTextureDepth, textureUnit);
+}
+void Shader::SetTextureNoiseSSAO(GLuint textureUnit)
+{
+	glUniform1i(uniformTextureNoiseSSAO, textureUnit);
 }
 void Shader::SetGamma(GLfloat gammaLevel)
 {

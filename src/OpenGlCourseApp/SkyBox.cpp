@@ -8,27 +8,28 @@ SkyBox::SkyBox()
 
 SkyBox::SkyBox(std::string fileLocation, const char *vertexShader, const char *fragmentShader) // directory to folder 
 {
-	std::vector<std::string> faceLocations;
-	faceLocations.push_back(fileLocation + "/right.jpg");
-	faceLocations.push_back(fileLocation + "/left.jpg");
-	faceLocations.push_back(fileLocation + "/top.jpg");
-	faceLocations.push_back(fileLocation + "/bot.jpg");
-	faceLocations.push_back(fileLocation + "/back.jpg");
-	faceLocations.push_back(fileLocation + "/front.jpg");
-
-	LoadShader(vertexShader, fragmentShader);
-	LoadTexturedCube(faceLocations);
+	LoadFromDirectory(fileLocation, vertexShader, fragmentShader, nullptr, nullptr);
 }
+SkyBox::SkyBox(std::string fileLocation, const char *vertexShader, const char *fragmentShader, const char *vertexShaderD, const char *fragmentShaderD) // directory to folder 
+{
+	LoadFromDirectory(fileLocation, vertexShader, fragmentShader, vertexShaderD, fragmentShaderD);
+}
+
 SkyBox::SkyBox(std::vector<std::string> faceLocations)
 {
 	const char* vert = "Shaders/skybox.vert";
 	const char* frag = "Shaders/skybox.frag";
+	const char* vertD = "Shaders/skyboxDeferred.vert";
+	const char* fragD = "shaders/skyboxDeferred.frag";
 
 	LoadShader(vert, frag);
 	LoadTexturedCube(faceLocations);
 }
-
 void SkyBox::LoadFromDirectory(std::string fileLocation, const char *vertexShader, const char *fragmentShader) // directory to folder 
+{
+	LoadFromDirectory(fileLocation, vertexShader, fragmentShader, nullptr, nullptr);
+}
+void SkyBox::LoadFromDirectory(std::string fileLocation, const char *vertexShader, const char *fragmentShader, const char *vertexShaderD, const char *fragmentShaderD) // directory to folder 
 {
 	std::vector<std::string> faceLocations;
 	faceLocations.push_back(fileLocation + "/right.jpg");
@@ -37,8 +38,16 @@ void SkyBox::LoadFromDirectory(std::string fileLocation, const char *vertexShade
 	faceLocations.push_back(fileLocation + "/bot.jpg");
 	faceLocations.push_back(fileLocation + "/back.jpg");
 	faceLocations.push_back(fileLocation + "/front.jpg");
+	
+	if (vertexShader != nullptr)
+	{
+		LoadShader(vertexShader, fragmentShader);
+	}
+	if (vertexShaderD != nullptr)
+	{
+		LoadShaderDeferred(vertexShaderD, fragmentShaderD);
+	}
 
-	LoadShader(vertexShader, fragmentShader);
 	LoadTexturedCube(faceLocations);
 }
 
@@ -49,6 +58,15 @@ void SkyBox::LoadShader(const char *vertexShader, const char *fragmentShader)
 
 	uniformProjection = skyShader->GetProjectionLocation();
 	uniformView = skyShader->GetViewLocation();
+}
+
+void SkyBox::LoadShaderDeferred(const char *vertexShader, const char *fragmentShader)
+{
+	skyShaderDeferred = new Shader();
+	skyShaderDeferred->CreateFromFiles(vertexShader, fragmentShader);
+
+	uniformProjectionDeferred = skyShaderDeferred->GetProjectionLocation();
+	uniformViewDeferred = skyShaderDeferred->GetViewLocation();
 }
 
 void SkyBox::LoadTexturedCube(std::vector<std::string> faceLocations) 
@@ -121,15 +139,18 @@ void SkyBox::unbinedCubeMapTexture() const
 	// add it if i need it i guess
 }
 
-void SkyBox::DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloat gamma, GLfloat bloomThreshold) const
+void SkyBox::DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation) const // add brightness contrast saturation
 {
 	viewMatrix = glm::mat4(glm::mat3(viewMatrix));
 
 	// glDepthMask(GL_FALSE);
 
 	skyShader->UseShader();
-	skyShader->SetGamma(gamma);
-	skyShader->SetBloomThreshold(bloomThreshold);
+	skyShader->SetGamma(*gamma);
+	skyShader->SetBloomThreshold(*bloomThreshold);
+	skyShader->SetBrightness(*brightness);
+	skyShader->SetContrast(*contrast);
+	skyShader->SetSaturation(*saturation);
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -139,6 +160,31 @@ void SkyBox::DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloa
 
 	skyShader->Validate();
 	
+	skyMesh->RenderMesh();
+
+	// glDepthMask(GL_TRUE);
+}
+void SkyBox::DrawSkyBoxDeferred(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation) const
+{
+	viewMatrix = glm::mat4(glm::mat3(viewMatrix));
+
+	// glDepthMask(GL_FALSE);
+
+	skyShaderDeferred->UseShader();
+	skyShaderDeferred->SetGamma(*gamma);
+	skyShaderDeferred->SetBloomThreshold(*bloomThreshold);
+	skyShaderDeferred->SetBrightness(*brightness);
+	skyShaderDeferred->SetContrast(*contrast);
+	skyShaderDeferred->SetSaturation(*saturation);
+
+	glUniformMatrix4fv(uniformProjectionDeferred, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	glUniformMatrix4fv(uniformViewDeferred, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	skyShaderDeferred->Validate();
+
 	skyMesh->RenderMesh();
 
 	// glDepthMask(GL_TRUE);

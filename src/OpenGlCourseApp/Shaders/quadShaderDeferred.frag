@@ -9,6 +9,7 @@ layout (binding = 23) uniform sampler2D theTextureDepth;
 layout (binding = 22) uniform sampler2D screenSpaceTexture;
 layout (binding = 21) uniform sampler2D screenSpaceTextureTwo;
 layout (binding = 20) uniform sampler2D screenSpaceTextureThree; 
+// add ssao binding
 
 // lights
 struct Light
@@ -59,7 +60,8 @@ vec4 ApplyGammaToneMapping(vec3 hdrColor)
 
 	return vec4(mapped, 1.0f);
 }
-vec4 CalcbrightnessContrastSaturation(vec4 colour){
+vec4 CalcbrightnessContrastSaturation(vec4 colour)
+{
     float b = brightness;
     float c = contrast;
     float s = saturation;
@@ -125,7 +127,7 @@ vec4 CalcPointLights()
 	
 	return totalColour;
 }
-vec3 CalcFragPosFromDepth(float depth)
+vec3 CalcDepthToFragPos(float depth)
 {
 	float z = depth * 2.0f - 1.0f;
 
@@ -143,27 +145,16 @@ void main()
 {
 	vec4 sampleTex2 = texture(screenSpaceTextureTwo, TexCoord);
 	vec4 sampleTex3 = texture(screenSpaceTexture, TexCoord);
+	float depthSample = texture(theTextureDepth, TexCoord).r;
 
 
-	//FragPos = texture(screenSpaceTextureThree, TexCoord).rgb;
-	//if(TexCoord.x > 0.5)
-	//{
-		float depthSample = texture(theTextureDepth, TexCoord).r;
-		FragPos = CalcFragPosFromDepth(depthSample);
-	//}
-
-
+	FragPos = CalcDepthToFragPos(depthSample);
 	Albedo = sampleTex3.rgb;
 	Specular = sampleTex3.a;
 	Normal = sampleTex2.rgb;
 	float Height = sampleTex2.a;
 
-
-
-
-	//Colour.rgb = CalcFragPosFromDepth(depth);
-	//Colour.rgb = vec3(1.0f - texture(theTextureDepth, TexCoord).r); // testing depth
-
+	
 	vec4 lighting = CalcPointLights();
 	Colour = lighting;
 	Colour = CalcbrightnessContrastSaturation(Colour);

@@ -290,6 +290,10 @@
     <None Include="Shaders\shader.vert" />
     <None Include="Shaders\skybox.frag" />
     <None Include="Shaders\skybox.vert" />
+    <None Include="Shaders\skyboxDeferred.frag" />
+    <None Include="Shaders\skyboxDeferred.vert" />
+    <None Include="Shaders\ssaoDeferred.frag" />
+    <None Include="Shaders\ssaoDeferred.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Models\Backdrop\BASE_COLOR.png" />

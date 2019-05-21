@@ -3,6 +3,11 @@
 #include <GL/glew.h>
 
 #include <string>
+#include <vector>
+
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 
 #include "CommonValues.h"
 
@@ -16,7 +21,7 @@ public:
 	bool LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type);
 	bool LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering);
 	bool LoadTexture(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filteringMIN, GLenum filteringMAX);
-
+	bool LoadTextureData(glm::vec3 *imageData, unsigned short int width, unsigned short int height, GLenum internalFormat, GLenum format, GLenum type);
 
 	bool MergeLoadTexture(GLenum glTextureUnit, const char *fileLocationTwo);
 

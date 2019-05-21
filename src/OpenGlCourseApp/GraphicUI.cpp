@@ -366,7 +366,7 @@ void GraphicUI::EditPOM(GLfloat *heightPOM)
 	
 	if (enableEditPOM)
 	{*/
-		ImGui::SliderFloat("Bloom Threshold", heightPOM, 0.001f, 5.0f);
+		ImGui::SliderFloat("POM Height", heightPOM, 0.001f, 5.0f);
 	//}
 }
 

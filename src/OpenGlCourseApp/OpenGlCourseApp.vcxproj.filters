@@ -289,6 +289,18 @@
     <None Include="Shaders\quadShaderDeferred.vert">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="Shaders\skyboxDeferred.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\skyboxDeferred.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\ssaoDeferred.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\ssaoDeferred.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Models\SimpleModel\BASE_COLOR.png">

@@ -48,7 +48,8 @@ public:
 	GLuint GetTextureScreenSpaceLocation() const ;
 	GLuint GetTextureScreenSpaceTwoLocation() const;
 	GLuint GetTextureScreenSpaceThreeLocation() const;
-	GLuint GetTextureDepth() const;
+	GLuint GetTextureDepthLocation() const;
+	GLuint GetTextureNoiseSSAOLocation() const;
 	GLuint GetGammaLocation() const ;
 	GLuint GetBloomThresholdLocation() const ;
 	GLuint GetHorizontalLocation() const ;
@@ -80,6 +81,7 @@ public:
 	void SetTextureScreenSpaceTwo(GLuint textureUnit);
 	void SetTextureScreenSpaceThree(GLuint textureUnit);
 	void SetTextureDepth(GLuint textureUnit);
+	void SetTextureNoiseSSAO(GLuint textureUnit);
 	void SetGamma(GLfloat gammaLevel);
 	void SetBloomThreshold(GLfloat bloomThreshold);
 	void SetHorizontal(GLboolean isHorizontal);
@@ -104,7 +106,7 @@ private:
 		   uniformDirectionalLightTransform, uniformDirectionalShadowMap,
 		   uniformOmniLightPos, uniformFarPlane, uniformSplitScreenIsOn, uniformSplitScreenType,
 		   uniformTextureScreenSpace, uniformTextureScreenSpaceTwo, uniformTextureScreenSpaceThree,
-		   uniformTextureDepth,
+		   uniformTextureDepth, uniformTextureNoiseSSAO,
 		   uniformGamma, uniformBloomThreshold, uniformHorizontal,
 		   uniformBrightness, uniformContrast, uniformSaturation,
 		   uniformHeightPOM;

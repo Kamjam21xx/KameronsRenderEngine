@@ -15,6 +15,7 @@
 #include <thread>
 #include <mutex>
 #include <fstream>
+#include <random>
 //										 openGL Math libraries
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -67,6 +68,7 @@ Shader framebufferBlurShader;
 Shader dualFramebuffershader;
 Shader gBufferShader;
 Shader quadShaderDeferred;
+Shader ShaderSSAO;
 
 GLuint uniformProjection = 0,
 	   uniformModel = 0,
@@ -97,6 +99,8 @@ static const char* gBufferShaderV = "Shaders/mainDeferredShader.vert";
 static const char* gBufferShaderF = "Shaders/mainDeferredShader.frag";
 static const char* quadShaderDeferredV = "Shaders/quadShaderDeferred.vert";
 static const char* quadShaderDeferredF = "Shaders/quadShaderDeferred.frag";
+static const char* ssaoSourceV= "Shaders/ssaoDeferred.vert";
+static const char* ssaoSourceF = "Shaders/ssaoDeferred.frag";
 
 Material shineMaterial;
 Material dullMaterial;
@@ -126,12 +130,16 @@ unsigned int screenQuadVAO, screenQuadVBO;
 int TEST_VALUE_IMGUI = 0;
 
 
+// TEMP SSAO
+std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
+std::default_random_engine generator;
 
+std::vector<glm::vec3> kernelSSAO; // keep kernel first for auto completion stuff
+std::vector<glm::vec3> noiseSSAO;
 
-
-
-
-
+Texture noiseTexture;
+FrameBuffer ssaoBuffer;
+// TEMP SSAO
 
 
 
@@ -207,6 +215,9 @@ void CreateShaders()
 
 	quadShaderDeferred = Shader();
 	quadShaderDeferred.CreateFromFiles(quadShaderDeferredV, quadShaderDeferredF);
+
+	ShaderSSAO = Shader();
+	ShaderSSAO.CreateFromFiles(ssaoSourceV, ssaoSourceF);
 }
 void RenderScene() 
 {
@@ -330,7 +341,7 @@ void RenderToQuadApplyBloom()
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glEnable(GL_DEPTH_TEST);
 }
-void RenderToQuadDeferred(glm::mat4 inverseProjectionMatrix, glm::mat4 inverseViewMatrix)
+void RenderToQuadDeferred(glm::mat4 *inverseProjectionMatrix, glm::mat4 *inverseViewMatrix)
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); 
 
@@ -341,8 +352,8 @@ void RenderToQuadDeferred(glm::mat4 inverseProjectionMatrix, glm::mat4 inverseVi
 
 	quadShaderDeferred.UseShader();
 
-	quadShaderDeferred.SetInverseProjection(&inverseProjectionMatrix);
-	quadShaderDeferred.SetInverseView(&inverseViewMatrix);
+	quadShaderDeferred.SetInverseProjection(inverseProjectionMatrix);
+	quadShaderDeferred.SetInverseView(inverseViewMatrix);
 
 
 	quadShaderDeferred.SetTextureDepth(23);
@@ -366,6 +377,7 @@ void RenderToQuadDeferred(glm::mat4 inverseProjectionMatrix, glm::mat4 inverseVi
 	glBindVertexArray(screenQuadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glEnable(GL_DEPTH_TEST);	
+	glDisable(GL_STENCIL_TEST);
 
 }
 void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
@@ -439,7 +451,7 @@ void ForwardRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
 
-	mainScene.GetSkyBoxPtr()->DrawSkyBox(viewMatrix, projectionMatrix, gamma, bloomThreshold);
+	mainScene.GetSkyBoxPtr()->DrawSkyBox(viewMatrix, projectionMatrix, &gamma, &bloomThreshold, &brightness, &contrast, &saturation);
 
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
@@ -451,7 +463,7 @@ void ForwardRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 
 	RenderToQuadApplyBloom();
 }
-void GBufferSetup(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
+void GBufferSetup(glm::mat4 *projectionMatrix, glm::mat4 *viewMatrix)
 {
 	gBufferShader.UseShader();
 	gBuffer.BindAll();
@@ -464,8 +476,8 @@ void GBufferSetup(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 	uniformEyeDirection = gBufferShader.GetEyeDirectionLocation();
 	
 	
-	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(*projectionMatrix));
+	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(*viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 	
 
@@ -500,7 +512,7 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 	glEnable(GL_STENCIL_TEST);
 
 
-	GBufferSetup(projectionMatrix, viewMatrix);	// make a member possibly
+	GBufferSetup(&projectionMatrix, &viewMatrix);	// make a member possibly
 
 
 	glDisable(GL_STENCIL_TEST);
@@ -509,38 +521,63 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 
 	glDisable(GL_DEPTH_TEST);
 
-/*
+
+
 	// flip stencil mask behavior
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
 
-	// draw skybox
-	mainScene.GetSkyBoxPtr()->bindCubeMapTexture();					// TEXTURE UNIT 6
+
 
 	// disable stencil and depth. passing position instead of calculating it from depth
 	glDisable(GL_STENCIL_TEST);
 	glStencilMask(0xFF);
-	glClear(GL_STENCIL_BUFFER_BIT);
-*/
+	//(GL_STENCIL_BUFFER_BIT);
+
+	// SSAO
+	
+	glm::mat4 inverseProjectionMatrix = glm::inverse(projectionMatrix);
+	glm::mat4 inverseViewMatrix = glm::inverse(viewMatrix);
+
+	/*
+	ShaderSSAO.SetInverseProjection(&inverseProjectionMatrix);
+	ShaderSSAO.SetInverseView(&inverseViewMatrix);
 
 
-	// calculate lighting, etc. get highlight and color
-	//RenderLighting();												// pass light stuff
+	ShaderSSAO.SetTextureDepth(23);
+	ShaderSSAO.SetTextureScreenSpace(TEST_VALUE_IMGUI);
+	ShaderSSAO.SetTextureScreenSpaceTwo(21);
+	ShaderSSAO.SetTextureScreenSpaceThree(20);
+	*/
+
+	// SSAO
+
 
 	// blur the bloom highlight // pass texture
 
 
 	// combine bloom with color and do post processing
-	glClear(GL_STENCIL_BUFFER_BIT);
+	
+	//glClear(GL_STENCIL_BUFFER_BIT);
+	RenderToQuadDeferred(&inverseProjectionMatrix, &inverseViewMatrix);
 
-	RenderToQuadDeferred(glm::inverse(projectionMatrix), glm::inverse(viewMatrix));
+	
+	// draw skybox
+	glEnable(GL_STENCIL_TEST);
+	//mainScene.GetSkyBoxPtr()->bindCubeMapTexture();					// TEXTURE UNIT 6
+	//mainScene.GetSkyBoxPtr()->DrawSkyBoxDeferred(viewMatrix, projectionMatrix, &gamma, &bloomThreshold, &brightness, &contrast, &saturation);
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glDisable(GL_STENCIL_TEST);
+
+	// add highlight output
+	// render sky here 
+	// dont clear stencil
+	// change stencil 
+	// re-enable stencil
+
 
 	glEnable(GL_DEPTH_TEST);
-
-
-
-
 	// set everything back to stop imgui from breaking
 
 
@@ -693,6 +730,38 @@ int main()
 	mainScene.loadNewFileLocation("Models/default.FLS");
 	mainScene.skybox = SkyBox("Textures/skybox", "Shaders/skybox.vert", "Shaders/skybox.frag");
    
+//<>=========================================================================================================<>
+// SSAO prep
+	// create random linear values between [0, 1]
+	// normalize them
+	// get a 2 quadrants so you got a hemisphere then
+	// multiply it by a random number between [0, 1]
+for(unsigned short int i = 0; i < 64; ++i)
+{
+	glm::vec3 sample( randomFloats(generator) * 2.0f - 1.0f,
+					  randomFloats(generator) * 2.0f - 1.0f,
+					  randomFloats(generator));
+
+	sample = glm::normalize(sample);
+	sample *= randomFloats(generator);
+	float scale = (float)i / 64.0;
+	scale = (0.1f + scale * scale) * 0.9f;
+	sample *= scale;
+	kernelSSAO.push_back(sample);
+}
+
+for (unsigned short int i = 0; i < 16; ++i)
+{
+	glm::vec3 noise( randomFloats(generator) * 2.0f - 1.0f,
+					 randomFloats(generator) * 2.0f - 1.0f,
+					 0.0f);
+	
+	noiseSSAO.push_back(noise);
+}
+
+noiseTexture.LoadTextureData(&noiseSSAO[0], 4, 4, GL_RGB16F, GL_RGB, GL_FLOAT);
+ssaoBuffer.Init(24, GL_RED, GL_RGB, GL_FLOAT, GL_NEAREST, 3840, 2160);
+
 //<>=========================================================================================================<>
 // (immediate mode graphic user interface)  ---------  IMGUI
 
