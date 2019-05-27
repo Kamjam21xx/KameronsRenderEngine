@@ -57,6 +57,10 @@ public:
 	GLuint GetContrastLocation() const;
 	GLuint GetSaturationLocation() const;
 	GLuint GetHeightPOMLocation() const;
+	GLuint GetRandomSamplesSSAOLocation(int index) const;
+	GLuint GetTextureAOLocation() const;
+	GLuint GetAORadiusLocation() const;
+	GLuint GetAOBiasLocation() const;
 
 	void UseShader();
 	void ClearShader();
@@ -89,7 +93,10 @@ public:
 	void SetContrast(GLfloat contrast);
 	void SetSaturation(GLfloat saturation);
 	void SetHeightPOM(GLfloat height);
-
+	void SetRandomSamplesSSAO(std::vector<glm::vec3> randomSamples);
+	void SetTextureAO(GLuint textureUnit);
+	void SetAmbientOcclusionRadius(GLfloat radius);
+	void SetAmbientOcclusionBias(GLfloat bias);
 
 	~Shader();
 
@@ -106,12 +113,15 @@ private:
 		   uniformDirectionalLightTransform, uniformDirectionalShadowMap,
 		   uniformOmniLightPos, uniformFarPlane, uniformSplitScreenIsOn, uniformSplitScreenType,
 		   uniformTextureScreenSpace, uniformTextureScreenSpaceTwo, uniformTextureScreenSpaceThree,
-		   uniformTextureDepth, uniformTextureNoiseSSAO,
+		   uniformTextureDepth, uniformTextureNoiseSSAO, uniformTextureAO,
 		   uniformGamma, uniformBloomThreshold, uniformHorizontal,
 		   uniformBrightness, uniformContrast, uniformSaturation,
-		   uniformHeightPOM;
+		   uniformHeightPOM,
+		   uniformRadiusAO, uniformBiasAO;
 
 	GLuint uniformLightMatrices[6];
+
+	GLuint uniformRandomSamplesSSAO[64];
 
 	struct {
 		GLuint uniformColor;

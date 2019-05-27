@@ -4,7 +4,6 @@ in vec2 TexCoord;
 in vec3 FragPos;
 in vec4 DirectionalLightSpacePos;
 in mat3 TBN;
-in mat3 tTBN;
 
 layout (location = 0) out vec4 colour;
 layout (location = 1) out vec4 highlights;
@@ -367,8 +366,8 @@ void main()
 {
 	// Parallax_occlusion_mapping
 	heightScale = 0.0175f * heightPOM;
-	vec3 TangentViewPos = tTBN * eyePosition;
-	vec3 TangentFragPos = tTBN * FragPos;
+	vec3 TangentViewPos = eyePosition * TBN;
+	vec3 TangentFragPos = FragPos * TBN;
 	vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 	vec2 TexCoord = ParallaxMapping(TexCoord, viewDir);
 

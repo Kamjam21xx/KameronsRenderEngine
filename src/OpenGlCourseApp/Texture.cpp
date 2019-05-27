@@ -262,6 +262,11 @@ void Texture::UseTexture() const
 	glActiveTexture(textureUnit);
 	glBindTexture(GL_TEXTURE_2D, textureID); 
 }
+void Texture::UseTexture(GLuint textureUnit)
+{
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+}
 
 
 void Texture::SetTextureUnit(GLuint glTextureUnit) 

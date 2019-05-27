@@ -31,6 +31,7 @@ public:
 	void BindZero() const;
 
 	void UseTexture() const;
+	void UseTexture(GLuint textureUnit);
 	void ClearTexture();
 
 	void SetTextureUnit(GLuint glTextureUnit);

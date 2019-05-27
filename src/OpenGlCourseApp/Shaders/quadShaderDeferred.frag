@@ -8,7 +8,7 @@ out vec4 Colour;
 layout (binding = 23) uniform sampler2D theTextureDepth;
 layout (binding = 22) uniform sampler2D screenSpaceTexture;
 layout (binding = 21) uniform sampler2D screenSpaceTextureTwo;
-layout (binding = 20) uniform sampler2D screenSpaceTextureThree; 
+layout (binding = 16) uniform sampler2D theTextureAO;
 // add ssao binding
 
 // lights
@@ -140,13 +140,25 @@ vec3 CalcDepthToFragPos(float depth)
 
 	return worldSpacePos.xyz;
 }
+vec3 CalcDepthToViewFragPos(vec2 texCoords)
+{
+	float z = texture(theTextureDepth, texCoords).r;
+	float x = texCoords.x * 2.0 - 1.0;
+	float y = texCoords.y * 2.0 - 1.0;
+
+	vec4 clipPos = vec4(x, y, z, 1.0);
+
+	vec4 viewSpacePos = clipPos * inverseProjection; // simplify
+
+	return viewSpacePos.xyz / viewSpacePos.w; 
+}
 
 void main()
 {
 	vec4 sampleTex2 = texture(screenSpaceTextureTwo, TexCoord);
 	vec4 sampleTex3 = texture(screenSpaceTexture, TexCoord);
 	float depthSample = texture(theTextureDepth, TexCoord).r;
-
+	float AO = texture(theTextureAO, TexCoord).r;
 
 	FragPos = CalcDepthToFragPos(depthSample);
 	Albedo = sampleTex3.rgb;
@@ -155,10 +167,21 @@ void main()
 	float Height = sampleTex2.a;
 
 	
+
 	vec4 lighting = CalcPointLights();
-	Colour = lighting;
+
+	Colour = lighting * vec4(AO, AO, AO, 1.0);
+
 	Colour = CalcbrightnessContrastSaturation(Colour);
+
 	Colour = ApplyGammaToneMapping(Colour.rgb);
+
+	// study the math. math math math math math math math math math is king king king. 
+
+	Colour.rgb = vec3(AO);
+
+
+
 }
 
 

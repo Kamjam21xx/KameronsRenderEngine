@@ -10,6 +10,7 @@ out vec2 TexCoord;
 out vec3 FragPos; 
 out mat3 TBN;
 out mat3 tTBN;
+out vec3 vNormal;
 
 uniform mat4 model;
 uniform mat4 projection;
@@ -26,6 +27,9 @@ void main()
 
 	TBN = mat3(T, cross( T , N ), N);
 	tTBN = transpose(TBN);
+
+	mat3 normalMatrix = mat3(view * model);
+	vNormal = normalMatrix * norm;
 }
 
 // add functions to multiply the matrices faster

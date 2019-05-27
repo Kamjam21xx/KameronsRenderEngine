@@ -219,6 +219,16 @@ void Shader::CompileProgram()
 	uniformSaturation = glGetUniformLocation(shaderID, "saturation");
 
 	uniformHeightPOM = glGetUniformLocation(shaderID, "heightPOM");
+
+	for (size_t i = 0; i < 64; i++) {
+		char locBuff[100] = { '\0' };
+
+		snprintf(locBuff, sizeof(locBuff), "samples[%d]", i);
+		uniformRandomSamplesSSAO[i] = glGetUniformLocation(shaderID, locBuff);
+	}
+	uniformTextureAO = glGetUniformLocation(shaderID, "theTextureAO");
+	uniformRadiusAO = glGetUniformLocation(shaderID, "ambientOcclusionRadius");
+	uniformBiasAO = glGetUniformLocation(shaderID, "ambientOcclusionBias");
 }
 
 GLuint Shader::GetDiffuseIntensityLocation() const
@@ -336,6 +346,22 @@ GLuint Shader::GetSaturationLocation() const
 GLuint Shader::GetHeightPOMLocation() const
 {
 	return uniformHeightPOM;
+}
+GLuint Shader::GetRandomSamplesSSAOLocation(int index) const
+{
+	return uniformRandomSamplesSSAO[index];
+}
+GLuint Shader::GetTextureAOLocation() const
+{
+	return uniformTextureAO;
+}
+GLuint Shader::GetAORadiusLocation() const
+{
+	return uniformRadiusAO;
+}
+GLuint Shader::GetAOBiasLocation() const
+{
+	return uniformBiasAO;
 }
 
 void Shader::SetDirectionalLight(DirectionalLight * dLight) 
@@ -490,6 +516,27 @@ void Shader::SetSaturation(GLfloat saturation)
 void Shader::SetHeightPOM(GLfloat height)
 {
 	glUniform1f(uniformHeightPOM, height);
+}
+void Shader::SetRandomSamplesSSAO(std::vector<glm::vec3> randomSamples)
+{
+	unsigned short int size = randomSamples.size();
+
+	for (unsigned short int i = 0; i < size; ++i)
+	{
+		glUniform3f(uniformRandomSamplesSSAO[i], randomSamples[i].x, randomSamples[i].y, randomSamples[i].z);
+	}
+}
+void Shader::SetTextureAO(GLuint textureUnit)
+{
+	glUniform1i(uniformTextureAO, textureUnit);
+}
+void Shader::SetAmbientOcclusionRadius(GLfloat radius)
+{
+	glUniform1f(uniformRadiusAO, radius);
+}
+void Shader::SetAmbientOcclusionBias(GLfloat bias)
+{
+	glUniform1f(uniformBiasAO, bias);
 }
 
 void Shader::UseShader() 

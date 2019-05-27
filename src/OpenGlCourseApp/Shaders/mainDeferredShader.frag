@@ -3,7 +3,7 @@
 in vec2 TexCoord;
 in vec3 FragPos;
 in mat3 TBN;
-in mat3 tTBN;
+in vec3 vNormal;
 
 layout (location = 0) out vec3 Position;  // re-calculate in next shader instead of passing a whole texture
 layout (location = 1) out vec4 NormalHeight;
@@ -53,14 +53,15 @@ vec2 ParallaxMapping(vec2 TexCoords, vec3 eyeDir)
 
 	return currentTexCoords; 
 }
+//vec3 M3t_Mul_v3
 
 
 void main()
 {
 	// Parallax_occlusion_mapping
 	heightScale = 0.0175f * heightPOM; // height not working for an unkown reason. will fix later
-	vec3 TangentViewPos = tTBN * eyePosition;
-	vec3 TangentFragPos = tTBN * FragPos;
+	vec3 TangentViewPos = eyePosition * TBN; // == TBN^t * eyePos
+	vec3 TangentFragPos = FragPos * TBN; // == TBN^t * fragPos
 	vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 	vec2 TexCoords = ParallaxMapping(TexCoord, viewDir);
 
@@ -73,7 +74,7 @@ void main()
 
 
 	// outputs
-	Position = FragPos;
+	Position = vNormal; // view space normals -- hack -- will eliminate
 	NormalHeight = NormalTexture;
 	ColourSpecular = texture(theTextureDiffuse, TexCoords);
 }

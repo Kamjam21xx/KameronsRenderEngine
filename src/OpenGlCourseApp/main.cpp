@@ -61,14 +61,30 @@ Camera camera;
 Scene mainScene;
 
 std::vector<Shader> shaderList;
-Shader directionalShadowShader;
-Shader omniShadowShader;
-Shader outlineShader;
-Shader framebufferBlurShader;
-Shader dualFramebuffershader;
-Shader gBufferShader;
-Shader quadShaderDeferred;
+Shader shaderDirectionalShadow;
+Shader shaderOmniShadow;
+Shader shaderOutline;
+Shader shaderBlur;
+Shader shaderForwardPost;
+Shader shaderGBuffer;
+Shader shaderDeferredPost;
 Shader ShaderSSAO;
+
+// main shader program hard locations
+static const char* sourceForwardVert = "Shaders/shader.vert";
+static const char* sourceForwardFrag = "Shaders/shader.frag";
+static const char* sourceOutlinevert = "Shaders/outline.vert";
+static const char* sourceOutlineFrag = "Shaders/outline.frag";
+static const char* sourceBlurVert = "Shaders/framebufferBlur.vert";
+static const char* sourceBlurFrag = "Shaders/framebufferBlur.frag";
+static const char* sourceForwardPostVert = "Shaders/dualFramebuffershader.vert";
+static const char* sourceForwardPostFrag = "Shaders/dualFramebuffershader.frag";
+static const char* sourceGBufferVert = "Shaders/mainDeferredShader.vert";
+static const char* sourceGBufferFrag = "Shaders/mainDeferredShader.frag";
+static const char* sourceDeferredPostVert = "Shaders/quadShaderDeferred.vert";
+static const char* sourceDeferredPostFrag = "Shaders/quadShaderDeferred.frag";
+static const char* sourceSSAOVert= "Shaders/ssaoDeferred.vert";
+static const char* sourceSSAOFrag = "Shaders/ssaoDeferred.frag";
 
 GLuint uniformProjection = 0,
 	   uniformModel = 0,
@@ -84,31 +100,8 @@ GLuint uniformProjection = 0,
 
 unsigned short int currentShader = 0;
 
-// main shader program hard locations
-static const char* vShader = "Shaders/shader.vert";
-static const char* fShader = "Shaders/shader.frag";
-static const char* olvShader = "Shaders/olfshader.vert";
-static const char* olfShader = "Shaders/olfshader.frag";
-static const char* outlineVShader = "Shaders/outline.vert";
-static const char* outlineFShader = "Shaders/outline.frag";
-static const char* FBBVShader = "Shaders/framebufferBlur.vert";
-static const char* FBBFShader = "Shaders/framebufferBlur.frag";
-static const char* DFBVShader = "Shaders/dualFramebuffershader.vert";
-static const char* DFBFShader = "Shaders/dualFramebuffershader.frag";
-static const char* gBufferShaderV = "Shaders/mainDeferredShader.vert";
-static const char* gBufferShaderF = "Shaders/mainDeferredShader.frag";
-static const char* quadShaderDeferredV = "Shaders/quadShaderDeferred.vert";
-static const char* quadShaderDeferredF = "Shaders/quadShaderDeferred.frag";
-static const char* ssaoSourceV= "Shaders/ssaoDeferred.vert";
-static const char* ssaoSourceF = "Shaders/ssaoDeferred.frag";
-
 Material shineMaterial;
 Material dullMaterial;
-
-GLfloat deltaTime = 0.0f;
-GLfloat lastTime = 0.0f;	
-GLfloat now = 0.0f;
-GLfloat spin;
 
 bool forwardRender = true;
 GLboolean splitScreenIsOn = false;
@@ -120,6 +113,13 @@ GLfloat brightness = 0.0f;
 GLfloat contrast = 1.0f;
 GLfloat saturation = 0.5f;
 GLfloat height = 1.0f;
+GLfloat radiusAO = 0.25f;
+GLfloat biasAO = 0.025f;
+
+GLfloat deltaTime = 0.0f;
+GLfloat lastTime = 0.0f;	
+GLfloat now = 0.0f;
+GLfloat spin;
 
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
@@ -140,8 +140,6 @@ std::vector<glm::vec3> noiseSSAO;
 Texture noiseTexture;
 FrameBuffer ssaoBuffer;
 // TEMP SSAO
-
-
 
 
 void errorCheckGL(std::string location)
@@ -173,51 +171,39 @@ void errorCheckGL(std::string location)
 		std::cout << location << " : ERROR : " << errorType << std::endl;
 	}
 }
-glm::mat4 calculateInverseProjection(glm::mat4 projectionMatrix)
-{
-	glm::mat4 inverseProjection = glm::mat4(0.0f);
-
-	inverseProjection[0][0] = 1.0f / projectionMatrix[0][0];
-	inverseProjection[1][1] = 1.0f / projectionMatrix[1][1];
-	inverseProjection[2][3] = 1.0f / projectionMatrix[3][2];
-	inverseProjection[3][2] = 1.0f / projectionMatrix[2][2];
-	inverseProjection[3][3] = projectionMatrix[2][2] / (projectionMatrix[3][2] * projectionMatrix[2][3]);
-
-	return inverseProjection;
-}
 void CreateShaders() 
 {
 	Shader *shader1 = new Shader();
-	shader1->CreateFromFiles(vShader, fShader);
+	shader1->CreateFromFiles(sourceForwardVert, sourceForwardFrag);
 	shaderList.push_back(*shader1);
 
-	outlineShader = Shader();
-	outlineShader.CreateFromFiles(outlineVShader, outlineFShader);
+	shaderOutline = Shader();
+	shaderOutline.CreateFromFiles(sourceOutlinevert, sourceOutlineFrag);
 
-	directionalShadowShader = Shader();
-	directionalShadowShader.CreateFromFiles("Shaders/directional_shadow_map.vert", 
+	shaderDirectionalShadow = Shader();
+	shaderDirectionalShadow.CreateFromFiles("Shaders/directional_shadow_map.vert", 
 											"Shaders/directional_shadow_map.frag"
 	);
-	omniShadowShader = Shader();
-	omniShadowShader.CreateFromFiles("Shaders/omni_shadow_map.vert",
+	shaderOmniShadow = Shader();
+	shaderOmniShadow.CreateFromFiles("Shaders/omni_shadow_map.vert",
 											"Shaders/omni_shadow_map.geom",
 											"Shaders/omni_shadow_map.frag"
 	);
 
-	framebufferBlurShader = Shader();
-	framebufferBlurShader.CreateFromFiles(FBBVShader, FBBFShader);
+	shaderBlur = Shader();
+	shaderBlur.CreateFromFiles(sourceBlurVert, sourceBlurFrag);
 
-	dualFramebuffershader = Shader();
-	dualFramebuffershader.CreateFromFiles(DFBVShader, DFBFShader);
+	shaderForwardPost = Shader();
+	shaderForwardPost.CreateFromFiles(sourceForwardPostVert, sourceForwardPostFrag);
 
-	gBufferShader = Shader();
-	gBufferShader.CreateFromFiles(gBufferShaderV, gBufferShaderF);
+	shaderGBuffer = Shader();
+	shaderGBuffer.CreateFromFiles(sourceGBufferVert, sourceGBufferFrag);
 
-	quadShaderDeferred = Shader();
-	quadShaderDeferred.CreateFromFiles(quadShaderDeferredV, quadShaderDeferredF);
+	shaderDeferredPost = Shader();
+	shaderDeferredPost.CreateFromFiles(sourceDeferredPostVert, sourceDeferredPostFrag);
 
 	ShaderSSAO = Shader();
-	ShaderSSAO.CreateFromFiles(ssaoSourceV, ssaoSourceF);
+	ShaderSSAO.CreateFromFiles(sourceSSAOVert, sourceSSAOFrag);
 }
 void RenderScene() 
 {
@@ -247,38 +233,38 @@ void RenderSceneStencil()
 }
 void DirectionalShadowMapPass(DirectionalLight* light) 
 {
-	directionalShadowShader.UseShader();
+	shaderDirectionalShadow.UseShader();
 	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
 	light->GetShadowMap()->Write();
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	uniformModel = directionalShadowShader.GetModelLocation();
-	directionalShadowShader.SetDirectionalLightTransform(&light->CalculateLightTransform());
+	uniformModel = shaderDirectionalShadow.GetModelLocation();
+	shaderDirectionalShadow.SetDirectionalLightTransform(&light->CalculateLightTransform());
 
-	directionalShadowShader.Validate();
+	shaderDirectionalShadow.Validate();
 	
 	RenderScene();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 void OmniShadowMapPass(PointLight *light) 
 {
-	omniShadowShader.UseShader();
+	shaderOmniShadow.UseShader();
 	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
 	light->GetShadowMap()->Write();
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	uniformModel = omniShadowShader.GetModelLocation();
-	uniformOmniLightPos = omniShadowShader.GetOmniLightLocation();
-	uniformFarPlane = omniShadowShader.GetFarPlanelocation();
+	uniformModel = shaderOmniShadow.GetModelLocation();
+	uniformOmniLightPos = shaderOmniShadow.GetOmniLightLocation();
+	uniformFarPlane = shaderOmniShadow.GetFarPlanelocation();
 	
 	glUniform3f(uniformOmniLightPos, light->GetPosition().x, light->GetPosition().y, light->GetPosition().z);
 	glUniform1f(uniformFarPlane, light->GetFarPlane());
 
-	omniShadowShader.SetLightMatrices(light->CalculateLightTransform());
+	shaderOmniShadow.SetLightMatrices(light->CalculateLightTransform());
 
-	omniShadowShader.Validate();
+	shaderOmniShadow.Validate();
 
 	RenderScene();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -289,10 +275,10 @@ void BloomBlurPass() // re-write to blur then downsize then blur etc and pack ev
 	bool isHorizontal = true;
 	bool first_iteration = true;
 
-	framebufferBlurShader.UseShader();
+	shaderBlur.UseShader();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, blurBuffer.GetFBO(isHorizontal));
-	framebufferBlurShader.SetHorizontal(isHorizontal);
+	shaderBlur.SetHorizontal(isHorizontal);
 	dualFramebufferHDR.BindTexture(1);
 
 	glBindVertexArray(screenQuadVAO);
@@ -305,7 +291,7 @@ void BloomBlurPass() // re-write to blur then downsize then blur etc and pack ev
 	for (unsigned short int i = 0; i < iterations; ++i)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, blurBuffer.GetFBO(isHorizontal));
-		framebufferBlurShader.SetHorizontal(isHorizontal);
+		shaderBlur.SetHorizontal(isHorizontal);
 
 		blurBuffer.BindTexture(!isHorizontal);
 		
@@ -329,13 +315,13 @@ void RenderToQuadApplyBloom()
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_DEPTH_TEST);
 
-	dualFramebuffershader.UseShader();
-	dualFramebuffershader.SetGamma(gamma);
+	shaderForwardPost.UseShader();
+	shaderForwardPost.SetGamma(gamma);
 
 	dualFramebufferHDR.BindTexture(0);
 	dualFramebufferHDR.BindTexture(1);
-	dualFramebuffershader.SetTextureScreenSpace(18);
-	dualFramebuffershader.SetTextureScreenSpaceTwo(17);
+	shaderForwardPost.SetTextureScreenSpace(18);
+	shaderForwardPost.SetTextureScreenSpaceTwo(17);
 
 	glBindVertexArray(screenQuadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -350,35 +336,34 @@ void RenderToQuadDeferred(glm::mat4 *inverseProjectionMatrix, glm::mat4 *inverse
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_DEPTH_TEST);
 
-	quadShaderDeferred.UseShader();
+	shaderDeferredPost.UseShader();
 
-	quadShaderDeferred.SetInverseProjection(inverseProjectionMatrix);
-	quadShaderDeferred.SetInverseView(inverseViewMatrix);
+	shaderDeferredPost.SetInverseProjection(inverseProjectionMatrix);
+	shaderDeferredPost.SetInverseView(inverseViewMatrix);
 
+	shaderDeferredPost.SetTextureDepth(23);
+	shaderDeferredPost.SetTextureScreenSpace(TEST_VALUE_IMGUI);
+	shaderDeferredPost.SetTextureScreenSpaceTwo(21);
+	shaderDeferredPost.SetTextureScreenSpaceThree(20);
+	shaderDeferredPost.SetTextureAO(16);
 
-	quadShaderDeferred.SetTextureDepth(23);
-	quadShaderDeferred.SetTextureScreenSpace(TEST_VALUE_IMGUI);
-	quadShaderDeferred.SetTextureScreenSpaceTwo(21);
-	quadShaderDeferred.SetTextureScreenSpaceThree(20);
+	shaderDeferredPost.SetPointLights(pointLights, pointLightCount, 8, 0);
 
-	quadShaderDeferred.SetPointLights(pointLights, pointLightCount, 8, 0);
-
-	quadShaderDeferred.SetGamma(gamma);
-	quadShaderDeferred.SetBrightness(brightness);
-	quadShaderDeferred.SetContrast(contrast);
-	quadShaderDeferred.SetSaturation(saturation);
-
-
-	gBuffer.BindTexturePos(20);
+	shaderDeferredPost.SetGamma(gamma);
+	shaderDeferredPost.SetBrightness(brightness);
+	shaderDeferredPost.SetContrast(contrast);
+	shaderDeferredPost.SetSaturation(saturation);
+    
+	ssaoBuffer.BindTexture(16);
 	gBuffer.BindTextureNormHeight(21);
 	gBuffer.BindTextureColSpec(22);
 	gBuffer.BindTextureDepthStencil(23);
-
+	
 	glBindVertexArray(screenQuadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glEnable(GL_DEPTH_TEST);	
-	glDisable(GL_STENCIL_TEST);
 
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_STENCIL_TEST);
 }
 void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 						 unsigned short int* pointLightCount, unsigned short int* spotLightCount,
@@ -465,36 +450,27 @@ void ForwardRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 }
 void GBufferSetup(glm::mat4 *projectionMatrix, glm::mat4 *viewMatrix)
 {
-	gBufferShader.UseShader();
+	shaderGBuffer.UseShader();
 	gBuffer.BindAll();
 
 
-	uniformModel = gBufferShader.GetModelLocation();
-	uniformProjection = gBufferShader.GetProjectionLocation();
-	uniformView = gBufferShader.GetViewLocation();
-	uniformEyePosition = gBufferShader.GetEyePositionLocation();
-	uniformEyeDirection = gBufferShader.GetEyeDirectionLocation();
-	
+	uniformModel = shaderGBuffer.GetModelLocation();
+	uniformProjection = shaderGBuffer.GetProjectionLocation();
+	uniformView = shaderGBuffer.GetViewLocation();
+	uniformEyePosition = shaderGBuffer.GetEyePositionLocation();
+	uniformEyeDirection = shaderGBuffer.GetEyeDirectionLocation();
 	
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(*projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(*viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 	
+	shaderGBuffer.SetHeightPOM(height);
 
+	shaderGBuffer.SetTextureDiffuse(unsigned short int(1));
+	shaderGBuffer.SetTextureNormal(unsigned short int(5));
+	shaderGBuffer.SetTextureSkyBox(unsigned short int(6));
 
-	gBufferShader.SetHeightPOM(height);
-
-	gBufferShader.SetTextureDiffuse(unsigned short int(1));
-	gBufferShader.SetTextureNormal(unsigned short int(5));
-	gBufferShader.SetTextureSkyBox(unsigned short int(6));
-
-
-
-
-	gBufferShader.Validate();
-
-
-	
+	shaderGBuffer.Validate();
 }
 void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsigned short int *pointLightCount, unsigned short int *spotLightCount, DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights)
 {
@@ -531,26 +507,41 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 
 
 	// disable stencil and depth. passing position instead of calculating it from depth
-	glDisable(GL_STENCIL_TEST);
 	glStencilMask(0xFF);
-	//(GL_STENCIL_BUFFER_BIT);
+	glDisable(GL_STENCIL_TEST);
+
+	// (GL_STENCIL_BUFFER_BIT);
 
 	// SSAO
+	// make a function to bake "samples[kernelSize]" to avoid uniform arrays
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ssaoBuffer.GetFBO());
+	glViewport(0, 0, 3840, 2160);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	ShaderSSAO.UseShader();
+
+	ShaderSSAO.SetTextureNoiseSSAO(24);
+	ShaderSSAO.SetTextureDepth(23);
+	ShaderSSAO.SetTextureScreenSpaceTwo(21);
 	
+	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glm::mat4 inverseProjectionMatrix = glm::inverse(projectionMatrix);
 	glm::mat4 inverseViewMatrix = glm::inverse(viewMatrix);
+	ShaderSSAO.SetInverseProjection(&inverseProjectionMatrix);	
+	ShaderSSAO.SetRandomSamplesSSAO(kernelSSAO);
 
-	/*
-	ShaderSSAO.SetInverseProjection(&inverseProjectionMatrix);
-	ShaderSSAO.SetInverseView(&inverseViewMatrix);
+	ShaderSSAO.SetAmbientOcclusionRadius(0.1 * radiusAO); // rework shader class and make it optional to pass a pointer too.
+	ShaderSSAO.SetAmbientOcclusionBias(0.1 * biasAO);
 
+	ShaderSSAO.Validate();
 
-	ShaderSSAO.SetTextureDepth(23);
-	ShaderSSAO.SetTextureScreenSpace(TEST_VALUE_IMGUI);
-	ShaderSSAO.SetTextureScreenSpaceTwo(21);
-	ShaderSSAO.SetTextureScreenSpaceThree(20);
-	*/
+	gBuffer.BindTextureDepthStencil(23);
+	gBuffer.BindAndSetTexturePos(20); // view space normal not position
+	noiseTexture.UseTexture(24);
 
+	glBindVertexArray(screenQuadVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 	// SSAO
 
 
@@ -558,7 +549,7 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 
 
 	// combine bloom with color and do post processing
-	
+
 	//glClear(GL_STENCIL_BUFFER_BIT);
 	RenderToQuadDeferred(&inverseProjectionMatrix, &inverseViewMatrix);
 
@@ -667,7 +658,7 @@ int main()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 // additional settings
-	glfwWindowHint(GLFW_SAMPLES, 16);
+	// glfwWindowHint(GLFW_SAMPLES, 16);
 	glEnable(GL_MULTISAMPLE);
 	glfwSwapInterval(1); // vsync
 	mainWindow.swapBuffers();
@@ -760,7 +751,8 @@ for (unsigned short int i = 0; i < 16; ++i)
 }
 
 noiseTexture.LoadTextureData(&noiseSSAO[0], 4, 4, GL_RGB16F, GL_RGB, GL_FLOAT);
-ssaoBuffer.Init(24, GL_RED, GL_RGB, GL_FLOAT, GL_NEAREST, 3840, 2160);
+noiseTexture.SetTextureUnit(GL_TEXTURE24);
+ssaoBuffer.Init(16, GL_RED, GL_RGB, GL_FLOAT, GL_NEAREST, 3840, 2160);
 
 //<>=========================================================================================================<>
 // (immediate mode graphic user interface)  ---------  IMGUI
@@ -843,7 +835,9 @@ ssaoBuffer.Init(24, GL_RED, GL_RGB, GL_FLOAT, GL_NEAREST, 3840, 2160);
 
 		graphicUserInterface.EditLights(pointLights, NULL, NULL, pointLightCount, NULL, false, true, false);
 		graphicUserInterface.EditScene(&spinModifier);
-		graphicUserInterface.EditRenderSettings(&forwardRender, &height, &splitScreenIsOn, &splitScreenType, &gamma, &bloomThreshold, &brightness, &contrast, &saturation);
+		graphicUserInterface.EditRenderSettings(&forwardRender, &height, &splitScreenIsOn, &splitScreenType, 
+												&gamma, &bloomThreshold, &brightness, &contrast, &saturation,
+												&radiusAO, &biasAO);
 		graphicUserInterface.DisplayInfo();
 		
 		graphicUserInterface.End();

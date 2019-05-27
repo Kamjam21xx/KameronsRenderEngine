@@ -175,7 +175,12 @@ void GraphicUI::EditSceneSpin(GLfloat *spin)
 
 }
 
-void GraphicUI::EditRenderSettings(bool *forwardRender, GLfloat *heightPOM, GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation)
+void GraphicUI::EditRenderSettings(bool *forwardRender, 
+	GLfloat *heightPOM, 
+	GLboolean *splitScreenIsOn, GLuint *splitScreenType, 
+	GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation,
+	GLfloat *radiusAO, GLfloat *biasAO
+)
 {
 	ImGui::Begin("Render Settings");
 	
@@ -186,6 +191,7 @@ void GraphicUI::EditRenderSettings(bool *forwardRender, GLfloat *heightPOM, GLbo
 	EditBloom(bloomThreshold);
 	EditBrightnessContrastSaturation(brightness, contrast, saturation);
 	EditPOM(heightPOM);
+	EditAmbientOcclusion(radiusAO, biasAO);
 	// EditFiltering(); // does not work
 
 	ImGui::End();
@@ -283,6 +289,11 @@ void GraphicUI::EditBrightnessContrastSaturation(GLfloat *brightness, GLfloat *c
 		//(*contrast) = Contrast + 1.5f;
 		//(*saturation) = Saturation * 2.0f;
 	//}
+}
+void GraphicUI::EditAmbientOcclusion(GLfloat *radius, GLfloat *bias)
+{
+	ImGui::SliderFloat("AO Radius", radius, 0.0, 0.5);
+	ImGui::SliderFloat("AO Bias", bias, 0.0, 0.06);
 }
 void GraphicUI::EditVerticalSync()
 {

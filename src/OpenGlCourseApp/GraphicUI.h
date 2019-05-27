@@ -35,7 +35,11 @@ public:
 	void EditScene(GLfloat *spin);
 	void EditSceneSpin(GLfloat *spin);
 
-	void EditRenderSettings(bool *forwardRender, GLfloat *heightPOM, GLboolean *splitScreenIsOn, GLuint *splitScreenType, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation);
+	void EditRenderSettings(bool *forwardRender, 
+							GLfloat *heightPOM, 
+							GLboolean *splitScreenIsOn, GLuint *splitScreenType, 
+							GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation,
+							GLfloat *radiusAO, GLfloat *biasAO);
 	void EditRenderMethod(bool *forwardRender);
 	void EditFiltering();
 	void EditGamma(GLfloat *gamma);
@@ -44,6 +48,7 @@ public:
 	void EditVerticalSync();
 	void EditSplitScreen(GLboolean *splitScreenIsOn, GLuint *splitScreenType);
 	void EditPOM(GLfloat *heightPOM);
+	void EditAmbientOcclusion(GLfloat *radius, GLfloat *bias);
 
 
 	~GraphicUI();
