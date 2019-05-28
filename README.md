@@ -31,7 +31,9 @@ i plan on adding my audio and physics engine after the graphics are solid.
 	x added gamma slider and uniform 
 	x added DualFrameBuffer class ..... might be a bad call, but it keeps the standard FrameBuffer class easy to use and simple, as well as other things
 	x implement GUI for changing multisampling and for turning on and off v-sync
-
+	x change default camera direction and position
+	x add pass by reference to shader setters
+	
 
 	//////////   D   O   N   T      F   O   R   G   E   T   //////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +51,7 @@ i plan on adding my audio and physics engine after the graphics are solid.
 	- automate more hardcoded numbers
 	- add resolution setting
 	- add start menu
-	- change default camera direction and position, so the demo starts viewing the entire scene at a 45
+	
 	- add configuration class
 	- make DualFrameBuffer class into MultiFrameBuffer class, and make it more automated
 	- add post process prebuilt shader buffer and select different shaders based on ImGui selection
