@@ -457,6 +457,26 @@ void Shader::SetLightMatrices(std::vector<glm::mat4> lightMatrices)
 		glUniformMatrix4fv(uniformLightMatrices[i], 1, GL_FALSE, glm::value_ptr(lightMatrices[i]));
 	}
 }
+void Shader::SetLightMatrices(std::vector<glm::mat4> *lightMatrices)
+{
+	for (size_t i = 0; i < 6; i++) {
+		glUniformMatrix4fv(uniformLightMatrices[i], 1, GL_FALSE, glm::value_ptr((*lightMatrices)[i]));
+	}
+}
+void Shader::SetLightMatrices(glm::vec3 *pos, glm::mat4 *Proj)
+{
+		glm::mat4 lightMatrices[6];
+		lightMatrices[0] = *Proj * glm::lookAt(*pos, *pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+		lightMatrices[1] = *Proj * glm::lookAt(*pos, *pos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+		lightMatrices[2] = *Proj * glm::lookAt(*pos, *pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		lightMatrices[3] = *Proj * glm::lookAt(*pos, *pos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+		lightMatrices[4] = *Proj * glm::lookAt(*pos, *pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+		lightMatrices[5] = *Proj * glm::lookAt(*pos, *pos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+
+	for (size_t i = 0; i < 6; i++) {
+		glUniformMatrix4fv(uniformLightMatrices[i], 1, GL_FALSE, glm::value_ptr(lightMatrices[i]));
+	}
+}
 void Shader::SetTextureSkyBox(GLuint textureUnit) 
 {
 	glUniform1i(uniformTextureSkyBox, textureUnit);
@@ -465,9 +485,17 @@ void Shader::SetSplitScreenIsOn(GLboolean splitScreenIsOn)
 {
 	glUniform1i(uniformSplitScreenIsOn, splitScreenIsOn);
 }
+void Shader::SetSplitScreenIsOn(GLboolean *splitScreenIsOn)
+{
+	glUniform1i(uniformSplitScreenIsOn, *splitScreenIsOn);
+}
 void Shader::SetSplitScreenType(GLuint splitScreenType) 
 {
 	glUniform1i(uniformSplitScreenType, splitScreenType);
+}
+void Shader::SetSplitScreenType(GLuint *splitScreenType)
+{
+	glUniform1i(uniformSplitScreenType, *splitScreenType);
 }
 void Shader::SetTextureScreenSpace(GLuint textureUnit)
 {
@@ -493,29 +521,57 @@ void Shader::SetGamma(GLfloat gammaLevel)
 {
 	glUniform1f(uniformGamma, gammaLevel);
 }
+void Shader::SetGamma(GLfloat *gammaLevel)
+{
+	glUniform1f(uniformGamma, *gammaLevel);
+}
 void Shader::SetBloomThreshold(GLfloat bloomThreshold)
 {
 	glUniform1f(uniformBloomThreshold, bloomThreshold);
+}
+void Shader::SetBloomThreshold(GLfloat *bloomThreshold)
+{
+	glUniform1f(uniformBloomThreshold, *bloomThreshold);
 }
 void Shader::SetHorizontal(GLboolean isHorizontal)
 {
 	glUniform1i(uniformHorizontal, isHorizontal);
 }
+void Shader::SetHorizontal(GLboolean *isHorizontal)
+{
+	glUniform1i(uniformHorizontal, *isHorizontal);
+}
 void Shader::SetBrightness(GLfloat brightness)
 {
 	glUniform1f(uniformBrightness, brightness);
+}
+void Shader::SetBrightness(GLfloat *brightness)
+{
+	glUniform1f(uniformBrightness, *brightness);
 }
 void Shader::SetContrast(GLfloat contrast)
 {
 	glUniform1f(uniformContrast, contrast);
 }
+void Shader::SetContrast(GLfloat *contrast)
+{
+	glUniform1f(uniformContrast, *contrast);
+}
 void Shader::SetSaturation(GLfloat saturation)
 {
 	glUniform1f(uniformSaturation, saturation);
 }
+void Shader::SetSaturation(GLfloat *saturation)
+{
+	glUniform1f(uniformSaturation, *saturation);
+}
 void Shader::SetHeightPOM(GLfloat height)
 {
 	glUniform1f(uniformHeightPOM, height);
+}
+void Shader::SetHeightPOM(GLfloat *height)
+{
+	glUniform1f(uniformHeightPOM, *height);
 }
 void Shader::SetRandomSamplesSSAO(std::vector<glm::vec3> randomSamples)
 {
@@ -526,6 +582,15 @@ void Shader::SetRandomSamplesSSAO(std::vector<glm::vec3> randomSamples)
 		glUniform3f(uniformRandomSamplesSSAO[i], randomSamples[i].x, randomSamples[i].y, randomSamples[i].z);
 	}
 }
+void Shader::SetRandomSamplesSSAO(std::vector<glm::vec3> *randomSamples)
+{
+	unsigned short int size = (*randomSamples).size();
+
+	for (unsigned short int i = 0; i < size; ++i)
+	{
+		glUniform3f(uniformRandomSamplesSSAO[i], (*randomSamples)[i].x, (*randomSamples)[i].y, (*randomSamples)[i].z);
+	}
+}
 void Shader::SetTextureAO(GLuint textureUnit)
 {
 	glUniform1i(uniformTextureAO, textureUnit);
@@ -534,9 +599,17 @@ void Shader::SetAmbientOcclusionRadius(GLfloat radius)
 {
 	glUniform1f(uniformRadiusAO, radius);
 }
+void Shader::SetAmbientOcclusionRadius(GLfloat *radius)
+{
+	glUniform1f(uniformRadiusAO, *radius);
+}
 void Shader::SetAmbientOcclusionBias(GLfloat bias)
 {
 	glUniform1f(uniformBiasAO, bias);
+}
+void Shader::SetAmbientOcclusionBias(GLfloat *bias)
+{
+	glUniform1f(uniformBiasAO, *bias);
 }
 
 void Shader::UseShader() 

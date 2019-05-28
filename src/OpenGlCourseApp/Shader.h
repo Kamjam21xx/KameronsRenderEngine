@@ -9,6 +9,7 @@
 
 #include <glm.hpp>
 #include <gtc\type_ptr.hpp>
+#include <gtc\matrix_transform.hpp>
 
 #include "DirectionalLight.h"
 #include "PointLight.h"
@@ -77,26 +78,40 @@ public:
 	void SetInverseProjection(glm::mat4 *inverseProjectionMatrix);
 	void SetInverseView(glm::mat4 *inverseViewMatrix);
 	void SetDirectionalLightTransform(glm::mat4 *lTransform);
-	void SetLightMatrices(std::vector<glm::mat4> lightMatrices);
+	void SetLightMatrices(std::vector<glm::mat4> lightMatrices);//-------------- copies vector - passed by value
+	void SetLightMatrices(std::vector<glm::mat4> *lightMatrices);
+	void SetLightMatrices(glm::vec3 *position, glm::mat4 *lightProjection);
 	void SetTextureSkyBox(GLuint textureUnit);
 	void SetSplitScreenIsOn(GLboolean splitScreenIsOn);
+	void SetSplitScreenIsOn(GLboolean *splitScreenIsOn);
 	void SetSplitScreenType(GLuint splitScreenType);
+	void SetSplitScreenType(GLuint *splitScreenType);
 	void SetTextureScreenSpace(GLuint textureUnit);
 	void SetTextureScreenSpaceTwo(GLuint textureUnit);
 	void SetTextureScreenSpaceThree(GLuint textureUnit);
 	void SetTextureDepth(GLuint textureUnit);
 	void SetTextureNoiseSSAO(GLuint textureUnit);
 	void SetGamma(GLfloat gammaLevel);
+	void SetGamma(GLfloat *gammaLevel);
 	void SetBloomThreshold(GLfloat bloomThreshold);
+	void SetBloomThreshold(GLfloat *bloomThreshold);
 	void SetHorizontal(GLboolean isHorizontal);
+	void SetHorizontal(GLboolean *isHorizontal);
 	void SetBrightness(GLfloat brightness);
+	void SetBrightness(GLfloat *brightness);
 	void SetContrast(GLfloat contrast);
+	void SetContrast(GLfloat *contrast);
 	void SetSaturation(GLfloat saturation);
+	void SetSaturation(GLfloat *saturation);
 	void SetHeightPOM(GLfloat height);
-	void SetRandomSamplesSSAO(std::vector<glm::vec3> randomSamples);
+	void SetHeightPOM(GLfloat *height);
+	void SetRandomSamplesSSAO(std::vector<glm::vec3> randomSamples);//-------------- copies vector - passed by value
+	void SetRandomSamplesSSAO(std::vector<glm::vec3> *randomSamples);
 	void SetTextureAO(GLuint textureUnit);
 	void SetAmbientOcclusionRadius(GLfloat radius);
+	void SetAmbientOcclusionRadius(GLfloat *radius);
 	void SetAmbientOcclusionBias(GLfloat bias);
+	void SetAmbientOcclusionBias(GLfloat *bias);
 
 	~Shader();
 

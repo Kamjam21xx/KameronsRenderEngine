@@ -33,7 +33,8 @@ PointLight::PointLight(GLuint shadowWidth, GLuint shadowHeight,
 
 void PointLight::UseLight(GLuint ambientIntensityLocation, GLuint ambientColourLocation,
 						  GLuint diffuseIntensityLocation, GLuint positionLocation,
-						  GLuint constantLocation,			GLuint linearLocation,		   GLuint exponentLocation) const {
+						  GLuint constantLocation,			GLuint linearLocation,		   GLuint exponentLocation) const 
+{
 	glUniform3f(ambientColourLocation, color.x, color.y, color.z);
 	glUniform1f(ambientIntensityLocation, ambientIntensity);
 	glUniform1f(diffuseIntensityLocation, diffuseIntensity);
@@ -44,7 +45,8 @@ void PointLight::UseLight(GLuint ambientIntensityLocation, GLuint ambientColourL
 	glUniform1f(exponentLocation, exponent);
 }
 
-std::vector<glm::mat4> PointLight::CalculateLightTransform() {
+std::vector<glm::mat4> PointLight::CalculateLightTransform() 
+{
 	std::vector<glm::mat4> lightMatrices;
 	lightMatrices.push_back(
 		lightProj * glm::lookAt(position, position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
@@ -60,17 +62,26 @@ std::vector<glm::mat4> PointLight::CalculateLightTransform() {
 		lightProj * glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 	return lightMatrices;
 }
-GLfloat PointLight::GetFarPlane() const {
+
+GLfloat PointLight::GetFarPlane() const 
+{
 	return farPlane;
 }
-glm::vec3 PointLight::GetPosition() const {
+glm::vec3 PointLight::GetPosition() const 
+{
 	return position;
 }
+glm::vec3* PointLight::GetPositionPtr()
+{
+	return &position;
+}
 
-void PointLight::SetPosition(glm::vec3 pos) {
+void PointLight::SetPosition(glm::vec3 pos) 
+{
 	position = pos;
 }
 
 PointLight::~PointLight()
 {
+
 }

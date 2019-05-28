@@ -22,16 +22,19 @@ public:
 	std::vector<glm::mat4> CalculateLightTransform();
 	GLfloat GetFarPlane() const ;
 	glm::vec3 GetPosition() const ;
+	glm::vec3* GetPositionPtr();
 
 	void SetPosition(glm::vec3 pos);
-	void SetLightRange(GLfloat newRange) {
+	void SetLightRange(GLfloat newRange) 
+	{
 		constant = 1.0f;
 		linear = 4.5f / newRange;
 		exponent = 75.0f / (newRange * newRange);
 
 		range = newRange; // SET BRIGHTNESS IN CONSTRUCTOR BASES ON THESE VALUES ? range = constant * (exp + linear;
 	}
-	float GetRange() const {
+	float GetRange() const 
+	{
 		return (float)range;
 	}
 
@@ -40,5 +43,4 @@ public:
 protected:
 	glm::vec3 position;
 	GLfloat constant, linear, exponent, farPlane, range;
-
 };

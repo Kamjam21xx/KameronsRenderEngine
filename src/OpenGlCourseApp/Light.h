@@ -17,37 +17,54 @@ public:
 		  GLfloat red, GLfloat green, GLfloat blue, 
 		  GLfloat aIntensity, GLfloat dIntensity);
 
-	ShadowMap* GetShadowMap() { return shadowMap; }
+	ShadowMap* GetShadowMap() 
+	{ 
+		return shadowMap; 
+	}
 
-	void SetAmbientIntensity(GLfloat newAmbientIntensity) {
+	void SetAmbientIntensity(GLfloat newAmbientIntensity) 
+{
 		ambientIntensity = newAmbientIntensity;
 	}
-	void SetDiffuseIntensity(GLfloat newDiffuseIntensity) {
+	void SetDiffuseIntensity(GLfloat newDiffuseIntensity) 
+{
 		diffuseIntensity = newDiffuseIntensity;
 	}
-	void SetLightColor(GLint red_8, GLint green_8, GLint blue_8) {
+	void SetLightColor(GLint red_8, GLint green_8, GLint blue_8) 
+	{
 		color = glm::vec3(GLfloat(red_8 / 255.0f), GLfloat(green_8 / 255.0f), GLfloat(blue_8 / 255.0f));
 	}
-	void SetLightColor(GLfloat red, GLfloat green, GLfloat blue) {
+	void SetLightColor(GLfloat red, GLfloat green, GLfloat blue) 
+{
 		color = glm::vec3(red, green, blue);
 	}
 	
-	glm::vec3 GetLightColor() const {
+	glm::mat4* GetLightProjectionPtr()
+	{
+		return &lightProj;
+	}
+	glm::vec3 GetLightColor() const 
+	{
 		return color;
 	}
-	float GetLightColorRed() const {
+	float GetLightColorRed() const 
+{
 		return (float)color.r;
 	}
-	float GetLightColorGreen() const {
+	float GetLightColorGreen() const 
+{
 		return (float)color.g;
 	}
-	float GetLightColorBlue() const {
+	float GetLightColorBlue() const 
+{
 		return (float)color.b;
 	}
-	float GetAmbientIntensity() const {
+	float GetAmbientIntensity() const 
+{
 		return ambientIntensity;
 	}
-	float GetDiffuseIntensity() const {
+	float GetDiffuseIntensity() const 
+{
 		return diffuseIntensity;
 	}
 

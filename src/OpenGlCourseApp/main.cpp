@@ -142,6 +142,9 @@ FrameBuffer ssaoBuffer;
 // TEMP SSAO
 
 
+
+
+
 void errorCheckGL(std::string location)
 {
 	GLenum error;
@@ -170,6 +173,14 @@ void errorCheckGL(std::string location)
 
 		std::cout << location << " : ERROR : " << errorType << std::endl;
 	}
+}
+GLfloat DeltaTime() 
+{
+	now = glfwGetTime();
+	deltaTime = now - lastTime;
+	lastTime = now;
+
+	return deltaTime;
 }
 void CreateShaders() 
 {
@@ -205,6 +216,59 @@ void CreateShaders()
 	ShaderSSAO = Shader();
 	ShaderSSAO.CreateFromFiles(sourceSSAOVert, sourceSSAOFrag);
 }
+void CreateLights(PointLight &pointLightsR, 
+				  SpotLight &spotLightsR, 
+				  unsigned short int *pointLightCount, 
+				  unsigned short int *spotLightCount) 
+{
+	// make plain text loader for lights, add to scene.
+	// added shadow detail var for ease testing
+	GLint shadowDetail = 4;
+
+	PointLight *pointLights = &pointLightsR; 
+	SpotLight *spotLights = &spotLightsR;
+
+	
+	pointLights[0] = PointLight(shadowDetail * 256, shadowDetail * 256,
+		0.01f, 100.0f,
+		0.7f, 0.7f, 1.0f,
+		0.001f, 40.0f,
+		3.0f, 8.0f, 3.0f,
+		100.0f, 10.0f, -200.8f);
+	(*pointLightCount)++;
+	pointLights[0].SetLightRange(12.0f);
+
+	pointLights[1] = PointLight(shadowDetail * 256, shadowDetail * 256,
+		0.01f, 100.0f,
+		1.0f, 0.7f, 0.7f,
+		0.0001f, 1.0f,
+		8.0f, 8.0f, -0.5f,
+		1.0f, 0.7f, -1.8f);
+	(*pointLightCount)++;
+	pointLights[1].SetLightRange(12.0f);
+
+	pointLights[2] = PointLight(shadowDetail * 256, shadowDetail * 256,
+		0.01f, 100.0f,
+		0.7f, 1.0f, 0.7f,
+		0.0001f, 1.0f,
+		8.0f, 8.0f, 0.5f,
+		-1.0f, 0.7f, 1.8f);
+	(*pointLightCount)++;
+	pointLights[2].SetLightRange(12.0f);
+/*
+	spotLights[0] = SpotLight(shadowDetail * 2048, shadowDetail * 2048,
+		0.1f, 100.0f,
+		0.5f, 0.5f, 0.5f,						// FIX SPOTLIGHT EDGE < < < < < << << << <<< <<< <<<< <<<< <<<<< <<<<<<
+		0.01f, 0.9f,
+		5.0f, 4.0f, 1.0f,
+		-0.9f, -1.0f, -0.40f,
+		0.8f, 0.1f, 0.01f,
+		32.0f); 
+	(*spotLightCount)++;
+	spotLights[0].SetLightRange(80.0f);
+*/	
+}
+
 void RenderScene() 
 {
 	for (auto element = mainScene.objects.begin() ; element != mainScene.objects.end(); ++element) {
@@ -231,44 +295,7 @@ void RenderSceneStencil()
 		(*element).RenderModel();
 	}
 }
-void DirectionalShadowMapPass(DirectionalLight* light) 
-{
-	shaderDirectionalShadow.UseShader();
-	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
-	light->GetShadowMap()->Write();
 
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	uniformModel = shaderDirectionalShadow.GetModelLocation();
-	shaderDirectionalShadow.SetDirectionalLightTransform(&light->CalculateLightTransform());
-
-	shaderDirectionalShadow.Validate();
-	
-	RenderScene();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-void OmniShadowMapPass(PointLight *light) 
-{
-	shaderOmniShadow.UseShader();
-	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
-	light->GetShadowMap()->Write();
-
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	uniformModel = shaderOmniShadow.GetModelLocation();
-	uniformOmniLightPos = shaderOmniShadow.GetOmniLightLocation();
-	uniformFarPlane = shaderOmniShadow.GetFarPlanelocation();
-	
-	glUniform3f(uniformOmniLightPos, light->GetPosition().x, light->GetPosition().y, light->GetPosition().z);
-	glUniform1f(uniformFarPlane, light->GetFarPlane());
-
-	shaderOmniShadow.SetLightMatrices(light->CalculateLightTransform());
-
-	shaderOmniShadow.Validate();
-
-	RenderScene();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
 void BloomBlurPass() // re-write to blur then downsize then blur etc and pack everything in a neat class or something
 {
 	unsigned short int iterations = 2 * numOfBloomPasses - 1;
@@ -278,7 +305,7 @@ void BloomBlurPass() // re-write to blur then downsize then blur etc and pack ev
 	shaderBlur.UseShader();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, blurBuffer.GetFBO(isHorizontal));
-	shaderBlur.SetHorizontal(isHorizontal);
+	shaderBlur.SetHorizontal((GLboolean*)&isHorizontal);
 	dualFramebufferHDR.BindTexture(1);
 
 	glBindVertexArray(screenQuadVAO);
@@ -291,7 +318,7 @@ void BloomBlurPass() // re-write to blur then downsize then blur etc and pack ev
 	for (unsigned short int i = 0; i < iterations; ++i)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, blurBuffer.GetFBO(isHorizontal));
-		shaderBlur.SetHorizontal(isHorizontal);
+		shaderBlur.SetHorizontal((GLboolean*)&isHorizontal);
 
 		blurBuffer.BindTexture(!isHorizontal);
 		
@@ -316,7 +343,7 @@ void RenderToQuadApplyBloom()
 	glDisable(GL_DEPTH_TEST);
 
 	shaderForwardPost.UseShader();
-	shaderForwardPost.SetGamma(gamma);
+	shaderForwardPost.SetGamma(&gamma);
 
 	dualFramebufferHDR.BindTexture(0);
 	dualFramebufferHDR.BindTexture(1);
@@ -349,10 +376,10 @@ void RenderToQuadDeferred(glm::mat4 *inverseProjectionMatrix, glm::mat4 *inverse
 
 	shaderDeferredPost.SetPointLights(pointLights, pointLightCount, 8, 0);
 
-	shaderDeferredPost.SetGamma(gamma);
-	shaderDeferredPost.SetBrightness(brightness);
-	shaderDeferredPost.SetContrast(contrast);
-	shaderDeferredPost.SetSaturation(saturation);
+	shaderDeferredPost.SetGamma(&gamma);
+	shaderDeferredPost.SetBrightness(&brightness);
+	shaderDeferredPost.SetContrast(&contrast);
+	shaderDeferredPost.SetSaturation(&saturation);
     
 	ssaoBuffer.BindTexture(16);
 	gBuffer.BindTextureNormHeight(21);
@@ -365,6 +392,7 @@ void RenderToQuadDeferred(glm::mat4 *inverseProjectionMatrix, glm::mat4 *inverse
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_STENCIL_TEST);
 }
+
 void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 						 unsigned short int* pointLightCount, unsigned short int* spotLightCount,
 						 DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights)
@@ -387,14 +415,14 @@ void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4
 	glUniform3f(uniformEyeDirection, camera.getCameraDirection().x, camera.getCameraDirection().y, camera.getCameraDirection().z);
 
 
-	shaderList[i].SetSplitScreenIsOn(splitScreenIsOn);
-	shaderList[i].SetSplitScreenType(splitScreenType);
-	shaderList[i].SetGamma(gamma);
-	shaderList[i].SetBloomThreshold(bloomThreshold);
-	shaderList[i].SetBrightness(brightness);
-	shaderList[i].SetContrast(contrast);
-	shaderList[i].SetSaturation(saturation);
-	shaderList[i].SetHeightPOM(height);
+	shaderList[i].SetSplitScreenIsOn(&splitScreenIsOn);
+	shaderList[i].SetSplitScreenType(&splitScreenType);
+	shaderList[i].SetGamma(&gamma);
+	shaderList[i].SetBloomThreshold(&bloomThreshold);
+	shaderList[i].SetBrightness(&brightness);
+	shaderList[i].SetContrast(&contrast);
+	shaderList[i].SetSaturation(&saturation);
+	shaderList[i].SetHeightPOM(&height);
 
 
 	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
@@ -464,7 +492,7 @@ void GBufferSetup(glm::mat4 *projectionMatrix, glm::mat4 *viewMatrix)
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(*viewMatrix));
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 	
-	shaderGBuffer.SetHeightPOM(height);
+	shaderGBuffer.SetHeightPOM(&height);
 
 	shaderGBuffer.SetTextureDiffuse(unsigned short int(1));
 	shaderGBuffer.SetTextureNormal(unsigned short int(5));
@@ -529,7 +557,7 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 	glm::mat4 inverseProjectionMatrix = glm::inverse(projectionMatrix);
 	glm::mat4 inverseViewMatrix = glm::inverse(viewMatrix);
 	ShaderSSAO.SetInverseProjection(&inverseProjectionMatrix);	
-	ShaderSSAO.SetRandomSamplesSSAO(kernelSSAO);
+	ShaderSSAO.SetRandomSamplesSSAO(&kernelSSAO);
 
 	ShaderSSAO.SetAmbientOcclusionRadius(0.1 * radiusAO); // rework shader class and make it optional to pass a pointer too.
 	ShaderSSAO.SetAmbientOcclusionBias(0.1 * biasAO);
@@ -579,67 +607,46 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 
 
 }
-void CreateLights(PointLight &pointLightsR, 
-				  SpotLight &spotLightsR, 
-				  unsigned short int *pointLightCount, 
-				  unsigned short int *spotLightCount) 
+
+
+void DirectionalShadowMapPass(DirectionalLight* light) 
 {
-	// make plain text loader for lights, add to scene.
-	// added shadow detail var for ease testing
-	GLint shadowDetail = 4;
+	shaderDirectionalShadow.UseShader();
+	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
+	light->GetShadowMap()->Write();
 
-	PointLight *pointLights = &pointLightsR; 
-	SpotLight *spotLights = &spotLightsR;
+	glClear(GL_DEPTH_BUFFER_BIT);
 
+	uniformModel = shaderDirectionalShadow.GetModelLocation();
+	shaderDirectionalShadow.SetDirectionalLightTransform(&light->CalculateLightTransform());
+
+	shaderDirectionalShadow.Validate();
 	
-	pointLights[0] = PointLight(shadowDetail * 256, shadowDetail * 256,
-		0.01f, 100.0f,
-		0.7f, 0.7f, 1.0f,
-		0.001f, 40.0f,
-		3.0f, 8.0f, 3.0f,
-		100.0f, 10.0f, -200.8f);
-	(*pointLightCount)++;
-	pointLights[0].SetLightRange(12.0f);
-
-	pointLights[1] = PointLight(shadowDetail * 256, shadowDetail * 256,
-		0.01f, 100.0f,
-		1.0f, 0.7f, 0.7f,
-		0.0001f, 1.0f,
-		8.0f, 8.0f, -0.5f,
-		1.0f, 0.7f, -1.8f);
-	(*pointLightCount)++;
-	pointLights[1].SetLightRange(12.0f);
-
-	pointLights[2] = PointLight(shadowDetail * 256, shadowDetail * 256,
-		0.01f, 100.0f,
-		0.7f, 1.0f, 0.7f,
-		0.0001f, 1.0f,
-		8.0f, 8.0f, 0.5f,
-		-1.0f, 0.7f, 1.8f);
-	(*pointLightCount)++;
-	pointLights[2].SetLightRange(12.0f);
-/*
-	spotLights[0] = SpotLight(shadowDetail * 2048, shadowDetail * 2048,
-		0.1f, 100.0f,
-		0.5f, 0.5f, 0.5f,						// FIX SPOTLIGHT EDGE < < < < < << << << <<< <<< <<<< <<<< <<<<< <<<<<<
-		0.01f, 0.9f,
-		5.0f, 4.0f, 1.0f,
-		-0.9f, -1.0f, -0.40f,
-		0.8f, 0.1f, 0.01f,
-		32.0f); 
-	(*spotLightCount)++;
-	spotLights[0].SetLightRange(80.0f);
-*/	
+	RenderScene();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-GLfloat DeltaTime() 
+void OmniShadowMapPass(PointLight *light) 
 {
-	now = glfwGetTime();
-	deltaTime = now - lastTime;
-	lastTime = now;
+	shaderOmniShadow.UseShader();
+	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
+	light->GetShadowMap()->Write();
 
-	return deltaTime;
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	uniformModel = shaderOmniShadow.GetModelLocation();
+	uniformOmniLightPos = shaderOmniShadow.GetOmniLightLocation();
+	uniformFarPlane = shaderOmniShadow.GetFarPlanelocation();
+	
+	glUniform3f(uniformOmniLightPos, light->GetPosition().x, light->GetPosition().y, light->GetPosition().z);
+	glUniform1f(uniformFarPlane, light->GetFarPlane());
+
+	shaderOmniShadow.SetLightMatrices(light->GetPositionPtr(), light->GetLightProjectionPtr());
+
+	shaderOmniShadow.Validate();
+
+	RenderScene();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
 
 
 
@@ -705,7 +712,7 @@ int main()
 	DirectionalLight mainLight;
 	glm::mat4 projection;
 
-	camera = Camera(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), -90.0f, 0, 3.0f, 0.5f);
+	camera = Camera(glm::vec3(0, 5, 11), glm::vec3(0, 1, 0), -90.0f, 0, 3.0f, 0.5f);
 	projection = glm::perspective(glm::radians(52.0f), mainWindow.getAspectRatio(), 0.1f, 100.0f);
 
 	shineMaterial = Material(4.0f, 32.0f);
