@@ -107,7 +107,7 @@ FrameBuffer::~FrameBuffer()
 {	
 	if (RBO) 
 	{
-		glDeleteTextures(1, &texColorBuffer);
+		glDeleteTextures(1, &RBO);
 	}
 	if (FBO) 
 	{

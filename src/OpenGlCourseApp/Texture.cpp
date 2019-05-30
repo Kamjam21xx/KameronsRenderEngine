@@ -242,7 +242,7 @@ bool Texture::GenerateTextureFBO(GLenum glTextureUnit, GLenum internalFormat, GL
 	return true;
 }
 
-void Texture::BindZero() const
+void Texture::Unbind() const
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -293,7 +293,7 @@ GLuint Texture::GetTextureUnit() const
 {
 	return textureUnit;
 }
-const char* Texture::GetFileLocationPtr() const 
+const char* Texture::GetFilePath() const 
 {
 	return fileLocation;
 }

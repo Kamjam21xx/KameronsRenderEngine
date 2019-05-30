@@ -25,9 +25,8 @@ public:
 	SkyBox(std::vector<std::string> faceLocations);
 
 	void bindCubeMapTexture() const ;
-	void unbinedCubeMapTexture() const ;
-	void DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation) const ;
-	void DrawSkyBoxDeferred(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation) const;
+	void DrawSkyBox(glm::mat4 *viewMatrix, glm::mat4 *projectionMatrix, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation) const ;
+	void DrawSkyBoxDeferred(glm::mat4 *viewMatrix, glm::mat4 *projectionMatrix, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation) const;
 
 	// make functions to clear memory without destructing
 
@@ -42,9 +41,9 @@ private:
 	GLuint textureID;
 	GLuint uniformProjection, uniformView, uniformProjectionDeferred, uniformViewDeferred;
 
-	void LoadFromDirectory(std::string fileLocation, const char *vertexShader, const char *fragmentShader);
-	void LoadFromDirectory(std::string fileLocation, const char *vertexShader, const char *fragmentShader,const char *vertexShaderD, const char *fragmentShaderD);
-	void LoadTexturedCube(std::vector<std::string> faceLocations);
+	void LoadFromDirectory(std::string *fileLocation, const char *vertexShader, const char *fragmentShader);
+	void LoadFromDirectory(std::string *fileLocation, const char *vertexShader, const char *fragmentShader,const char *vertexShaderD, const char *fragmentShaderD);
+	void LoadTexturedCube(std::vector<std::string> *faceLocations);
 	void LoadShader(const char *vertexShader, const char *fragmentShader);
 	void LoadShaderDeferred(const char *vertexShader, const char *fragmentShader);
 

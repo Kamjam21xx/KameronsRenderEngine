@@ -8,11 +8,11 @@ SkyBox::SkyBox()
 
 SkyBox::SkyBox(std::string fileLocation, const char *vertexShader, const char *fragmentShader) // directory to folder 
 {
-	LoadFromDirectory(fileLocation, vertexShader, fragmentShader, nullptr, nullptr);
+	LoadFromDirectory(&fileLocation, vertexShader, fragmentShader, nullptr, nullptr);
 }
 SkyBox::SkyBox(std::string fileLocation, const char *vertexShader, const char *fragmentShader, const char *vertexShaderD, const char *fragmentShaderD) // directory to folder 
 {
-	LoadFromDirectory(fileLocation, vertexShader, fragmentShader, vertexShaderD, fragmentShaderD);
+	LoadFromDirectory(&fileLocation, vertexShader, fragmentShader, vertexShaderD, fragmentShaderD);
 }
 
 SkyBox::SkyBox(std::vector<std::string> faceLocations)
@@ -23,21 +23,21 @@ SkyBox::SkyBox(std::vector<std::string> faceLocations)
 	const char* fragD = "shaders/skyboxDeferred.frag";
 
 	LoadShader(vert, frag);
-	LoadTexturedCube(faceLocations);
+	LoadTexturedCube(&faceLocations);
 }
-void SkyBox::LoadFromDirectory(std::string fileLocation, const char *vertexShader, const char *fragmentShader) // directory to folder 
+void SkyBox::LoadFromDirectory(std::string *fileLocation, const char *vertexShader, const char *fragmentShader) // directory to folder 
 {
 	LoadFromDirectory(fileLocation, vertexShader, fragmentShader, nullptr, nullptr);
 }
-void SkyBox::LoadFromDirectory(std::string fileLocation, const char *vertexShader, const char *fragmentShader, const char *vertexShaderD, const char *fragmentShaderD) // directory to folder 
+void SkyBox::LoadFromDirectory(std::string *fileLocation, const char *vertexShader, const char *fragmentShader, const char *vertexShaderD, const char *fragmentShaderD) // directory to folder 
 {
 	std::vector<std::string> faceLocations;
-	faceLocations.push_back(fileLocation + "/right.jpg");
-	faceLocations.push_back(fileLocation + "/left.jpg");	
-	faceLocations.push_back(fileLocation + "/top.jpg");
-	faceLocations.push_back(fileLocation + "/bot.jpg");
-	faceLocations.push_back(fileLocation + "/back.jpg");
-	faceLocations.push_back(fileLocation + "/front.jpg");
+	faceLocations.push_back((*fileLocation) + "/right.jpg");
+	faceLocations.push_back((*fileLocation) + "/left.jpg");	
+	faceLocations.push_back((*fileLocation) + "/top.jpg");
+	faceLocations.push_back((*fileLocation) + "/bot.jpg");
+	faceLocations.push_back((*fileLocation) + "/back.jpg");
+	faceLocations.push_back((*fileLocation) + "/front.jpg");
 	
 	if (vertexShader != nullptr)
 	{
@@ -48,7 +48,7 @@ void SkyBox::LoadFromDirectory(std::string fileLocation, const char *vertexShade
 		LoadShaderDeferred(vertexShaderD, fragmentShaderD);
 	}
 
-	LoadTexturedCube(faceLocations);
+	LoadTexturedCube(&faceLocations);
 }
 
 void SkyBox::LoadShader(const char *vertexShader, const char *fragmentShader)
@@ -69,7 +69,7 @@ void SkyBox::LoadShaderDeferred(const char *vertexShader, const char *fragmentSh
 	uniformViewDeferred = skyShaderDeferred->GetViewLocation();
 }
 
-void SkyBox::LoadTexturedCube(std::vector<std::string> faceLocations) 
+void SkyBox::LoadTexturedCube(std::vector<std::string> *faceLocations) 
 {
 	// Texture
 	glGenTextures(1, &textureID);
@@ -77,9 +77,9 @@ void SkyBox::LoadTexturedCube(std::vector<std::string> faceLocations)
 	int width, height, bitDepth;
 	for (size_t i = 0; i < 6; ++i) 
 	{
-		unsigned char *texData = stbi_load(faceLocations[i].c_str(), &width, &height, &bitDepth, 0);
+		unsigned char *texData = stbi_load((*faceLocations)[i].c_str(), &width, &height, &bitDepth, 0);
 		if (!texData) {
-			printf("Failed to find: %s \n", faceLocations[i].c_str());
+			printf("Failed to find: %s \n", (*faceLocations)[i].c_str());
 			return;
 		}
 
@@ -134,14 +134,16 @@ void SkyBox::bindCubeMapTexture() const
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 }
-void SkyBox::unbinedCubeMapTexture() const 
-{
-	// add it if i need it i guess
-}
 
-void SkyBox::DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation) const // add brightness contrast saturation
+void SkyBox::DrawSkyBox(glm::mat4 *viewMatrix, glm::mat4 *projectionMatrix, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation) const // add brightness contrast saturation
 {
-	viewMatrix = glm::mat4(glm::mat3(viewMatrix));
+	GLfloat viewMatrixArray[16] =
+	{
+	(*viewMatrix)[0][0],  (*viewMatrix)[0][1],  (*viewMatrix)[0][2],  0.0f,
+	(*viewMatrix)[1][0],  (*viewMatrix)[1][1],  (*viewMatrix)[1][2],  0.0f,
+	(*viewMatrix)[2][0],  (*viewMatrix)[2][1],  (*viewMatrix)[2][2],  0.0f,
+	0.0f,				  0.0f,				    0.0f,				  0.0f
+	};
 
 	// glDepthMask(GL_FALSE);
 
@@ -152,8 +154,8 @@ void SkyBox::DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloa
 	skyShader->SetContrast(*contrast);
 	skyShader->SetSaturation(*saturation);
 
-	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(*projectionMatrix));
+	glUniformMatrix4fv(uniformView, 1, GL_FALSE, viewMatrixArray);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
@@ -164,9 +166,15 @@ void SkyBox::DrawSkyBox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloa
 
 	// glDepthMask(GL_TRUE);
 }
-void SkyBox::DrawSkyBoxDeferred(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation) const
+void SkyBox::DrawSkyBoxDeferred(glm::mat4 *viewMatrix, glm::mat4 *projectionMatrix, GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation) const
 {
-	viewMatrix = glm::mat4(glm::mat3(viewMatrix));
+	GLfloat viewMatrixArray[16] =
+	{
+	(*viewMatrix)[0][0],  (*viewMatrix)[0][1],  (*viewMatrix)[0][2],  0.0f,
+	(*viewMatrix)[1][0],  (*viewMatrix)[1][1],  (*viewMatrix)[1][2],  0.0f,
+	(*viewMatrix)[2][0],  (*viewMatrix)[2][1],  (*viewMatrix)[2][2],  0.0f,
+	0.0f,				  0.0f,				    0.0f,				  0.0f
+	};
 
 	// glDepthMask(GL_FALSE);
 
@@ -177,8 +185,8 @@ void SkyBox::DrawSkyBoxDeferred(glm::mat4 viewMatrix, glm::mat4 projectionMatrix
 	skyShaderDeferred->SetContrast(*contrast);
 	skyShaderDeferred->SetSaturation(*saturation);
 
-	glUniformMatrix4fv(uniformProjectionDeferred, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-	glUniformMatrix4fv(uniformViewDeferred, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniformMatrix4fv(uniformProjectionDeferred, 1, GL_FALSE, glm::value_ptr(*projectionMatrix));
+	glUniformMatrix4fv(uniformViewDeferred, 1, GL_FALSE, viewMatrixArray);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);

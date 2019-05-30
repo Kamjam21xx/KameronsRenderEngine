@@ -14,20 +14,34 @@ uniform vec3 samples[64]; // maybe bake this
 uniform float ambientOcclusionRadius;
 uniform float ambientOcclusionBias;
 
-const vec2 noiseScale = vec2(1920, 1080); // 1/4 screen resolution 1080p from 4k, make it dynamic or whatevs
+ // 1/4 screen resolution 1080p from 4k, make it dynamic or whatevs
 
 vec3 CalcDepthToViewFragPos(vec2 texCoords)
 {
-	float z = texture(theTextureDepth, texCoords).r; // * 2.0 - 1.0;
+	float z = texture(theTextureDepth, texCoords).r * 2.0 - 1.0;
 
 	vec4 viewSpacePos = vec4(texCoords * 2.0 - 1.0, z, 1.0) * inverseProjection;
 
 	return viewSpacePos.xyz / viewSpacePos.w; 
 }
+vec3 CalcDepthToViewFragPoss(vec2 texCoords)
+{
+	float z = texture(theTextureDepth, texCoords).r;
+	float x = texCoords.x * 2.0 - 1.0;
+	float y = texCoords.y * 2.0 - 1.0;
+
+	vec4 clipPos = vec4(x, y, z, 1.0);
+
+	vec4 viewSpacePos = clipPos * inverseProjection; // simplify
+
+	return viewSpacePos.xyz / viewSpacePos.w; 
+}
+
 
 void main()
 {
-	vec3 FragPos = CalcDepthToViewFragPos(TexCoord).rgb;
+	const vec2 noiseScale = vec2(4.0/3840.0, 4.0/2160.0);
+	vec3 FragPos = CalcDepthToViewFragPoss(TexCoord).rgb;
 	vec3 Normal = normalize(texture(screenSpaceTextureThree, TexCoord).rgb);
 	vec3 sampleRotation = normalize(texture(theTextureNoiseSSAO, TexCoord * noiseScale).rgb);
 
@@ -40,24 +54,30 @@ void main()
 	float occlusion = 0.0;
 	float radius = ambientOcclusionRadius;
 	float bias = ambientOcclusionBias;
-	float kernelSize = 64.0;
+	float kernelSize = 32.0;
 
 	for(int i = 0; i < kernelSize; ++i)
 	{
-		vec3 samplePos = TBN * samples[i];
+		vec3 samplePos = TBN * samples[i] ;
 		samplePos = FragPos + samplePos * radius; // determine radius
+		//samplePos.xy = samplePos.xy;// * 0.25 + 0.25;
+		//samplePos.z = samplePos.z * 2.0;// - 1.0;
 
 		vec4 offset = vec4(samplePos, 1.0);
 		offset = projection * offset; // view to clipspace
-		offset.xyz /= offset.w; // perspective divide
-		offset.xyz = offset.xyz * 0.5 + 0.5; // 0-1 range
+		offset.xy /= offset.w; // perspective divide
 
-		float sampleDepth = CalcDepthToViewFragPos(offset.xy).z; // massive room for improvement - make seperate function
-		float rangeCheck = smoothstep(0.0, 1.0, radius / abs(FragPos.z - sampleDepth));
-		occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck;
+		float sampleDepth = CalcDepthToViewFragPoss(offset.xy * 0.5 + 0.5).z; // massive room for improvement - make seperate function
+		//float rangeCheck = smoothstep(0.0, 1.0, radius / abs(FragPos.z - sampleDepth));
+		occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0);// * rangeCheck;
 	}
 
 	occlusion = 1.0 - (occlusion / kernelSize);
 	SSAO = vec3(occlusion);
+
+	if(TexCoord.x > 0.5)
+	{ 
+		SSAO.rgb = vec3(CalcDepthToViewFragPos(TexCoord).r);
+	}
 
 }

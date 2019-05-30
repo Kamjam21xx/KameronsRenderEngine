@@ -167,18 +167,19 @@ void main()
 	float Height = sampleTex2.a;
 
 	
-
 	vec4 lighting = CalcPointLights();
 
 	Colour = lighting * vec4(AO, AO, AO, 1.0);
 
+
+
 	Colour = CalcbrightnessContrastSaturation(Colour);
 
 	Colour = ApplyGammaToneMapping(Colour.rgb);
-
+	Colour.rgb = vec3(AO);
 	// study the math. math math math math math math math math math is king king king. 
 
-	Colour.rgb = vec3(AO);
+
 
 
 

@@ -9,7 +9,7 @@ Mesh::Mesh()
 	IBO = 0;
 	indexCount = 0;
 }
-
+// consolidate the loading into one singular function that calls other functions if needed
 void Mesh::CreateMesh(GLfloat *vertices, unsigned int *indices, 
 					  unsigned int numOfVertices, unsigned int numOfIndices, 
 					  GLenum drawType
@@ -93,9 +93,9 @@ void Mesh::RenderMesh() const
 	glBindVertexArray(0);
 }
 
-void Mesh::ClearMesh()
+Mesh::~Mesh()
 {
-	if (IBO != 0)
+		if (IBO != 0)
 	{
 		glDeleteBuffers(1, &IBO);
 		IBO = 0;
@@ -114,10 +114,4 @@ void Mesh::ClearMesh()
 	}
 
 	indexCount = 0;
-}
-
-
-Mesh::~Mesh()
-{
-	ClearMesh();
 }

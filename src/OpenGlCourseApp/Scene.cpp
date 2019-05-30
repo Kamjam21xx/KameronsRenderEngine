@@ -100,11 +100,11 @@ void Scene::loadSceneFile() { // pretty much has to be a full function. dont bre
 			objects[arrayLocation].LoadModel(
 				path + ".fbx",
 				GL_STREAM_DRAW,
-				color,
-				specular,
-				normal,
-				height,
-				bitFlags
+				&color,
+				&specular,
+				&normal,
+				&height,
+				&bitFlags
 			);
 			arrayLocation++;	
 		}

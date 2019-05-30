@@ -41,6 +41,7 @@
 #include "FrameBuffer.h"
 #include "MultiFrameBuffer.h"
 #include "GBuffer.h"
+#include "ScreenQuad.h"
 
 // linear interpolation == free lunch
 // possibly make a bokeh bloom blur shader that takes advantage of linear interpolation to keep it light
@@ -126,7 +127,8 @@ SpotLight spotLights[MAX_SPOT_LIGHTS];
 unsigned short int spotLightCount = 0;
 unsigned short int pointLightCount = 0;
 
-unsigned int screenQuadVAO, screenQuadVBO;
+ScreenQuad screenQuad;
+
 int TEST_VALUE_IMGUI = 0;
 
 
@@ -216,10 +218,7 @@ void CreateShaders()
 	ShaderSSAO = Shader();
 	ShaderSSAO.CreateFromFiles(sourceSSAOVert, sourceSSAOFrag);
 }
-void CreateLights(PointLight &pointLightsR, 
-				  SpotLight &spotLightsR, 
-				  unsigned short int *pointLightCount, 
-				  unsigned short int *spotLightCount) 
+void CreateLights(PointLight &pointLightsR, SpotLight &spotLightsR, unsigned short int *pointLightCount, unsigned short int *spotLightCount) 
 {
 	// make plain text loader for lights, add to scene.
 	// added shadow detail var for ease testing
@@ -283,7 +282,7 @@ void RenderScene()
 		(*element).RenderModel();
 	}
 }
-void RenderSceneStencil() 
+void RenderSceneStencil()  // Edit to use for individual objects as a subset of renderScene()
 {
 	for (auto element = mainScene.objects.begin(); element != mainScene.objects.end(); ++element) {
 		glm::mat4 model = glm::mat4(1.0);
@@ -296,7 +295,7 @@ void RenderSceneStencil()
 	}
 }
 
-void BloomBlurPass() // re-write to blur then downsize then blur etc and pack everything in a neat class or something
+void ForwardBloomBlurPass() // re-write to blur then downsize then blur etc and pack everything in a neat class or something
 {
 	unsigned short int iterations = 2 * numOfBloomPasses - 1;
 	bool isHorizontal = true;
@@ -308,8 +307,8 @@ void BloomBlurPass() // re-write to blur then downsize then blur etc and pack ev
 	shaderBlur.SetHorizontal((GLboolean*)&isHorizontal);
 	dualFramebufferHDR.BindTexture(1);
 
-	glBindVertexArray(screenQuadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	screenQuad.Render();
+
 	glEnable(GL_DEPTH_TEST);
 
 	isHorizontal = !isHorizontal;
@@ -322,8 +321,7 @@ void BloomBlurPass() // re-write to blur then downsize then blur etc and pack ev
 
 		blurBuffer.BindTexture(!isHorizontal);
 		
-		glBindVertexArray(screenQuadVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		screenQuad.Render();
 		glEnable(GL_DEPTH_TEST);
 
 		isHorizontal = !isHorizontal;
@@ -332,7 +330,7 @@ void BloomBlurPass() // re-write to blur then downsize then blur etc and pack ev
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, 3840, 2160);
 }
-void RenderToQuadApplyBloom() 
+void ForwardFinalPass() 
 {
 	// could make framebuffer / dualframebuffer children of a base class and treat them in a generic manner for automatic use
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // switch this to the other dual fbo thing and then do a final render to quad
@@ -350,11 +348,11 @@ void RenderToQuadApplyBloom()
 	shaderForwardPost.SetTextureScreenSpace(18);
 	shaderForwardPost.SetTextureScreenSpaceTwo(17);
 
-	glBindVertexArray(screenQuadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	screenQuad.Render();
+
 	glEnable(GL_DEPTH_TEST);
 }
-void RenderToQuadDeferred(glm::mat4 *inverseProjectionMatrix, glm::mat4 *inverseViewMatrix)
+void DeferredFinalPass(glm::mat4 *inverseProjectionMatrix, glm::mat4 *inverseViewMatrix)
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); 
 
@@ -386,16 +384,14 @@ void RenderToQuadDeferred(glm::mat4 *inverseProjectionMatrix, glm::mat4 *inverse
 	gBuffer.BindTextureColSpec(22);
 	gBuffer.BindTextureDepthStencil(23);
 	
-	glBindVertexArray(screenQuadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	screenQuad.Render();
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_STENCIL_TEST);
 }
 
-void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
-						 unsigned short int* pointLightCount, unsigned short int* spotLightCount,
-						 DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights)
+// main passes call other render passes
+void ForwardMainPassSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsigned short int* pointLightCount, unsigned short int* spotLightCount, DirectionalLight *mainLight, PointLight *pointLights, SpotLight *spotLights)
 {
 	shaderList[i].UseShader();
 
@@ -438,9 +434,7 @@ void MainRenderSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4
 
 	shaderList[i].Validate();
 }
-void ForwardRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, 
-				unsigned short int* pointLightCount, unsigned short int* spotLightCount,
-				DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights) 
+void ForwardMainPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsigned short int* pointLightCount, unsigned short int* spotLightCount, DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights) 
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dualFramebufferHDR.GetFBO(0));
 	
@@ -449,7 +443,7 @@ void ForwardRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glStencilMask(0x00);
 
-	MainRenderSetup(currentShader, projectionMatrix, viewMatrix, pointLightCount, spotLightCount, mainLight, pointLights, spotLights);
+	ForwardMainPassSetup(currentShader, projectionMatrix, viewMatrix, pointLightCount, spotLightCount, mainLight, pointLights, spotLights);
 
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
@@ -464,7 +458,7 @@ void ForwardRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 	glStencilMask(0x00);
 	glDisable(GL_DEPTH_TEST);
 
-	mainScene.GetSkyBoxPtr()->DrawSkyBox(viewMatrix, projectionMatrix, &gamma, &bloomThreshold, &brightness, &contrast, &saturation);
+	mainScene.GetSkyBoxPtr()->DrawSkyBox(&viewMatrix, &projectionMatrix, &gamma, &bloomThreshold, &brightness, &contrast, &saturation);
 
 	glStencilMask(0xFF);
 	glEnable(GL_DEPTH_TEST);
@@ -472,11 +466,11 @@ void ForwardRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix,
 	glDisable(GL_STENCIL_TEST);
 
 	// add shader swapping in ImGui 
-	BloomBlurPass();
+	ForwardBloomBlurPass();
 
-	RenderToQuadApplyBloom();
+	ForwardFinalPass();
 }
-void GBufferSetup(glm::mat4 *projectionMatrix, glm::mat4 *viewMatrix)
+void DeferredMainPassSetup(glm::mat4 *projectionMatrix, glm::mat4 *viewMatrix)
 {
 	shaderGBuffer.UseShader();
 	gBuffer.BindAll();
@@ -500,7 +494,7 @@ void GBufferSetup(glm::mat4 *projectionMatrix, glm::mat4 *viewMatrix)
 
 	shaderGBuffer.Validate();
 }
-void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsigned short int *pointLightCount, unsigned short int *spotLightCount, DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights)
+void DeferredMainPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsigned short int *pointLightCount, unsigned short int *spotLightCount, DirectionalLight* mainLight, PointLight *pointLights, SpotLight *spotLights)
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gBuffer.GetFBO());
 	glViewport(0, 0, 3840, 2160);
@@ -516,7 +510,7 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 	glEnable(GL_STENCIL_TEST);
 
 
-	GBufferSetup(&projectionMatrix, &viewMatrix);	// make a member possibly
+	DeferredMainPassSetup(&projectionMatrix, &viewMatrix);	// make a member possibly
 
 
 	glDisable(GL_STENCIL_TEST);
@@ -542,10 +536,10 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 
 	// SSAO
 	// make a function to bake "samples[kernelSize]" to avoid uniform arrays
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ssaoBuffer.GetFBO());
+	glBindFramebuffer(GL_FRAMEBUFFER, ssaoBuffer.GetFBO());
 	glViewport(0, 0, 3840, 2160);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	ShaderSSAO.UseShader();
 
@@ -568,8 +562,7 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 	gBuffer.BindAndSetTexturePos(20); // view space normal not position
 	noiseTexture.UseTexture(24);
 
-	glBindVertexArray(screenQuadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	screenQuad.Render();
 	// SSAO
 
 
@@ -579,13 +572,13 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 	// combine bloom with color and do post processing
 
 	//glClear(GL_STENCIL_BUFFER_BIT);
-	RenderToQuadDeferred(&inverseProjectionMatrix, &inverseViewMatrix);
+	DeferredFinalPass(&inverseProjectionMatrix, &inverseViewMatrix);
 
 	
 	// draw skybox
 	glEnable(GL_STENCIL_TEST);
 	//mainScene.GetSkyBoxPtr()->bindCubeMapTexture();					// TEXTURE UNIT 6
-	//mainScene.GetSkyBoxPtr()->DrawSkyBoxDeferred(viewMatrix, projectionMatrix, &gamma, &bloomThreshold, &brightness, &contrast, &saturation);
+	//mainScene.GetSkyBoxPtr()->DrawSkyBoxDeferred(&viewMatrix, &projectionMatrix, &gamma, &bloomThreshold, &brightness, &contrast, &saturation);
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
 
@@ -608,8 +601,7 @@ void DeferredRenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsign
 
 }
 
-
-void DirectionalShadowMapPass(DirectionalLight* light) 
+void ShadowMapPassDirectional(DirectionalLight* light) 
 {
 	shaderDirectionalShadow.UseShader();
 	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
@@ -625,7 +617,7 @@ void DirectionalShadowMapPass(DirectionalLight* light)
 	RenderScene();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-void OmniShadowMapPass(PointLight *light) 
+void ShadowMapPassOmni(PointLight *light) 
 {
 	shaderOmniShadow.UseShader();
 	glViewport(0, 0, light->GetShadowMap()->GetShadowWidth(), light->GetShadowMap()->GetShadowHeight());
@@ -664,8 +656,8 @@ int main()
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-// additional settings
-	// glfwWindowHint(GLFW_SAMPLES, 16);
+	// additional settings
+	glfwWindowHint(GLFW_SAMPLES, 16);
 	glEnable(GL_MULTISAMPLE);
 	glfwSwapInterval(1); // vsync
 	mainWindow.swapBuffers();
@@ -678,27 +670,7 @@ int main()
 //<>=========================================================================================================<>
 // frame buffer setup
 
-	float quadVertices[] = 
-	{
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		-1.0f, -1.0f,  0.0f, 0.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-		 1.0f,  1.0f,  1.0f, 1.0f
-	};
-
-	glGenVertexArrays(1, &screenQuadVAO);
-	glGenBuffers(1, &screenQuadVBO);
-	glBindVertexArray(screenQuadVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, screenQuadVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
+	screenQuad.Init();
 
 	framebufferBlur.Init(19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
 	dualFramebufferHDR.Init(18, 19, GL_RGB16F, GL_RGB, GL_FLOAT, GL_LINEAR, 3840, 2160);
@@ -734,32 +706,32 @@ int main()
 	// normalize them
 	// get a 2 quadrants so you got a hemisphere then
 	// multiply it by a random number between [0, 1]
-for(unsigned short int i = 0; i < 64; ++i)
-{
-	glm::vec3 sample( randomFloats(generator) * 2.0f - 1.0f,
-					  randomFloats(generator) * 2.0f - 1.0f,
-					  randomFloats(generator));
+	for(unsigned short int i = 0; i < 64; ++i)
+	{
+		glm::vec3 sample( randomFloats(generator) * 2.0f - 1.0f,
+						  randomFloats(generator) * 2.0f - 1.0f,
+						  randomFloats(generator));
 
-	sample = glm::normalize(sample);
-	sample *= randomFloats(generator);
-	float scale = (float)i / 64.0;
-	scale = (0.1f + scale * scale) * 0.9f;
-	sample *= scale;
-	kernelSSAO.push_back(sample);
-}
+		sample = glm::normalize(sample);
+		sample *= randomFloats(generator);
+		float scale = (float)i / 64.0;
+		scale = (0.1f + scale * scale) * 0.9f;
+		sample *= scale;
+		kernelSSAO.push_back(sample);
+	}
 
-for (unsigned short int i = 0; i < 16; ++i)
-{
-	glm::vec3 noise( randomFloats(generator) * 2.0f - 1.0f,
-					 randomFloats(generator) * 2.0f - 1.0f,
-					 0.0f);
+	for (unsigned short int i = 0; i < 16; ++i)
+	{
+		glm::vec3 noise( randomFloats(generator) * 2.0f - 1.0f,
+						 randomFloats(generator) * 2.0f - 1.0f,
+						 0.0f);
 	
-	noiseSSAO.push_back(noise);
-}
+		noiseSSAO.push_back(noise);
+	}
 
-noiseTexture.LoadTextureData(&noiseSSAO[0], 4, 4, GL_RGB16F, GL_RGB, GL_FLOAT);
-noiseTexture.SetTextureUnit(GL_TEXTURE24);
-ssaoBuffer.Init(16, GL_RED, GL_RGB, GL_FLOAT, GL_NEAREST, 3840, 2160);
+	noiseTexture.LoadTextureData(&noiseSSAO[0], 4, 4, GL_RGB16F, GL_RGB, GL_FLOAT);
+	noiseTexture.SetTextureUnit(GL_TEXTURE24);
+	ssaoBuffer.Init(16, GL_RED, GL_RGB, GL_FLOAT, GL_NEAREST, 3840, 2160);
 
 //<>=========================================================================================================<>
 // (immediate mode graphic user interface)  ---------  IMGUI
@@ -813,24 +785,21 @@ ssaoBuffer.Init(16, GL_RED, GL_RGB, GL_FLOAT, GL_NEAREST, 3840, 2160);
 		if (forwardRender)
 		{
 			// FORWARD RENDERING
-			DirectionalShadowMapPass(&mainLight);
+			ShadowMapPassDirectional(&mainLight);
 
-			for (size_t i = 0; i < pointLightCount; i++) { OmniShadowMapPass(&pointLights[i]); }
-			for (size_t i = 0; i < spotLightCount; i++) { OmniShadowMapPass(&spotLights[i]); }
+			for (size_t i = 0; i < pointLightCount; i++) { ShadowMapPassOmni(&pointLights[i]); }
+			for (size_t i = 0; i < spotLightCount; i++) { ShadowMapPassOmni(&spotLights[i]); }
 
-			ForwardRenderPass(projection, camera.calculateViewMatrix(), &pointLightCount, &spotLightCount, &mainLight, pointLights, spotLights);
+			ForwardMainPass(projection, camera.calculateViewMatrix(), &pointLightCount, &spotLightCount, &mainLight, pointLights, spotLights);
 		}
 		else
 		{
 			// deffered rendering
-			DeferredRenderPass(projection, camera.calculateViewMatrix(), &pointLightCount, &spotLightCount, &mainLight, pointLights, spotLights);
+			DeferredMainPass(projection, camera.calculateViewMatrix(), &pointLightCount, &spotLightCount, &mainLight, pointLights, spotLights);
 		}
-
-		
-
-		
-
 		glUseProgram(0);
+
+
 
 		// GUI
 		graphicUserInterface.Start();

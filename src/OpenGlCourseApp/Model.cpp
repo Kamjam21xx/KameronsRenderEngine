@@ -7,11 +7,21 @@ Model::Model()
 	// undecided. under construction.
 }
 
-void Model::LoadModel(const std::string& fileName, GLenum drawType, std::string colorTexture, std::string specularTexture, std::string normalTexture, std::string heightTexture, std::bitset<8> bitSet) {
+void Model::LoadModel(const std::string &fileName, GLenum drawType, std::string colorTexture, std::string specularTexture, std::string normalTexture, std::string heightTexture, std::bitset<8> bitSet) {
+
+	LoadModel(fileName, &drawType, &colorTexture, &specularTexture, &normalTexture, &heightTexture, &bitSet);
+
+}
+void Model::LoadModel(const std::string &fileName, GLenum drawType, std::string *colorTexture, std::string *specularTexture, std::string *normalTexture, std::string *heightTexture, std::bitset<8> *bitSet) {
+
+	LoadModel(fileName, &drawType, colorTexture, specularTexture, normalTexture, heightTexture, bitSet);
+
+}
+void Model::LoadModel(const std::string& fileName, GLenum *drawType, std::string *colorTexture, std::string *specularTexture, std::string *normalTexture, std::string *heightTexture, std::bitset<8> *bitSet) {
 	Assimp::Importer importer;
 
 	aiPostProcessSteps calculateTangents;
-	if (bitSet[1]) { // complex bitflag shit, flippin ur bit flags. yeehaw
+	if ((*bitSet)[1]) { // complex bitflag shit, flippin ur bit flags. yeehaw
 		calculateTangents = aiProcess_CalcTangentSpace;
 	}
 	else {
@@ -26,10 +36,9 @@ void Model::LoadModel(const std::string& fileName, GLenum drawType, std::string 
 		return;
 	}
 
-	bitFlags.push_back(bitSet);
-	LoadNode(scene->mRootNode, scene, drawType, bitSet[1]);
+	bitFlags.push_back(*bitSet);
+	LoadNode(scene->mRootNode, scene, drawType, (*bitSet)[1]);
 	LoadMaterials(scene, colorTexture, specularTexture, normalTexture, heightTexture);
-
 }
 
 void Model::RenderModel() const 
@@ -60,8 +69,6 @@ void Model::RenderModel() const
 
 void Model::ClearModel() { // will need to be revised with a pointer count pointing to what we are deleting and the pointers
 
-	// make multithreaded
-
 	for (size_t i = 0; i < meshList.size(); ++i) 
 	{
 		if (meshList[i]) {
@@ -88,11 +95,10 @@ void Model::ClearModel() { // will need to be revised with a pointer count point
 			delete textureListChannelFour[i];
 			textureListChannelFour[i] = nullptr;
 		}
-
 	}
 }
 
-void Model::LoadNode(aiNode *node, const aiScene *scene, GLenum drawType, bool tangents) 
+void Model::LoadNode(aiNode *node, const aiScene *scene, GLenum *drawType, bool tangents) 
 {
 	for (size_t i = 0; i < node->mNumMeshes; ++i) {
 		LoadMesh(scene->mMeshes[node->mMeshes[i]], scene, drawType, tangents);
@@ -103,7 +109,7 @@ void Model::LoadNode(aiNode *node, const aiScene *scene, GLenum drawType, bool t
 	}
 }
 
-void Model::LoadMesh(aiMesh *mesh, const aiScene *scene, GLenum drawType, bool tangents) 
+void Model::LoadMesh(aiMesh *mesh, const aiScene *scene, GLenum *drawType, bool tangents) 
 {
 	std::vector<GLfloat> vertices;
 	std::vector<unsigned int> indices;
@@ -154,17 +160,17 @@ void Model::LoadMesh(aiMesh *mesh, const aiScene *scene, GLenum drawType, bool t
 
 	Mesh *newMesh = new Mesh();
 	if (tangents) {
-		newMesh->CreateMesh(&vertices[0], &indices[0], vertices.size(), indices.size(), drawType);
+		newMesh->CreateMesh(&vertices[0], &indices[0], vertices.size(), indices.size(), *drawType);
 	}
 	else {
-		newMesh->CreateMeshNoTangents(&vertices[0], &indices[0], vertices.size(), indices.size(), drawType);
+		newMesh->CreateMeshNoTangents(&vertices[0], &indices[0], vertices.size(), indices.size(), *drawType);
 	}
 	
 	meshList.push_back(newMesh);
 	meshToTex.push_back(mesh->mMaterialIndex);
 }
 
-void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::string specularTexture, std::string normalTexture, std::string heightTexture) 
+void Model::LoadMaterials(const aiScene *scene, std::string *colorTexture, std::string *specularTexture, std::string *normalTexture, std::string *heightTexture) 
 {
 	// Can add extra texture channels if need be, cleaned up a touch for now.
 	textureListChannelOne.resize(scene->mNumMaterials);
@@ -178,8 +184,8 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 		textureListChannelOne[i] = nullptr;
 		if (!textureListChannelOne[i]) 
 		{
-			const char* textureFile = colorTexture.c_str();
-			const char* textureFileTwo = specularTexture.c_str();
+			const char* textureFile = (*colorTexture).c_str();
+			const char* textureFileTwo = (*specularTexture).c_str();
 
 			textureListChannelOne[i] = new Texture(textureFile);
 			textureListChannelOne[i]->MergeLoadTexture(GL_TEXTURE1, textureFileTwo);
@@ -187,8 +193,8 @@ void Model::LoadMaterials(const aiScene *scene, std::string colorTexture, std::s
 
 		textureListChannelTwo[i] = nullptr;
 		if (!textureListChannelTwo[i]) {
-			const char* textureFile = normalTexture.c_str();
-			const char* textureFileTwo = heightTexture.c_str();
+			const char* textureFile = (*normalTexture).c_str();
+			const char* textureFileTwo = (*heightTexture).c_str();
 
 			textureListChannelTwo[i] = new Texture(textureFile);
 			textureListChannelTwo[i]->MergeLoadTexture(GL_TEXTURE5, textureFileTwo);

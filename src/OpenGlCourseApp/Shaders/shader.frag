@@ -341,7 +341,8 @@ vec4 ApplyGammaToneMapping(vec3 hdrColor)
 
 	return vec4(mapped, 1.0f);
 }
-vec4 CalcBrightnessContrastSaturation(vec4 Colour){
+vec4 CalcBrightnessContrastSaturation(vec4 Colour)
+{
     float b = brightness;
     float c = contrast;
     float s = saturation;
@@ -403,6 +404,7 @@ void main()
 
 
 	// make a seperate split screen shader that gets swapped via ImGui 
+	/*
 	if(splitScreenIsOn) 
 	{
 		if(splitScreenType == 0)
@@ -439,4 +441,5 @@ void main()
 		}
 		colour = ApplyGammaToneMapping(colour.xyz);
 	}
+	*/
 }
