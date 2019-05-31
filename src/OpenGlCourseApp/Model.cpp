@@ -48,18 +48,18 @@ void Model::RenderModel() const
 		unsigned int materialIndex = meshToTex[i];
 		
 		if (materialIndex < textureListChannelOne.size() && textureListChannelOne[materialIndex]) {
-			textureListChannelOne[materialIndex]->UseTexture();
+			textureListChannelOne[materialIndex]->BindTexture();
 		}
 		if (materialIndex < textureListChannelTwo.size() && textureListChannelTwo[materialIndex]) {
-			textureListChannelTwo[materialIndex]->UseTexture();
+			textureListChannelTwo[materialIndex]->BindTexture();
 		}
 
 		/*
 		if (materialIndex < textureListChannelThree.size() && textureListChannelThree[materialIndex]) {
-			textureListChannelThree[materialIndex]->UseTexture();
+			textureListChannelThree[materialIndex]->BindTexture();
 		}
 		if (materialIndex < textureListChannelFour.size() && textureListChannelFour[materialIndex]) {
-			textureListChannelFour[materialIndex]->UseTexture();
+			textureListChannelFour[materialIndex]->BindTexture();
 		}
         */
 

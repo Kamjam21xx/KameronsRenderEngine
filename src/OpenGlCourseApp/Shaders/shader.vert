@@ -40,8 +40,7 @@ vec4 CalcVertexWorldPos(mat4 P, mat4 V, mat4 M, vec3 vp)
 		P[2].w * V[3].z
 	);
 
-
-	return PV * M * vec4(vp, 1.0);
+	return PV * M * vec4(vp, 1.0); 
 }
 
 void main()

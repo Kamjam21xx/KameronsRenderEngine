@@ -28,10 +28,9 @@ public:
 	bool GenerateTextureFBO(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLint texWidth, GLint texHeight);
 	bool GenerateTextureFBO(GLenum glTextureUnit, GLenum internalFormat, GLenum format, GLenum type, GLenum filtering, GLint texWidth, GLint texHeight);
 
-	void Unbind() const;
-
-	void UseTexture() const;
-	void UseTexture(GLuint textureUnit);
+	void UnbindTexture() const;
+	void BindTexture() const;
+	void BindTexture(GLuint textureUnit);
 	void ClearTexture();
 
 	void SetTextureUnit(GLuint glTextureUnit);

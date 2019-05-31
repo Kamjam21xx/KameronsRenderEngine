@@ -242,7 +242,7 @@ bool Texture::GenerateTextureFBO(GLenum glTextureUnit, GLenum internalFormat, GL
 	return true;
 }
 
-void Texture::Unbind() const
+void Texture::UnbindTexture() const
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -257,12 +257,12 @@ void Texture::ClearTexture()
 	bitDepth = 0;
 	fileLocation = NULL;
 }
-void Texture::UseTexture() const
+void Texture::BindTexture() const
 {
 	glActiveTexture(textureUnit);
 	glBindTexture(GL_TEXTURE_2D, textureID); 
 }
-void Texture::UseTexture(GLuint textureUnit)
+void Texture::BindTexture(GLuint textureUnit)
 {
 	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, textureID);

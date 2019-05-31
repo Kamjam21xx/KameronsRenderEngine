@@ -421,7 +421,7 @@ void ForwardMainPassSetup(unsigned short int i, glm::mat4 projectionMatrix, glm:
 	shaderList[i].SetHeightPOM(&height);
 
 
-	(*mainLight).GetShadowMap()->Read(GL_TEXTURE2); // 2
+	mainLight->GetShadowMap()->Read(GL_TEXTURE2); // 2
 	shaderList[i].SetTextureDiffuse(1);
 	shaderList[i].SetTextureNormal(5);
 	shaderList[i].SetDirectionalShadowMap(2); // 2
@@ -560,7 +560,7 @@ void DeferredMainPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsigned
 
 	gBuffer.BindTextureDepthStencil(23);
 	gBuffer.BindAndSetTexturePos(20); // view space normal not position
-	noiseTexture.UseTexture(24);
+	noiseTexture.BindTexture(24);
 
 	screenQuad.Render();
 	// SSAO

@@ -273,12 +273,12 @@ vec4 CalcSpotLights()
 	return totalColour;
 }
 
-vec2 ParallaxMapping(vec2 TexCoords, vec3 eyeDir)
+vec2 ParallaxMapping(vec2 TexCoords, vec3 eyeDir, float minLayers, float maxLayers)
 {
 	eyeDir.y *= -1.0f;
 
-	const float minLayers = 32.0f;
-	const float maxLayers = 64.0f;
+	//const float minLayers = 32.0f;
+	//const float maxLayers = 64.0f;
 	float layerCount = mix(maxLayers, minLayers, abs(dot(vec3(0.0f, 0.0f, 1.0f), eyeDir)));
 
 	float layerDepth = 1.0f / layerCount;
@@ -366,11 +366,35 @@ vec4 CalcBrightnessContrastSaturation(vec4 Colour)
 void main()
 {
 	// Parallax_occlusion_mapping
-	heightScale = 0.0175f * heightPOM;
-	vec3 TangentViewPos = eyePosition * TBN;
-	vec3 TangentFragPos = FragPos * TBN;
-	vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
-	vec2 TexCoord = ParallaxMapping(TexCoord, viewDir);
+	vec2 TexCoord = TexCoord;
+	float pomDistance = distance(FragPos, eyePosition);
+	if(pomDistance < 72.0){
+		float minLayers = 2.0f;
+		float maxLayers = 4.0f;
+		if(pomDistance < 36.0){
+			minLayers = 4.0f;
+			maxLayers = 8.0f;
+			if(pomDistance < 18.0){
+				minLayers = 8.0f;
+				maxLayers = 16.0f;
+				if(pomDistance < 8.0){ //// BAD just bad. need to fix
+					minLayers = 16.0f;
+					maxLayers = 32.0f;
+					if(pomDistance < 2.0){
+						minLayers = 32.0f;
+						maxLayers = 64.0f;
+					}
+				}
+			}
+		}
+
+		heightScale = 0.0175f * heightPOM;
+		vec3 TangentViewPos = eyePosition * TBN;
+		vec3 TangentFragPos = FragPos * TBN;
+		vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+		TexCoord = ParallaxMapping(TexCoord, viewDir, minLayers, maxLayers);
+	}
+
 
 
 	// Normal_mapping

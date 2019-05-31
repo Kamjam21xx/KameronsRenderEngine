@@ -364,14 +364,14 @@ GLuint Shader::GetAOBiasLocation() const
 	return uniformBiasAO;
 }
 
-void Shader::SetDirectionalLight(DirectionalLight * dLight) 
+void Shader::SetDirectionalLight(DirectionalLight *dLight) 
 {
 	dLight->UseLight(uniformDirectionalLight.uniformAmbientIntensity, 
 					 uniformDirectionalLight.uniformColor,
 		             uniformDirectionalLight.uniformDiffuseIntensity, 
 					 uniformDirectionalLight.uniformDirection );
 }
-void Shader::SetPointLights(PointLight * pLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset) 
+void Shader::SetPointLights(PointLight *pLight, unsigned int lightCount, unsigned int textureUnit, unsigned int offset) 
 {
 	if (lightCount > MAX_POINT_LIGHTS) lightCount = MAX_POINT_LIGHTS;
 
