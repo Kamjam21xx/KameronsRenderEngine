@@ -4,16 +4,15 @@ in vec2 TexCoords;
 
 layout (location = 0) out vec4 FragColor;
 
-layout (binding = 18) uniform sampler2D screenSpaceTexture;
-layout (binding = 19) uniform sampler2D screenSpaceTextureTwo;
+layout (binding = 18) uniform sampler2D screenSpaceTexture; // color
+layout (binding = 19) uniform sampler2D screenSpaceTextureTwo; // bloom
 
+uniform float bloomStrength;
 
 void main() 
 {
-	vec3 hdrColor = texture(screenSpaceTexture, TexCoords).xyz;
-	hdrColor += texture(screenSpaceTextureTwo, TexCoords).xyz;
-
-	FragColor = vec4(hdrColor, 1.0f);
+	// color + bloom * bloom strength
+	FragColor = vec4(texture(screenSpaceTexture, TexCoords).xyz + texture(screenSpaceTextureTwo, TexCoords).xyz * bloomStrength, 1.0f);
 }	
 
 

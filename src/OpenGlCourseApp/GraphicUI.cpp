@@ -178,7 +178,7 @@ void GraphicUI::EditSceneSpin(GLfloat *spin)
 void GraphicUI::EditRenderSettings(bool *forwardRender, 
 	GLfloat *heightPOM, 
 	GLboolean *splitScreenIsOn, GLuint *splitScreenType, 
-	GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation,
+	GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *bloomStrength, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation,
 	GLfloat *radiusAO, GLfloat *biasAO
 )
 {
@@ -188,7 +188,7 @@ void GraphicUI::EditRenderSettings(bool *forwardRender,
 	EditVerticalSync();
 	EditSplitScreen(splitScreenIsOn, splitScreenType);
 	EditGamma(gamma);
-	EditBloom(bloomThreshold);
+	EditBloom(bloomThreshold, bloomStrength);
 	EditBrightnessContrastSaturation(brightness, contrast, saturation);
 	EditPOM(heightPOM);
 	EditAmbientOcclusion(radiusAO, biasAO);
@@ -252,7 +252,7 @@ void GraphicUI::EditGamma(GLfloat *gamma)
 		ImGui::SliderFloat("Gamma", gamma, 0.001f, 4.000f);
 	//}
 }
-void GraphicUI::EditBloom(GLfloat *bloomThreshold)
+void GraphicUI::EditBloom(GLfloat *bloomThreshold, GLfloat *bloomStrength)
 {
 	/*
 	if (ImGui::Button("Edit Bloom"))
@@ -263,6 +263,7 @@ void GraphicUI::EditBloom(GLfloat *bloomThreshold)
 	if (enableBloomEdit)
 	{*/
 		ImGui::SliderFloat("Bloom Threshold", bloomThreshold, 0.001f, 1.0f);
+		ImGui::SliderFloat("Bloom Strength", bloomStrength, 0.001f, 1.0f);
 	//}
 }
 void GraphicUI::EditBrightnessContrastSaturation(GLfloat *brightness, GLfloat *contrast, GLfloat *saturation)

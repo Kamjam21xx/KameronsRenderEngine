@@ -38,12 +38,13 @@ public:
 	void EditRenderSettings(bool *forwardRender, 
 							GLfloat *heightPOM, 
 							GLboolean *splitScreenIsOn, GLuint *splitScreenType, 
-							GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *brightness, GLfloat *contrast, GLfloat *saturation,
+							GLfloat *gamma, GLfloat *bloomThreshold, GLfloat *bloomStrength,
+							GLfloat *brightness, GLfloat *contrast, GLfloat *saturation,
 							GLfloat *radiusAO, GLfloat *biasAO);
 	void EditRenderMethod(bool *forwardRender);
 	void EditFiltering();
 	void EditGamma(GLfloat *gamma);
-	void EditBloom(GLfloat *bloomThreshold);
+	void EditBloom(GLfloat *bloomThreshold, GLfloat *bloomStrength);
 	void EditBrightnessContrastSaturation(GLfloat *brightness, GLfloat *contrast, GLfloat *saturation);
 	void EditVerticalSync();
 	void EditSplitScreen(GLboolean *splitScreenIsOn, GLuint *splitScreenType);

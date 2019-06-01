@@ -53,7 +53,8 @@ public:
 	GLuint GetTextureNoiseSSAOLocation() const;
 	GLuint GetGammaLocation() const ;
 	GLuint GetBloomThresholdLocation() const ;
-	GLuint GetHorizontalLocation() const ;
+	GLuint GetBloomStrengthLocation() const;
+	GLuint GetBlurDirectionLocation() const ;
 	GLuint GetBrightnessLocation() const;
 	GLuint GetContrastLocation() const;
 	GLuint GetSaturationLocation() const;
@@ -95,8 +96,10 @@ public:
 	void SetGamma(GLfloat *gammaLevel);
 	void SetBloomThreshold(GLfloat bloomThreshold);
 	void SetBloomThreshold(GLfloat *bloomThreshold);
-	void SetHorizontal(GLboolean isHorizontal);
-	void SetHorizontal(GLboolean *isHorizontal);
+	void SetBloomStrength(GLfloat bloomStrength);
+	void SetBloomStrength(GLfloat *bloomStrength);
+	void SetBlurDirection(glm::vec2 blurDirection);
+	void SetBlurDirection(glm::vec2 *blurDirection);
 	void SetBrightness(GLfloat brightness);
 	void SetBrightness(GLfloat *brightness);
 	void SetContrast(GLfloat contrast);
@@ -129,7 +132,7 @@ private:
 		   uniformOmniLightPos, uniformFarPlane, uniformSplitScreenIsOn, uniformSplitScreenType,
 		   uniformTextureScreenSpace, uniformTextureScreenSpaceTwo, uniformTextureScreenSpaceThree,
 		   uniformTextureDepth, uniformTextureNoiseSSAO, uniformTextureAO,
-		   uniformGamma, uniformBloomThreshold, uniformHorizontal,
+		   uniformGamma, uniformBloomThreshold, uniformBloomStrength, uniformBlurDirection,
 		   uniformBrightness, uniformContrast, uniformSaturation,
 		   uniformHeightPOM,
 		   uniformRadiusAO, uniformBiasAO;

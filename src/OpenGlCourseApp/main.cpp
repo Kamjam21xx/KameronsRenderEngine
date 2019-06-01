@@ -109,6 +109,7 @@ GLboolean splitScreenIsOn = false;
 GLuint splitScreenType = 0;
 GLfloat gamma = 1.0f;
 GLfloat bloomThreshold = 1.0f;
+GLfloat bloomStrength = 1.0f;
 unsigned short int numOfBloomPasses = 5;
 GLfloat brightness = 0.0f;
 GLfloat contrast = 1.0f;
@@ -297,34 +298,33 @@ void RenderSceneStencil()  // Edit to use for individual objects as a subset of 
 
 void ForwardBloomBlurPass() // re-write to blur then downsize then blur etc and pack everything in a neat class or something
 {
-	unsigned short int iterations = 2 * numOfBloomPasses - 1;
-	bool isHorizontal = true;
-	bool first_iteration = true;
+	unsigned short int iterations = numOfBloomPasses - 2;
+	glm::vec2 x = glm::vec2(1.0, 0.0);
+	glm::vec2 y = glm::vec2(0.0, 1.0);
 
 	shaderBlur.UseShader();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, blurBuffer.GetFBO(isHorizontal));
-	shaderBlur.SetHorizontal((GLboolean*)&isHorizontal);
-	dualFramebufferHDR.BindTexture(1);
-
-	screenQuad.Render();
-
-	glEnable(GL_DEPTH_TEST);
-
-	isHorizontal = !isHorizontal;
-
 	glViewport(0, 0, 1920, 1080);
 	for (unsigned short int i = 0; i < iterations; ++i)
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, blurBuffer.GetFBO(isHorizontal));
-		shaderBlur.SetHorizontal((GLboolean*)&isHorizontal);
+	{		
+		// x dir
+		glBindFramebuffer(GL_FRAMEBUFFER, blurBuffer.GetFBO(1));
+		shaderBlur.SetBlurDirection(&x);
 
-		blurBuffer.BindTexture(!isHorizontal);
+		blurBuffer.BindTexture(0);
+
+		screenQuad.Render();
+		glEnable(GL_DEPTH_TEST);
+
+		// y dir
+		glBindFramebuffer(GL_FRAMEBUFFER, blurBuffer.GetFBO(0));
+		shaderBlur.SetBlurDirection(&y);
+
+		blurBuffer.BindTexture(1);
 		
 		screenQuad.Render();
 		glEnable(GL_DEPTH_TEST);
 
-		isHorizontal = !isHorizontal;
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -347,10 +347,40 @@ void ForwardFinalPass()
 	dualFramebufferHDR.BindTexture(1);
 	shaderForwardPost.SetTextureScreenSpace(18);
 	shaderForwardPost.SetTextureScreenSpaceTwo(17);
+	shaderForwardPost.SetBloomStrength(&bloomStrength);
 
 	screenQuad.Render();
 
 	glEnable(GL_DEPTH_TEST);
+}
+void DeferredSSAOPass(glm::mat4 *projection, glm::mat4 *inverseProjection)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, ssaoBuffer.GetFBO());
+	glViewport(0, 0, 3840, 2160);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	ShaderSSAO.UseShader();
+
+	ShaderSSAO.SetTextureNoiseSSAO(24);
+	ShaderSSAO.SetTextureDepth(23);
+	ShaderSSAO.SetTextureScreenSpaceTwo(21);
+
+	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr((*projection)));
+
+	ShaderSSAO.SetInverseProjection(inverseProjection);
+	ShaderSSAO.SetRandomSamplesSSAO(&kernelSSAO);
+
+	ShaderSSAO.SetAmbientOcclusionRadius(0.1 * radiusAO);
+	ShaderSSAO.SetAmbientOcclusionBias(0.1 * biasAO);
+
+	ShaderSSAO.Validate();
+
+	gBuffer.BindTextureDepthStencil(23);
+	gBuffer.BindAndSetTexturePos(20);
+	noiseTexture.BindTexture(24);
+
+	screenQuad.Render();
 }
 void DeferredFinalPass(glm::mat4 *inverseProjectionMatrix, glm::mat4 *inverseViewMatrix)
 {
@@ -389,6 +419,7 @@ void DeferredFinalPass(glm::mat4 *inverseProjectionMatrix, glm::mat4 *inverseVie
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_STENCIL_TEST);
 }
+
 
 // main passes call other render passes
 void ForwardMainPassSetup(unsigned short int i, glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsigned short int* pointLightCount, unsigned short int* spotLightCount, DirectionalLight *mainLight, PointLight *pointLights, SpotLight *spotLights)
@@ -536,39 +567,11 @@ void DeferredMainPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsigned
 
 	// SSAO
 	// make a function to bake "samples[kernelSize]" to avoid uniform arrays
-	glBindFramebuffer(GL_FRAMEBUFFER, ssaoBuffer.GetFBO());
-	glViewport(0, 0, 3840, 2160);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	ShaderSSAO.UseShader();
-
-	ShaderSSAO.SetTextureNoiseSSAO(24);
-	ShaderSSAO.SetTextureDepth(23);
-	ShaderSSAO.SetTextureScreenSpaceTwo(21);
-	
-	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glm::mat4 inverseProjectionMatrix = glm::inverse(projectionMatrix);
 	glm::mat4 inverseViewMatrix = glm::inverse(viewMatrix);
-	ShaderSSAO.SetInverseProjection(&inverseProjectionMatrix);	
-	ShaderSSAO.SetRandomSamplesSSAO(&kernelSSAO);
-
-	ShaderSSAO.SetAmbientOcclusionRadius(0.1 * radiusAO); // rework shader class and make it optional to pass a pointer too.
-	ShaderSSAO.SetAmbientOcclusionBias(0.1 * biasAO);
-
-	ShaderSSAO.Validate();
-
-	gBuffer.BindTextureDepthStencil(23);
-	gBuffer.BindAndSetTexturePos(20); // view space normal not position
-	noiseTexture.BindTexture(24);
-
-	screenQuad.Render();
-	// SSAO
-
+	DeferredSSAOPass(&projectionMatrix, &inverseProjectionMatrix);
 
 	// blur the bloom highlight // pass texture
-
-
 	// combine bloom with color and do post processing
 
 	//glClear(GL_STENCIL_BUFFER_BIT);
@@ -591,14 +594,6 @@ void DeferredMainPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix, unsigned
 
 	glEnable(GL_DEPTH_TEST);
 	// set everything back to stop imgui from breaking
-
-
-
-	
-
-
-
-
 }
 
 void ShadowMapPassDirectional(DirectionalLight* light) 
@@ -812,7 +807,8 @@ int main()
 		graphicUserInterface.EditLights(pointLights, NULL, NULL, pointLightCount, NULL, false, true, false);
 		graphicUserInterface.EditScene(&spinModifier);
 		graphicUserInterface.EditRenderSettings(&forwardRender, &height, &splitScreenIsOn, &splitScreenType, 
-												&gamma, &bloomThreshold, &brightness, &contrast, &saturation,
+												&gamma, &bloomThreshold, &bloomStrength,
+												&brightness, &contrast, &saturation,
 												&radiusAO, &biasAO);
 		graphicUserInterface.DisplayInfo();
 		

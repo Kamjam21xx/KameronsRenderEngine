@@ -207,7 +207,8 @@ void Shader::CompileProgram()
 	uniformSplitScreenType = glGetUniformLocation(shaderID, "splitScreenType");
 	uniformGamma = glGetUniformLocation(shaderID, "gammaLevel");
 	uniformBloomThreshold = glGetUniformLocation(shaderID, "bloomThreshold");
-	uniformHorizontal = glGetUniformLocation(shaderID, "isHorizontal");
+	uniformBloomStrength = glGetUniformLocation(shaderID, "bloomStrength");
+	uniformBlurDirection = glGetUniformLocation(shaderID, "blurDirection");
 
 	uniformTextureScreenSpace = glGetUniformLocation(shaderID, "screenSpaceTexture");
 	uniformTextureScreenSpaceTwo = glGetUniformLocation(shaderID, "screenSpaceTextureTwo");
@@ -327,9 +328,13 @@ GLuint Shader::GetBloomThresholdLocation() const
 {
 	return uniformBloomThreshold;
 }
-GLuint Shader::GetHorizontalLocation() const
+GLuint Shader::GetBloomStrengthLocation() const
 {
-	return uniformHorizontal;
+	return uniformBloomStrength;
+}
+GLuint Shader::GetBlurDirectionLocation() const
+{
+	return uniformBlurDirection;
 }
 GLuint Shader::GetBrightnessLocation() const
 {
@@ -533,13 +538,21 @@ void Shader::SetBloomThreshold(GLfloat *bloomThreshold)
 {
 	glUniform1f(uniformBloomThreshold, *bloomThreshold);
 }
-void Shader::SetHorizontal(GLboolean isHorizontal)
+void Shader::SetBloomStrength(GLfloat bloomStrength)
 {
-	glUniform1i(uniformHorizontal, isHorizontal);
+	glUniform1f(uniformBloomStrength, bloomStrength);
 }
-void Shader::SetHorizontal(GLboolean *isHorizontal)
+void Shader::SetBloomStrength(GLfloat *bloomStrength)
 {
-	glUniform1i(uniformHorizontal, *isHorizontal);
+	glUniform1f(uniformBloomStrength, *bloomStrength);
+}
+void Shader::SetBlurDirection(glm::vec2 blurDirection)
+{
+	glUniform2f(uniformBlurDirection, blurDirection.x, blurDirection.y);
+}
+void Shader::SetBlurDirection(glm::vec2 *blurDirection)
+{
+	glUniform2f(uniformBlurDirection, (*blurDirection).x, (*blurDirection).y );
 }
 void Shader::SetBrightness(GLfloat brightness)
 {
