@@ -53,6 +53,8 @@ i plan on adding my audio and physics engine after the graphics are solid.
 	- add start menu
 	
 	- add configuration class
+	- add configuration file that you can save too
+	- add configuration file loader
 	- make DualFrameBuffer class into MultiFrameBuffer class, and make it more automated
 	- add post process prebuilt shader buffer and select different shaders based on ImGui selection
 	- improve and standardize naming conventions as youre working through stuff
